@@ -2,15 +2,14 @@
 
 import wx
 
-from client import GUIClient
-from config import Settings
+from game import GameEngine
 from ui.window import MainWindow
 
-settings = Settings()
-settings.load()
 app = wx.App()
-window = MainWindow(settings)
-client = GUIClient("vanciamud.fr", 4000, 0.1, window.panel, settings)
-window.panel.client = client.client
+engine = GameEngine()
+engine.load()
+client = engine.open("vanciamud.fr", 4000)
+window = MainWindow(engine)
+client.link_window(window)
 client.start()
 app.MainLoop()

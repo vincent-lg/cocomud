@@ -3,30 +3,50 @@
 import wx
 
 from dialogs.preferences import PreferencesDialog
-from event import EVT_FOCUS
+from dialogs.alias import AliasDialog
 from scripting.key import key_name
+from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 
 class MainWindow(wx.Frame):
 
-    def __init__(self, settings):
+    def __init__(self, engine):
         super(MainWindow, self).__init__(None)
-        self.settings = settings
+        self.engine = engine
         self.CreateMenuBar()
         self.InitUI()
+
+    def _get_client(self):
+        return self.panel.client
+    def _set_client(self, client):
+        self.panel.client = client
+    client = property(_get_client, _set_client)
 
     def CreateMenuBar(self):
         """Create the GUI menu bar and hierarchy of menus."""
         menubar = wx.MenuBar()
+
+        # Differemtn menus
         fileMenu = wx.Menu()
+        gameMenu = wx.Menu()
+
+        # File menu
+        ## Preferences
         preferences = wx.MenuItem(fileMenu, -1, '&Preferences\tAlt+Enter')
-        quit = wx.MenuItem(fileMenu, -1, '&Quit\tCtrl+Q')
+        self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
+
+        ## Quit
+        quit = wx.MenuItem(fileMenu, -1, '&Quit\tCtrl+Q')
+        self.Bind(wx.EVT_MENU, self.OnQuit, quit)
         fileMenu.AppendItem(quit)
 
-        self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
-        self.Bind(wx.EVT_MENU, self.OnQuit, quit)
+        # Game menu
+        alias = wx.MenuItem(fileMenu, -1, '&Alias')
+        self.Bind(wx.EVT_MENU, self.OnAlias, alias)
+        gameMenu.AppendItem(alias)
 
         menubar.Append(fileMenu, '&File')
+        menubar.Append(gameMenu, '&Game')
 
         self.SetMenuBar(menubar)
 
@@ -38,12 +58,41 @@ class MainWindow(wx.Frame):
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
-        dialog = PreferencesDialog(self.settings)
+        dialog = PreferencesDialog(self.engine)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnAlias(self, e):
+        """Open the alias dialog box."""
+        dialog = AliasDialog(self.engine)
+        dialog.ShowModal()
+        dialog.Destroy()
+
     def OnQuit(self, e):
         self.Close()
 
+    # Methods to handle client's events
+    def handle_message(self, message):
+        """The client has just received a message."""
+        pos = self.panel.output.GetInsertionPoint()
+        self.panel.output.write(message)
+        self.panel.output.SetInsertionPoint(pos)
+
+    def handle_option(self, command):
+        """Handle the specified option.
+
+        The command is a string representing the received option.
+        The following options are supported:
+            "hide":  the input should be hidden
+            "show":  the input should be shown
+
+        """
+        if command == "hide":
+            evt = FocusEvent(myEVT_FOCUS, -1, "password")
+            wx.PostEvent(self.panel, evt)
+        elif command == "show":
+            evt = FocusEvent(myEVT_FOCUS, -1, "input")
+            wx.PostEvent(self.panel, evt)
 
 class MUDPanel(wx.Panel):
 

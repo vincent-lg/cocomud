@@ -8,15 +8,12 @@ import re
 from telnetlib import Telnet, WONT, WILL, ECHO
 import threading
 import time
-import wx
 
 try:
     from UniversalSpeech import say, braille
 except ImportError:
     say = None
     braille = None
-
-from ui.event import FocusEvent, myEVT_FOCUS
 
 # Constants
 ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
@@ -25,12 +22,12 @@ class Client(threading.Thread):
 
     """Class to receive data from the MUD."""
 
-    def __init__(self, host, port=4000, timeout=0.1, settings=None):
+    def __init__(self, host, port=4000, timeout=0.1, engine=None):
         """Connects to the MUD."""
         threading.Thread.__init__(self)
         self.client = None
         self.timeout = timeout
-        self.settings = settings
+        self.engine = engine
         self.running = False
 
         # Try to connect to the specified host and port
@@ -58,30 +55,45 @@ class GUIClient(Client):
 
     """
 
-    def __init__(self, host, port=4000, timeout=0.1, panel=None,
-            settings=None):
-        Client.__init__(self, host, port, timeout, settings)
-        self.panel = panel
+    def __init__(self, host, port=4000, timeout=0.1, engine=None):
+        Client.__init__(self, host, port, timeout, engine)
+        self.window = None
         if self.client:
             self.client.set_option_negotiation_callback(self.handle_option)
 
+    def link_window(self, window):
+        """Link to a window (a GUI object).
+
+        This objectt can be of various types.  The client only interacts
+        with it in two ways:  First, whenever it receives a message,
+        it sends it to the window's 'handle_message' method.  It also
+        calls the window's 'handle_option' method whenever it receives
+        a Telnet option that it can recognize.
+
+        """
+        self.window = window
+        window.client = self.client
+
     def handle_message(self, msg):
         """When the client receives a message."""
-        pos = self.panel.output.GetInsertionPoint()
         msg = msg.decode("utf-8", "replace")
         msg = ANSI_ESCAPE.sub('', msg)
-        self.panel.output.write(msg)
-        self.panel.output.SetInsertionPoint(pos)
-        if self.settings["options.TTS.on"]:
+        if self.window:
+            self.window.handle_message(msg)
+
+        # In any case, tries to find the TTS
+        if self.engine.TTS_on:
             if say and braille:
                 say(msg, interrupt=False)
                 braille(msg)
 
     def handle_option(self, socket, command, option):
         """Handle a received option."""
+        name = ""
         if command == WILL and option == ECHO:
-            evt = FocusEvent(myEVT_FOCUS, -1, "password")
-            wx.PostEvent(self.panel, evt)
+            name = "hide"
         elif command == WONT and option == ECHO:
-            evt = FocusEvent(myEVT_FOCUS, -1, "input")
-            wx.PostEvent(self.panel, evt)
+            name = "show"
+
+        if name and self.window:
+            self.window.handle_option(name)
