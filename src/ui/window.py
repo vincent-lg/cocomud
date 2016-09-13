@@ -4,6 +4,7 @@ import wx
 
 from dialogs.preferences import PreferencesDialog
 from event import EVT_FOCUS
+from scripting.key import key_name
 
 class MainWindow(wx.Frame):
 
@@ -107,10 +108,12 @@ class MUDPanel(wx.Panel):
 
     def OnKeyDownInOutput(self, e):
         """A key is pressed while in the output."""
+        modifiers = e.GetModifiers()
         key = e.GetUnicodeKey()
-        print "pressing in output", key
-        if key == 66:
-            self.input.SetFocus()
-            wx.PostEvent(self.input, e)
-        else:
-            e.Skip()
+        if not key:
+            key = e.GetKeyCode()
+
+        name = key_name(key, modifiers)
+        if name:
+            print "pressing in output", name, key
+        e.Skip()
