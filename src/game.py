@@ -2,6 +2,7 @@
 
 from client import GUIClient
 from config import Settings
+from scripting.key import key_code
 
 class GameEngine:
 
@@ -17,12 +18,20 @@ class GameEngine:
 
     def __init__(self):
         self.settings = Settings()
+        self.macros = {}
 
     def load(self):
         """Load the configuration."""
         self.settings.load()
         self.TTS_on = self.settings["options.TTS.on"]
         self.TTS_outside = self.settings["options.TTS.outside"]
+
+        # Load the macros
+        for key_name, action in self.settings["macros"].items():
+            code = key_code(key_name)
+            self.macros[code] = action
+
+        print "macros", self.macros
 
     def open(self, host, port):
         """Connect to the specified host and port.

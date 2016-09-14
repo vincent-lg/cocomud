@@ -3,8 +3,7 @@
 import wx
 
 from dialogs.preferences import PreferencesDialog
-from dialogs.alias import AliasDialog
-from scripting.key import key_name
+from dialogs.macro import MacroDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 
 class MainWindow(wx.Frame):
@@ -41,9 +40,9 @@ class MainWindow(wx.Frame):
         fileMenu.AppendItem(quit)
 
         # Game menu
-        alias = wx.MenuItem(fileMenu, -1, '&Alias')
-        self.Bind(wx.EVT_MENU, self.OnAlias, alias)
-        gameMenu.AppendItem(alias)
+        macro = wx.MenuItem(fileMenu, -1, '&Macro')
+        self.Bind(wx.EVT_MENU, self.OnMacro, macro)
+        gameMenu.AppendItem(macro)
 
         menubar.Append(fileMenu, '&File')
         menubar.Append(gameMenu, '&Game')
@@ -51,7 +50,7 @@ class MainWindow(wx.Frame):
         self.SetMenuBar(menubar)
 
     def InitUI(self):
-        self.panel = MUDPanel(self)
+        self.panel = MUDPanel(self, self.engine)
         self.SetTitle("CocoMUD client")
         self.Centre()
         self.Show()
@@ -62,9 +61,9 @@ class MainWindow(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
-    def OnAlias(self, e):
-        """Open the alias dialog box."""
-        dialog = AliasDialog(self.engine)
+    def OnMacro(self, e):
+        """Open the macro dialog box."""
+        dialog = MacroDialog(self.engine)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -96,8 +95,9 @@ class MainWindow(wx.Frame):
 
 class MUDPanel(wx.Panel):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         wx.Panel.__init__(self, parent)
+        self.engine = engine
         self.client = None
 
         mainSizer = wx.GridBagSizer(5, 5)
@@ -135,7 +135,9 @@ class MUDPanel(wx.Panel):
         t_input.Bind(wx.EVT_TEXT_ENTER, self.EvtText)
         t_password.Bind(wx.EVT_TEXT_ENTER, self.EvtText)
         self.Bind(EVT_FOCUS, self.OnFocus)
-        t_output.Bind(wx.EVT_KEY_DOWN, self.OnKeyDownInOutput)
+        t_input.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        t_password.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        t_output.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 
     def EvtText(self, event):
         """One of the input fields is sending text."""
@@ -155,14 +157,16 @@ class MUDPanel(wx.Panel):
             self.password.SetFocus()
             self.input.Hide()
 
-    def OnKeyDownInOutput(self, e):
-        """A key is pressed while in the output."""
+    def OnKeyDown(self, e):
+        """A key is pressed in the window."""
         modifiers = e.GetModifiers()
         key = e.GetUnicodeKey()
         if not key:
             key = e.GetKeyCode()
 
-        name = key_name(key, modifiers)
-        if name:
-            print "pressing in output", name, key
+        # Look for matching macros
+        for code, action in self.engine.macros.items():
+            if code == (key, modifiers):
+                self.client.write(action + "\r\n")
+
         e.Skip()

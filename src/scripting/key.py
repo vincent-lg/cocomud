@@ -47,7 +47,7 @@ CODE_TO_KEY = {
 
 KEY_TO_CODE = {}
 for code, key in CODE_TO_KEY.items():
-    KEY_TO_CODE[key] = code
+    KEY_TO_CODE[key.lower()] = code
 
 # Add a few keys in the KEY_TO_CODE dictionary, as names may differ
 KEY_TO_CODE["esc"] = 27
@@ -62,7 +62,7 @@ def key_name(code, modifiers):
     if code in CODE_TO_KEY:
         name = CODE_TO_KEY[code]
     elif 0 < code < 256:
-        name = chr(code)
+        name = chr(code).upper()
     else:
         return ""
 
@@ -77,3 +77,54 @@ def key_name(code, modifiers):
         name = "Ctrl + " + name
 
     return name
+
+def key_code(name):
+    """Return the key code as a tuple.
+
+    The returned key code is a tuple containing two integers:
+        code: The key code as present in the constants
+        modifiers: A binary value of active modifiers
+
+    For example:
+        (8, 0) means Backspace (no modifiers)
+        (340, 1) means Alt + F1
+        (13, 6) means Ctrl + Shift + Enter
+        (107, 2) means Ctrl + K
+
+    """
+    # Remove spaces
+    name = name.replace(" ", "").lower()
+
+    # Scan for modifiers
+    modifiers = ("shift", "ctrl", "control", "alt")
+    active_modifiers = 0
+    while name:
+        found = False
+        for modifier in modifiers:
+            if name.startswith(modifier):
+                name = name[len(modifier):]
+                if modifier == "alt":
+                    active_modifiers = active_modifiers | MOD_ALT
+                elif modifier in ("ctrl", "control"):
+                    active_modifiers = active_modifiers | MOD_CTRL
+                elif modifier == "shift":
+                    active_modifiers = active_modifiers | MOD_SHIFT
+
+                found = True
+                break
+
+        if name and name[0] in "+-":
+            name = name[1:]
+
+        if not found:
+            break
+
+    if len(name) == 1:
+        code = ord(name.upper())
+    elif name not in KEY_TO_CODE:
+        raise ValueError("The key {} cannot be found".format(
+                repr(name)))
+    else:
+        code = KEY_TO_CODE[name]
+
+    return (code, active_modifiers)

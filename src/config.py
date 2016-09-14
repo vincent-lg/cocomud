@@ -4,6 +4,7 @@ import os
 import os.path
 from textwrap import dedent
 
+from yaml import safe_dump, safe_load
 from configobj import ConfigObj
 from validate import Validator
 
@@ -11,7 +12,11 @@ class Configuration:
 
     """Class describing CocoMUD's configuration.
 
-    Each configuration file is loaded here. Each file is loaded and validated with ConfigObj.  If everything goes smoothly, the ConfigObj objects can be found in _getitem__-ing these values, specifying the directory structure.
+    Each configuration file is loaded here.  A configuration file can
+    be either YAML or respecting the ConfigObj syntax (that is,
+    basically a .ini file).  If everything goes smoothly, the ConfigObj
+    objects can be found in __getitem__-ing these values, specifying
+    the directory structure.
 
     Example:
 
@@ -88,7 +93,7 @@ class Configuration:
         """Load the configuration."""
         raise NotImplementedError
 
-    def load_file(self, filename, spec):
+    def load_config_file(self, filename, spec):
         """Load the specified file using ConfigObj."""
         fullpath = self.root_dir + os.sep + filename
 
@@ -121,6 +126,23 @@ class Configuration:
 
         values[os.path.basename(fullpath)] = config
 
+    def load_YAML_file(self, filename):
+        """Load the YAML file."""
+        fullpath = self.root_dir + os.sep + filename
+        if os.path.exists(fullpath + ".yml"):
+            file = open(fullpath + ".yml", "r")
+            datas = safe_load(file.read())
+        else:
+            datas = {}
+
+        values = self.values
+        for path in os.path.dirname(fullpath).split("/")[1:]:
+            if path not in values:
+                values[path] = {}
+            values = values[path]
+
+        values[os.path.basename(fullpath)] = datas
+
 
 class Settings(Configuration):
 
@@ -132,13 +154,13 @@ class Settings(Configuration):
     def load(self):
         """Load all the files."""
         self.load_options()
+        self.load_YAML_file("macros")
 
     def load_options(self):
         """Load the file containing the options."""
         spec = dedent("""
-            # Text-to-speech configuration
             [TTS]
                 on = boolean(default=True)
                 outside = boolean(default=True)
         """.strip("\n"))
-        self.load_file("options", spec)
+        self.load_config_file("options", spec)
