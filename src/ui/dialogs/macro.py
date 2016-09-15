@@ -3,6 +3,7 @@
 import wx
 
 from scripting.key import key_name
+from scripting.macro import Macro
 
 class MacroDialog(wx.Dialog):
 
@@ -58,26 +59,32 @@ class MacroDialog(wx.Dialog):
         sizer.Fit(self)
 
         # Populate the list
+        self.macro_list = []
+        macro_list = sorted(list(self.engine.macros.values()),
+                key=lambda macro: macro.shortcut)
+        for macro in macro_list:
+            # Copy the macro, so it can be modified by the dialog
+            # without modifying the settings
+            macro = macro.copied
+            self.macro_list.append(macro)
+
         self.populate_list()
+        self.macros.SetFocus()
 
         # Event binding
         macros.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
         t_shortcut.Bind(wx.EVT_KEY_DOWN, self.OnShortcutUpdate)
 
-    def populate_list(self):
+    def populate_list(self, selection=0):
         """Populate the list with existing macros."""
         self.macros.DeleteAllItems()
-        self.macro_list = sorted(list(self.engine.macros.values()),
-                key=lambda macro: macro.shortcut)
         for macro in self.macro_list:
             self.macros.Append((macro.shortcut, macro.action))
 
         if self.macro_list:
-            macro = self.macro_list[0]
-            self.macros.Focus(0)
+            macro = self.macro_list[selection]
+            self.macros.Focus(selection)
             self.shortcut.SetValue(macro.shortcut)
-
-        self.macros.SetFocus()
 
     def OnShortcutUpdate(self, e):
         """A key is pressed in the shortcut area."""
@@ -91,6 +98,20 @@ class MacroDialog(wx.Dialog):
         if name:
             self.shortcut.SetValue(name)
             self.shortcut.SelectAll()
+
+            # Update the information in the table
+            index = self.macros.GetFirstSelected()
+            if index < 0:
+                index = 0
+
+            try:
+                macro = self.macro_list[index]
+            except IndexError:
+                pass
+            else:
+                macro.key = key
+                macro.modifiers = modifiers
+                self.populate_list(index)
 
         e.Skip()
 

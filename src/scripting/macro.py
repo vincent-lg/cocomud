@@ -25,6 +25,12 @@ class Macro:
         """Return the key name."""
         return key_name(self.key, self.modifiers)
 
+    @property
+    def copied(self):
+        """Return another object of the Macro class with identical info."""
+        copy = Macro(self.key, self.modifiers, self.action)
+        return copy
+
     def execute(self, engine, client):
         """Execute the macro."""
         client.write(self.action + "\r\n")

@@ -52,7 +52,7 @@ class MainWindow(wx.Frame):
     def InitUI(self):
         self.panel = MUDPanel(self, self.engine)
         self.SetTitle("CocoMUD client")
-        self.Centre()
+        self.Maximize()
         self.Show()
 
     def OnPreferences(self, e):
@@ -124,7 +124,7 @@ class MUDPanel(wx.Panel):
         # Ouput
         l_output = wx.StaticText(self, -1, "Output")
         t_output = wx.TextCtrl(self, -1, "",
-                size=(800, 800), style=wx.TE_MULTILINE|wx.TE_READONLY)
+                size=(600, 600), style=wx.TE_MULTILINE|wx.TE_READONLY)
         self.output = t_output
 
         # Add the output fields in the sizer
