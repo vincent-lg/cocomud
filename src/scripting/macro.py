@@ -1,5 +1,7 @@
 ﻿"""Class containing the Macro class."""
 
+from scripting.key import key_name
+
 class Macro:
 
     """A macro object.
@@ -10,16 +12,19 @@ class Macro:
 
     """
 
-    def __init__(self, key, action, shift=False, ctrl=False, alt=False):
+    def __init__(self, key, modifiers, action):
         self.key = key
+        self.modifiers = modifiers
         self.action = action
-        self.shift = shift
-        self.ctrl = ctrl
-        self.alt = alt
 
     def __repr__(self):
-        return "<Macro {}: {}>".format(self.printable_key, self.action)
+        return "<Macro {}: {}>".format(self.shortcut, self.action)
 
     @property
-    def printable_key(self):
-        """Return the
+    def shortcut(self):
+        """Return the key name."""
+        return key_name(self.key, self.modifiers)
+
+    def execute(self, engine, client):
+        """Execute the macro."""
+        client.write(self.action + "\r\n")

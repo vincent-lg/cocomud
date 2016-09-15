@@ -165,8 +165,8 @@ class MUDPanel(wx.Panel):
             key = e.GetKeyCode()
 
         # Look for matching macros
-        for code, action in self.engine.macros.items():
+        for code, macro in self.engine.macros.items():
             if code == (key, modifiers):
-                self.client.write(action + "\r\n")
+                macro.execute(self.engine, self.client)
 
         e.Skip()

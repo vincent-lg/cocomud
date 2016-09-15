@@ -3,6 +3,7 @@
 from client import GUIClient
 from config import Settings
 from scripting.key import key_code
+from scripting.macro import Macro
 
 class GameEngine:
 
@@ -29,9 +30,10 @@ class GameEngine:
         # Load the macros
         for key_name, action in self.settings["macros"].items():
             code = key_code(key_name)
-            self.macros[code] = action
+            key, modifiers = code
+            self.macros[code] = Macro(key, modifiers, action)
 
-        print "macros", self.macros
+        print self.macros
 
     def open(self, host, port):
         """Connect to the specified host and port.
