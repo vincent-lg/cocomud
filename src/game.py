@@ -18,7 +18,7 @@ class GameEngine:
     """
 
     def __init__(self):
-        self.settings = Settings()
+        self.settings = Settings(self)
         self.macros = {}
 
     def load(self):

@@ -31,8 +31,9 @@ class Configuration:
 
     """
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, engine):
         self.root_dir = root_dir
+        self.engine = engine
         self.values = {}
 
     def __getitem__(self, key):
@@ -143,13 +144,27 @@ class Configuration:
 
         values[os.path.basename(fullpath)] = datas
 
+    def write_YAML_file(self, filename, data):
+        """Write the YAML associated with the data.
+
+        Arguments:
+            filename: the filename relative to the rootdir without extension
+            data: the data as a dictionary.
+
+        """
+        fullpath = self.root_dir + os.sep + filename + ".yml"
+        file = open(fullpath, "w")
+        try:
+            safe_dump(data, file, default_flow_style=False)
+        finally:
+            file.close()
 
 class Settings(Configuration):
 
     """Special configuration in the 'settings' directory."""
 
-    def __init__(self):
-        Configuration.__init__(self, "settings")
+    def __init__(self, engine):
+        Configuration.__init__(self, "settings", engine)
 
     def load(self):
         """Load all the files."""
@@ -164,3 +179,11 @@ class Settings(Configuration):
                 outside = boolean(default=True)
         """.strip("\n"))
         self.load_config_file("options", spec)
+
+    def write_macros(self):
+        """Write the YAML data file."""
+        macros = {}
+        for macro in self.engine.macros.values():
+            macros[macro.shortcut] = macro.action
+
+        self.write_YAML_file("macros", macros)

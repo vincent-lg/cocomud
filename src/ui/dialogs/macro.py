@@ -21,6 +21,7 @@ class MacroDialog(wx.Dialog):
         top = wx.BoxSizer(wx.HORIZONTAL)
         edit = wx.BoxSizer(wx.VERTICAL)
         buttons = wx.BoxSizer(wx.HORIZONTAL)
+        confirm = self.CreateButtonSizer(wx.OK | wx.CLOSE)
         self.SetSizer(sizer)
 
         # Create the dialog
@@ -43,12 +44,9 @@ class MacroDialog(wx.Dialog):
         # Buttons
         add = wx.Button(self, label="Add")
         remove = wx.Button(self, label="Remove")
-        save = wx.Button(self, label="Save")
-        close = wx.Button(self, label="Cancel")
         buttons.Add(add)
         buttons.Add(remove)
-        buttons.Add(save)
-        buttons.Add(close)
+        buttons.Add(confirm)
 
         # Main sizer
         top.Add(macros, proportion=2)
@@ -74,6 +72,8 @@ class MacroDialog(wx.Dialog):
         # Event binding
         macros.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
         t_shortcut.Bind(wx.EVT_KEY_DOWN, self.OnShortcutUpdate)
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnClose, id=wx.ID_CLOSE)
 
     def populate_list(self, selection=0):
         """Populate the list with existing macros."""
@@ -125,3 +125,18 @@ class MacroDialog(wx.Dialog):
         else:
             self.shortcut.SetValue(macro.shortcut)
             self.shortcut.SelectAll()
+
+    def OnOK(self, e):
+        """Save the macros."""
+        macros = self.engine.macros
+        macros.clear()
+        for macro in self.macro_list:
+            macros[(macro.key, macro.modifiers)] = macro
+
+        self.engine.settings.write_macros()
+        self.Destroy()
+
+    def OnClose(self, e):
+        """Simply exit the dialog."""
+        self.Destroy()
+
