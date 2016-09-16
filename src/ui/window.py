@@ -2,6 +2,8 @@
 
 import wx
 
+from ytranslate.tools import t
+
 from dialogs.preferences import PreferencesDialog
 from dialogs.macro import MacroDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
@@ -30,22 +32,22 @@ class MainWindow(wx.Frame):
 
         # File menu
         ## Preferences
-        preferences = wx.MenuItem(fileMenu, -1, '&Preferences\tAlt+Enter')
+        preferences = wx.MenuItem(fileMenu, -1, t("ui.main.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
 
         ## Quit
-        quit = wx.MenuItem(fileMenu, -1, '&Quit\tCtrl+Q')
+        quit = wx.MenuItem(fileMenu, -1, t("ui.main.menu.quit"))
         self.Bind(wx.EVT_MENU, self.OnQuit, quit)
         fileMenu.AppendItem(quit)
 
         # Game menu
-        macro = wx.MenuItem(fileMenu, -1, '&Macro')
+        macro = wx.MenuItem(fileMenu, -1, t("ui.main.menu.macro"))
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
         gameMenu.AppendItem(macro)
 
-        menubar.Append(fileMenu, '&File')
-        menubar.Append(gameMenu, '&Game')
+        menubar.Append(fileMenu, t("ui.main.menu.file"))
+        menubar.Append(gameMenu, t("ui.main.menu.game"))
 
         self.SetMenuBar(menubar)
 

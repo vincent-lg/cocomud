@@ -2,6 +2,11 @@
 
 import wx
 
+from ytranslate.tools import init, select
+
+init(root_dir="translations")
+select("en")
+
 from game import GameEngine
 from ui.window import MainWindow
 
