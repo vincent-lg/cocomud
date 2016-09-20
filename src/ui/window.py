@@ -32,22 +32,22 @@ class MainWindow(wx.Frame):
 
         # File menu
         ## Preferences
-        preferences = wx.MenuItem(fileMenu, -1, t("ui.main.menu.preferences"))
+        preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
 
         ## Quit
-        quit = wx.MenuItem(fileMenu, -1, t("ui.main.menu.quit"))
+        quit = wx.MenuItem(fileMenu, -1, t("ui.menu.quit"))
         self.Bind(wx.EVT_MENU, self.OnQuit, quit)
         fileMenu.AppendItem(quit)
 
         # Game menu
-        macro = wx.MenuItem(fileMenu, -1, t("ui.main.menu.macro"))
+        macro = wx.MenuItem(fileMenu, -1, t("ui.menu.macro"))
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
         gameMenu.AppendItem(macro)
 
-        menubar.Append(fileMenu, t("ui.main.menu.file"))
-        menubar.Append(gameMenu, t("ui.main.menu.game"))
+        menubar.Append(fileMenu, t("ui.menu.file"))
+        menubar.Append(gameMenu, t("ui.menu.game"))
 
         self.SetMenuBar(menubar)
 
