@@ -1,0 +1,8 @@
+﻿input: Input
+password: Pasword
+output: Output
+
+preferences: "&Preferences\tAlt+Enter"
+quit: "&Quit"
+game: "&Game"
+macro: "&Macro"

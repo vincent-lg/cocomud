@@ -106,13 +106,13 @@ class MUDPanel(wx.Panel):
 
         # Input
         s_input = wx.BoxSizer(wx.HORIZONTAL)
-        l_input = wx.StaticText(self, -1, "Input")
+        l_input = wx.StaticText(self, -1, t("ui.client.input"))
         t_input = wx.TextCtrl(self, -1, "", size=(125, -1),
                 style=wx.TE_PROCESS_ENTER)
         self.input = t_input
 
         # Password
-        l_password = wx.StaticText(self, -1, "Password")
+        l_password = wx.StaticText(self, -1, t("ui.client.password"))
         t_password = wx.TextCtrl(self, -1, "", size=(20, -1),
                 style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
         self.password = t_password
@@ -125,7 +125,7 @@ class MUDPanel(wx.Panel):
         s_input.Add(t_password, proportion=2)
 
         # Ouput
-        l_output = wx.StaticText(self, -1, "Output")
+        l_output = wx.StaticText(self, -1, t("ui.client.output"))
         t_output = wx.TextCtrl(self, -1, "",
                 size=(600, 400), style=wx.TE_MULTILINE|wx.TE_READONLY)
         self.output = t_output
@@ -150,6 +150,13 @@ class MUDPanel(wx.Panel):
         self.client.write(msg + "\r\n")
 
     def OnFocus(self, evt):
+        """The GUIClient requires a change of focus.
+
+        This event is triggered when the GUIClient asks a change of
+        focus in the input field (hiding the password field) or in
+        the password field (hiding the input field).
+
+        """
         val = evt.GetValue()
         if val == "input":
             self.input.Show()
