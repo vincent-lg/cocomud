@@ -101,10 +101,11 @@ class MUDPanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.engine = engine
         self.client = None
-
-        mainSizer = wx.GridBagSizer(5, 5)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
 
         # Input
+        s_input = wx.BoxSizer(wx.HORIZONTAL)
         l_input = wx.StaticText(self, -1, "Input")
         t_input = wx.TextCtrl(self, -1, "", size=(125, -1),
                 style=wx.TE_PROCESS_ENTER)
@@ -118,20 +119,20 @@ class MUDPanel(wx.Panel):
         t_password.Hide()
 
         # Add the input field in the sizer
-        mainSizer.Add(l_input, pos=(0, 0))
-        mainSizer.Add(t_input, pos=(0, 1), span=(1, 6))
-        mainSizer.Add(l_password, pos=(0, 7))
-        mainSizer.Add(t_password, pos=(0, 8), span=(1, 2))
+        s_input.Add(l_input)
+        s_input.Add(t_input, proportion=4)
+        s_input.Add(l_password)
+        s_input.Add(t_password, proportion=2)
 
         # Ouput
         l_output = wx.StaticText(self, -1, "Output")
         t_output = wx.TextCtrl(self, -1, "",
-                size=(600, 500), style=wx.TE_MULTILINE|wx.TE_READONLY)
+                size=(600, 400), style=wx.TE_MULTILINE|wx.TE_READONLY)
         self.output = t_output
 
         # Add the output fields in the sizer
-        mainSizer.Add(l_output, pos=(1, 0))
-        mainSizer.Add(t_output, pos=(10, 10))
+        sizer.Add(s_input)
+        sizer.Add(t_output, proportion=8)
 
         # Event handler
         t_input.Bind(wx.EVT_TEXT_ENTER, self.EvtText)

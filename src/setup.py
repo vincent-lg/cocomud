@@ -6,6 +6,7 @@ exe = Executable(
 )
 
 includefiles = [
+    "translations",
     "../dolapi.dll",
     "../jfwapi.dll",
     "../nvdaControllerClient.dll",
