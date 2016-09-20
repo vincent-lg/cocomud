@@ -17,7 +17,7 @@ includefiles = [
 
 setup(
     name = "CocoMUD client",
-    version = "0.1",
+    version = "0.2",
     description = "The CocoMUD client.",
     options = {'build_exe': {'include_files': includefiles}},
     executables = [exe]
