@@ -1,4 +1,4 @@
-﻿"""This file contains the MainWindow class."""
+﻿"""This file contains the ClientWindow class."""
 
 import wx
 
@@ -8,10 +8,10 @@ from dialogs.preferences import PreferencesDialog
 from dialogs.macro import MacroDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 
-class MainWindow(wx.Frame):
+class ClientWindow(wx.Frame):
 
     def __init__(self, engine):
-        super(MainWindow, self).__init__(None)
+        super(ClientWindow, self).__init__(None)
         self.engine = engine
         self.CreateMenuBar()
         self.InitUI()
@@ -126,7 +126,7 @@ class MUDPanel(wx.Panel):
         # Ouput
         l_output = wx.StaticText(self, -1, "Output")
         t_output = wx.TextCtrl(self, -1, "",
-                size=(600, 600), style=wx.TE_MULTILINE|wx.TE_READONLY)
+                size=(600, 500), style=wx.TE_MULTILINE|wx.TE_READONLY)
         self.output = t_output
 
         # Add the output fields in the sizer
