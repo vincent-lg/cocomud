@@ -33,8 +33,6 @@ class GameEngine:
             key, modifiers = code
             self.macros[code] = Macro(key, modifiers, action)
 
-        print self.macros
-
     def open(self, host, port):
         """Connect to the specified host and port.
 

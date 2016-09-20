@@ -1,5 +1,6 @@
 ﻿"""This module defines the default configuration."""
 
+import locale
 import os
 import os.path
 from textwrap import dedent
@@ -8,7 +9,7 @@ from yaml import safe_dump, safe_load
 from configobj import ConfigObj
 from validate import Validator
 
-class Configuration:
+class Configuration(object):
 
     """Class describing CocoMUD's configuration.
 
@@ -159,12 +160,34 @@ class Configuration:
         finally:
             file.close()
 
+
 class Settings(Configuration):
 
     """Special configuration in the 'settings' directory."""
 
+    LANGUAGES = {
+        "en": "English",
+        "fr": "French",
+    }
+
     def __init__(self, engine):
         Configuration.__init__(self, "settings", engine)
+
+    def get_language(self):
+        """Return the configured language.
+
+        If the configuration hasn't been loaded, or the configured
+        language isn't valid, return "en" (English).
+
+        """
+        default = "en"
+        try:
+            lang = self["options.general.language"]
+            assert lang in type(self).LANGUAGES.keys()
+        except (KeyError, AssertionError):
+            return default
+
+        return lang
 
     def load(self):
         """Load all the files."""
@@ -173,11 +196,15 @@ class Settings(Configuration):
 
     def load_options(self):
         """Load the file containing the options."""
+        lang = locale.getdefaultlocale()[0].split("_")[0]
         spec = dedent("""
+            [general]
+                language = option('en', 'fr', default='{lang}')
+
             [TTS]
                 on = boolean(default=True)
                 outside = boolean(default=True)
-        """.strip("\n"))
+        """.format(lang=lang).strip("\n"))
         self.load_config_file("options", spec)
 
     def write_macros(self):
