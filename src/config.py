@@ -165,10 +165,10 @@ class Settings(Configuration):
 
     """Special configuration in the 'settings' directory."""
 
-    LANGUAGES = {
-        "en": "English",
-        "fr": "French",
-    }
+    LANGUAGES = (
+        ("en", "English"),
+        ("fr", "French"),
+    )
 
     def __init__(self, engine):
         Configuration.__init__(self, "settings", engine)
@@ -181,9 +181,10 @@ class Settings(Configuration):
 
         """
         default = "en"
+        codes = [c[0] for c in type(self).LANGUAGES]
         try:
             lang = self["options.general.language"]
-            assert lang in type(self).LANGUAGES.keys()
+            assert lang in codes
         except (KeyError, AssertionError):
             return default
 
