@@ -1,0 +1,10 @@
+TTS:
+    'on': Activer le TTS (Text-To-Speech)
+    outside: Activer le TTS hors de la fenêtre
+accessibility: Accessibilité
+general: Général
+message:
+    update_language: >
+        Vous avez modifié la langue du client CocoMUD. Vous devez
+        redémarrer le programme pour voir ces modifications.
+restart: Redémarrage

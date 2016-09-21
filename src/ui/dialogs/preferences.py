@@ -2,6 +2,8 @@
 
 import wx
 
+from ytranslate import t
+
 class GeneralTab(wx.Panel):
 
     """General tab."""
@@ -18,7 +20,7 @@ class GeneralTab(wx.Panel):
         self.SetSizer(sizer)
 
         # Language selection
-        l_languages = wx.StaticText(self, label="Language")
+        l_languages = wx.StaticText(self, label=t("ui.dialog.general"))
         languages = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         languages.InsertColumn(0, "Name")
         self.languages = languages
@@ -50,12 +52,12 @@ class GeneralTab(wx.Panel):
         return codes[index]
 
 
-class TTSTab(wx.Panel):
+class AccessibilityTab(wx.Panel):
 
-    """TTS tab."""
+    """Accessibility tab."""
 
     def __init__(self, parent, engine):
-        super(TTSTab, self).__init__(parent)
+        super(AccessibilityTab, self).__init__(parent)
         self.engine = engine
 
         self.InitUI()
@@ -63,14 +65,13 @@ class TTSTab(wx.Panel):
 
     def InitUI(self):
         settings = self.engine.settings
-        panel = wx.Panel(self)
         sizer = wx.GridBagSizer(15, 15)
-        panel.SetSizer(sizer)
+        self.SetSizer(sizer)
 
         # TTS preferendces
-        self.TTS_on = wx.CheckBox(panel, label="Enable TTS (Text-To Speech)")
+        self.TTS_on = wx.CheckBox(self, label=t("ui.dialog.TTS.on"))
         self.TTS_on.SetValue(settings["options.TTS.on"])
-        self.TTS_outside = wx.CheckBox(panel, label="Enable TTS when on a different window")
+        self.TTS_outside = wx.CheckBox(self, label=t("ui.dialog.TTS.outside"))
         self.TTS_outside.SetValue(settings["options.TTS.outside"])
 
         # Append to the sizer
@@ -86,11 +87,11 @@ class PreferencesTabs(wx.Notebook):
         wx.Notebook.__init__(self, parent)
 
         general_tab = GeneralTab(self, engine)
-        TTS_tab = TTSTab(self, engine)
-        self.AddPage(general_tab, "General")
-        self.AddPage(TTS_tab, "TTS")
+        accessibility_tab = AccessibilityTab(self, engine)
+        self.AddPage(general_tab, t("ui.dialog.general"))
+        self.AddPage(accessibility_tab, t("ui.dialog.accessibility"))
         self.general = general_tab
-        self.TTS = TTS_tab
+        self.accessibility = accessibility_tab
 
 class PreferencesDialog(wx.Dialog):
 
@@ -104,12 +105,11 @@ class PreferencesDialog(wx.Dialog):
         self.Maximize()
 
     def InitUI(self):
-        panel = wx.Panel(self)
         sizer = wx.GridBagSizer(15, 15)
-        panel.SetSizer(sizer)
+        self.SetSizer(sizer)
 
         # Add the tabs
-        self.tabs = PreferencesTabs(panel, self.engine)
+        self.tabs = PreferencesTabs(self, self.engine)
         buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
 
         # Append to the sizer
@@ -127,17 +127,16 @@ class PreferencesDialog(wx.Dialog):
         """Save the preferences."""
         settings = self.engine.settings
         general = self.tabs.general
-        tts = self.tabs.TTS
+        accessibility = self.tabs.accessibility
         new_language = general.get_selected_language()
         old_language = settings["options.general.language"]
         settings["options.general.language"] = new_language
-        settings["options.TTS.on"] = tts.TTS_on.GetValue()
-        settings["options.TTS.outside"] = tts.TTS_outside.GetValue()
+        settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
+        settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options"].write()
         if old_language != new_language:
-            wx.MessageBox("You have changed the CocoMUD anguage.  You " \
-                    " to restart the application to see these changes.",
-                    "Restart", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(t("ui.dialog.message.update_language"),
+                    t("ui.dialog.restart"), wx.OK | wx.ICON_INFORMATION)
         self.Destroy()
 
     def OnCancel(self, e):
