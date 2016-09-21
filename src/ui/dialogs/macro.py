@@ -2,6 +2,8 @@
 
 import wx
 
+from ytranslate import t
+
 from scripting.key import key_code, key_name
 from scripting.macro import Macro
 
@@ -10,7 +12,7 @@ class MacroDialog(wx.Dialog):
     """Macro dialog."""
 
     def __init__(self, engine):
-        super(MacroDialog, self).__init__(None, title="Macros")
+        super(MacroDialog, self).__init__(None, title=t("ui.dialog.macros"))
         self.engine = engine
 
         self.InitUI()
@@ -26,13 +28,13 @@ class MacroDialog(wx.Dialog):
 
         # Create the dialog
         macros = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        macros.InsertColumn(0, "Shortcut")
-        macros.InsertColumn(1, "Action")
+        macros.InsertColumn(0, t("ui.dialog.shortcut"))
+        macros.InsertColumn(1, t("ui.dialog.action"))
         self.macros = macros
 
         # Create the edit field
         s_shortcut = wx.BoxSizer(wx.HORIZONTAL)
-        l_shortcut = wx.StaticText(self, label="Shortcut")
+        l_shortcut = wx.StaticText(self, label=t("ui.dialog.shortcut"))
         t_shortcut = wx.TextCtrl(self, value="",
                 style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.shortcut = t_shortcut
@@ -42,11 +44,11 @@ class MacroDialog(wx.Dialog):
         edit.Add((-1, 20))
 
         # Buttons
-        b_edit = wx.Button(self, label="Edit")
-        remove = wx.Button(self, label="Remove")
+        b_edit = wx.Button(self, label=t("ui.button.edit"))
+        remove = wx.Button(self, label=t("ui.button.remove"))
         edit.Add(b_edit)
         edit.Add(remove)
-        add = wx.Button(self, label="Add")
+        add = wx.Button(self, label=t("ui.button.add"))
         buttons.Add(add)
         buttons.Add(confirm)
 
@@ -160,12 +162,13 @@ class MacroDialog(wx.Dialog):
         try:
             macro = self.macro_list[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected macro.",
+            wx.MessageBox(t("ui.dialog.message.unknown_macro"),
                     wx.OK | wx.ICON_ERROR)
         else:
-            value = wx.MessageBox("Do you want to delete this macro? {}: " \
-                    "{}".format(macro.shortcut, macro.action), "Confirm",
-                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+            value = wx.MessageBox(t("ui.dialog.message.remove_macro",
+            shortcut=macro.shortcut, action=macro.action),
+            t("ui.dialog.confirm"),
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
                 self.macro_list.remove(macro)
@@ -197,12 +200,8 @@ class MacroDialog(wx.Dialog):
         if dlg_macros == act_macros:
             self.Destroy()
         else:
-            value = wx.MessageBox("One or more macros have been modified in " \
-                    "this dialog, but these modifications won't be kept " \
-                    "as it is.  If you want to save these modifications, " \
-                    "press 'no', then select the 'ok' button.\nDo you " \
-                    "want to close this dialog and lose these modifications?",
-                    "Unsaved modifications",
+            value = wx.MessageBox(t("ui.dialog.message.unsaved_macros"),
+                    t("ui.dialog.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -215,9 +214,9 @@ class EditMacroDialog(wx.Dialog):
 
     def __init__(self, engine, macros, macro=None):
         if macro:
-            title = "Edit a macro"
+            title = t("ui.dialog.macro.edit")
         else:
-            title = "Add a macro"
+            title = t("ui.dialog.macro.add")
 
         super(EditMacroDialog, self).__init__(None, title=title)
         self.engine = engine
@@ -235,7 +234,7 @@ class EditMacroDialog(wx.Dialog):
 
         # Create the shortcut field
         s_shortcut = wx.BoxSizer(wx.VERTICAL)
-        l_shortcut = wx.StaticText(self, label="Shortcut")
+        l_shortcut = wx.StaticText(self, label=t("ui.dialog.shortcut"))
         t_shortcut = wx.TextCtrl(self, value=self.macro.shortcut,
                 style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.shortcut = t_shortcut
@@ -246,7 +245,7 @@ class EditMacroDialog(wx.Dialog):
 
         # Create the action field
         s_action = wx.BoxSizer(wx.VERTICAL)
-        l_action = wx.StaticText(self, label="Action")
+        l_action = wx.StaticText(self, label=t("ui.dialog.action"))
         t_action = wx.TextCtrl(self, value=self.macro.action,
                 style=wx.TE_MULTILINE)
         self.action = t_action
@@ -286,15 +285,12 @@ class EditMacroDialog(wx.Dialog):
         shortcut = self.shortcut.GetValue()
         action = self.action.GetValue()
         if not shortcut:
-            wx.MessageBox("The shortcut field is empty.  Please press " \
-                    "the combination key you want to associate with this " \
-                    "new macro.", "Missing information",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.dialog.message.missing_macro"),
+                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
             self.shortcut.SetFocus()
         elif not action:
-            wx.MessageBox("The action field is empty.  Please specify " \
-                    "the actions associated with this macro.",
-                    "Missing information", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.dialog.message.missing_action"),
+                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
             self.action.SetFocus()
         else:
             shortcut = shortcut.encode("utf-8", "replace")

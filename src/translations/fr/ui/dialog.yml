@@ -1,10 +1,34 @@
 TTS:
     'on': Activer le TTS (Text-To-Speech)
-    outside: Activer le TTS hors de la fenêtre
-accessibility: Accessibilité
-general: Général
+    outside: "Activer le TTS hors de la fen\xEAtre"
+accessibility: "Accessibilit\xE9"
+action: Action
+confirm: Confirmer
+general: "G\xE9n\xE9ral"
+macro:
+    add: Ajout d'un nouveau macro
+    edit: Édition d'un macro
+macros: Macros
 message:
-    update_language: >
-        Vous avez modifié la langue du client CocoMUD. Vous devez
-        redémarrer le programme pour voir ces modifications.
-restart: Redémarrage
+    missing: Information manquante
+    missing_action: >
+        Le champ de texte contenant l'action est vide. Veuillez préciser
+        l'action à associer à ce macro.
+    missing_macro: >
+        Le champ de texte contenant le raccourci est vide. Une fois
+        dans le champ de texte, pressez les touches raccourci à associer
+        à ce macro.
+    remove_macro: >
+        Voulez-vous réellement supprimer ce macro ? {action} via {shortcut}.
+    unknown_macro: Impossible de trouver le macro sélectionné.
+    unsaved_macros: >
+        Un macro ou plusieurs ont été modifiés dans cette boîte de
+        dialogue, mais ces modifications seront perdues si vous la
+        quittez. Si vous désirez enregistrer ces modifications,
+        sélectionnez 'non', puis 'ok' pour quitter la boîte de dialogue.
+        Voulez-vous réellement quitter cette boîte de dialogue sans
+        sauvegarder ?
+    update_language: "Vous avez modifi\xE9 la langue du client CocoMUD. Vous devez\
+        \ red\xE9marrer le programme pour voir ces modifications.\n"
+restart: "Red\xE9marrage"
+shortcut: Raccourci
