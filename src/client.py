@@ -43,6 +43,8 @@ except ImportError:
     say = None
     braille = None
 
+from sharp.engine import SharpScript
+
 # Constants
 ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
 
@@ -57,6 +59,7 @@ class Client(threading.Thread):
         self.timeout = timeout
         self.engine = engine
         self.running = False
+        self.sharp_engine = SharpScript(engine, self)
 
         # Try to connect to the specified host and port
         self.client = Telnet(host, port)
@@ -73,6 +76,14 @@ class Client(threading.Thread):
     def handle_message(self, msg):
         """When the client receives a message."""
         pass
+
+    def write(self, text):
+        """Write text to the client."""
+        if text.startswith("#"):
+            print "Executing", text
+            self.sharp_engine.execute(text)
+        else:
+            self.client.write(text)
 
 
 class GUIClient(Client):
@@ -100,7 +111,7 @@ class GUIClient(Client):
 
         """
         self.window = window
-        window.client = self.client
+        window.client = self
 
     def handle_message(self, msg):
         """When the client receives a message."""
