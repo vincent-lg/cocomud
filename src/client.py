@@ -60,6 +60,7 @@ class Client(threading.Thread):
         self.engine = engine
         self.running = False
         self.sharp_engine = SharpScript(engine, self)
+        self.triggers = []
 
         # Try to connect to the specified host and port
         self.client = Telnet(host, port)
@@ -71,6 +72,10 @@ class Client(threading.Thread):
             time.sleep(self.timeout)
             msg = self.client.read_very_eager()
             if msg:
+                for line in msg.splitlines():
+                    for trigger in self.triggers:
+                        trigger.feed(line)
+
                 self.handle_message(msg)
 
     def handle_message(self, msg):
@@ -80,7 +85,6 @@ class Client(threading.Thread):
     def write(self, text):
         """Write text to the client."""
         if text.startswith("#"):
-            print "Executing", text
             self.sharp_engine.execute(text)
         else:
             self.client.write(text)
