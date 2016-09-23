@@ -97,6 +97,8 @@ class SharpScript(object):
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = repr(argument[1:-1])
+            elif argument.endswith("=True") or argument.endswith("=False"):
+                pass
             else:
                 argument = repr(argument)
 
@@ -153,6 +155,14 @@ class SharpScript(object):
                     argument = remaining.splitlines()[0]
                     i += len(argument)
                     arguments = [argument]
+            elif remaining[0] in "+-":
+                argument = remaining.splitlines()[0].split(" ")[0]
+                flag = argument[1:]
+                if argument.startswith("+"):
+                    arguments.append(flag + "=True")
+                else:
+                    arguments.append(flag + "=False")
+                i += len(flag) + 1
             elif remaining[0] == "{":
                 end = self.find_right_brace(remaining)
                 argument = remaining[:end + 1]

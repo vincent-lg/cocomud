@@ -84,3 +84,10 @@ class TestSyntax(unittest.TestCase):
             "trigger('Should it work?', compile('var = 2 + 3\nprint var\n', " \
             "'SharpScript', 'exec'))"
         ])
+
+    def test_flag(self):
+        """Test the SharpScript syntax with flags in funciton calls."""
+        statements = self.engine.feed("#say {A message} -braille +speech")
+        self.assertEqual(statements, [
+            "say('A message', braille=False, speech=True)"
+        ])
