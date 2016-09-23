@@ -93,8 +93,8 @@ class SharpScript(object):
         for argument in statement[1:]:
             if argument.startswith("{+"):
                 argument = argument[3:-2]
-                code = dedent(argument)
-                argument = "compile(" + repr(code) + ", 'SharpScript', 'exec')"
+                argument = repr(dedent(argument)).replace("\\n", "\n")
+                argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = repr(argument[1:-1])
             else:
