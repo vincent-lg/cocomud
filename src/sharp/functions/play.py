@@ -41,7 +41,16 @@ class Play(Function):
 
     """
 
+    def init(self):
+        """Initialize the cache of sounds."""
+        self.cache = {}
+
     def run(self, filename):
         """Say the text."""
-        sound = mixer.Sound(filename)
+        if filename in self.cache:
+            sound = self.cache[filename]
+        else:
+            sound = mixer.Sound(filename)
+            self.cache[filename] = sound
+
         sound.play()

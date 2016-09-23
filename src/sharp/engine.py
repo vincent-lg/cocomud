@@ -50,7 +50,7 @@ class SharpScript(object):
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
-            function = function(engine, client, self.locals)
+            function = function(engine, client, self)
             self.globals[name] = function.run
 
     def execute(self, code):
