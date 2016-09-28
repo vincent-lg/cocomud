@@ -81,7 +81,7 @@ class TestSyntax(unittest.TestCase):
             print var
         }""")
         self.assertEqual(statements, [
-            "trigger('Should it work?', compile('var = 2 + 3\nprint var\n', " \
+            "trigger('Should it work?', compile('var = 2 + 3\nprint var', " \
             "'SharpScript', 'exec'))"
         ])
 
@@ -90,4 +90,14 @@ class TestSyntax(unittest.TestCase):
         statements = self.engine.feed("#say {A message} -braille +speech")
         self.assertEqual(statements, [
             "say('A message', braille=False, speech=True)"
+        ])
+
+    def test_python(self):
+        """Test Python code in SharpScript."""
+        statements = self.engine.feed("""{+
+            print 1
+            print 3
+        }""")
+        self.assertEqual(statements, [
+            "compile('print 1\nprint 3', 'SharpScript', 'exec')",
         ])

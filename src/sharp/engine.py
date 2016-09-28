@@ -55,7 +55,11 @@ class SharpScript(object):
 
     def execute(self, code):
         """Execute the SharpScript code given as an argument."""
-        instructions = self.feed(code)
+        if isinstance(code, str):
+            instructions = self.feed(code)
+        else:
+            instructions = [code]
+
         globals = self.globals
         locals = self.locals
         for instruction in instructions:
@@ -70,9 +74,18 @@ class SharpScript(object):
         this suite of statements.
 
         """
-        # First, splits into statements
-        statements = self.split_statements(content)
+        # Execute Python code if necessary
         codes = []
+        while content.startswith("{+"):
+            end = self.find_right_brace(content)
+            code = content[2:end - 1].lstrip("\n").rstrip("\n ")
+            code = repr(dedent(code)).replace("\\n", "\n")
+            code = "compile(" + code + ", 'SharpScript', 'exec')"
+            codes.append(code)
+            content = content[end + 1:]
+
+        # The remaining must be SharpScript, splits into statements
+        statements = self.split_statements(content)
         for statement in statements:
             pycode = self.convert_to_python(statement)
             codes.append(pycode)
@@ -93,7 +106,7 @@ class SharpScript(object):
         kwargs = {}
         for argument in statement[1:]:
             if argument.startswith("{+"):
-                argument = argument[3:-2]
+                argument = argument[2:-1].lstrip("\n").rstrip("\n ")
                 argument = repr(dedent(argument)).replace("\\n", "\n")
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
