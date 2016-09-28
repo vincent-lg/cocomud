@@ -90,6 +90,7 @@ class SharpScript(object):
         """
         function_name = statement[0][1:].lower()
         arguments = []
+        kwargs = {}
         for argument in statement[1:]:
             if argument.startswith("{+"):
                 argument = argument[3:-2]
@@ -97,14 +98,22 @@ class SharpScript(object):
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = repr(argument[1:-1])
-            elif argument.endswith("=True") or argument.endswith("=False"):
-                pass
+            elif argument[0] in "-+":
+                kwargs[argument[1:]] = True if argument[0] == "+" else False
+                continue
             else:
                 argument = repr(argument)
 
             arguments.append(argument)
 
-        return function_name + "(" + ", ".join(arguments) + ")"
+        code = function_name + "(" + ", ".join(arguments)
+        if arguments and kwargs:
+            code += ", "
+
+        code += ", ".join([name + "=" + repr(value) for name, value in \
+                kwargs.items()])
+
+        return code + ")"
 
     def split_statements(self, content):
         """Split the given string content into different statements.
@@ -155,14 +164,6 @@ class SharpScript(object):
                     argument = remaining.splitlines()[0]
                     i += len(argument)
                     arguments = [argument]
-            elif remaining[0] in "+-":
-                argument = remaining.splitlines()[0].split(" ")[0]
-                flag = argument[1:]
-                if argument.startswith("+"):
-                    arguments.append(flag + "=True")
-                else:
-                    arguments.append(flag + "=False")
-                i += len(flag) + 1
             elif remaining[0] == "{":
                 end = self.find_right_brace(remaining)
                 argument = remaining[:end + 1]
