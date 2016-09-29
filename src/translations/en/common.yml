@@ -1,0 +1,4 @@
+﻿connection: Connection
+name: Name
+hostname: Hostname
+port: Port

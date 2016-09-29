@@ -47,8 +47,10 @@ lang = engine.settings.get_language()
 select(lang)
 
 # Create the client and ClientWindow
-client = engine.open("vanciamud.fr", 4000)
 window = ClientWindow(engine)
+hostname = window.panel.world.hostname
+port = window.panel.world.port
+client = engine.open(hostname, port)
 client.link_window(window)
 client.start()
 app.MainLoop()

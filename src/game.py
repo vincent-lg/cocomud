@@ -48,6 +48,7 @@ class GameEngine:
     def __init__(self):
         self.settings = Settings(self)
         self.worlds = {}
+        self.default_world = None
         self.macros = {}
 
     def load(self):
@@ -69,5 +70,5 @@ class GameEngine:
         with the specified information.
 
         """
-        client = GUIClient("vanciamud.fr", 4000, engine=self)
+        client = GUIClient(host, port, engine=self)
         return client

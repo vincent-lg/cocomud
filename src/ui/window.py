@@ -32,17 +32,18 @@ import wx
 
 from ytranslate.tools import t
 
-from dialogs.preferences import PreferencesDialog
-from dialogs.macro import MacroDialog
+from ui.dialogs.connection import ConnectionDialog
+from ui.dialogs.macro import MacroDialog
+from ui.dialogs.preferences import PreferencesDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 
 class ClientWindow(wx.Frame):
 
-    def __init__(self, engine):
+    def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
         self.engine = engine
         self.CreateMenuBar()
-        self.InitUI()
+        self.InitUI(world)
 
     def _get_client(self):
         return self.panel.client
@@ -79,8 +80,13 @@ class ClientWindow(wx.Frame):
 
         self.SetMenuBar(menubar)
 
-    def InitUI(self):
-        self.panel = MUDPanel(self, self.engine)
+    def InitUI(self, world=None):
+        if world is None:
+            dialog = ConnectionDialog(self.engine)
+            dialog.ShowModal()
+            world = self.engine.default_world
+
+        self.panel = MUDPanel(self, self.engine, world)
         self.SetTitle("CocoMUD client")
         self.Maximize()
         self.Show()
@@ -125,10 +131,11 @@ class ClientWindow(wx.Frame):
 
 class MUDPanel(wx.Panel):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent, engine, world):
         wx.Panel.__init__(self, parent)
         self.engine = engine
         self.client = None
+        self.world = world
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
