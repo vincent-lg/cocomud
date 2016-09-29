@@ -111,11 +111,13 @@ class SharpScript(object):
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = repr(argument[1:-1])
+                argument = self.replace_semicolons(argument)
             elif argument[0] in "-+":
                 kwargs[argument[1:]] = True if argument[0] == "+" else False
                 continue
             else:
                 argument = repr(argument)
+                argument = self.replace_semicolons(argument)
 
             arguments.append(argument)
 
@@ -214,3 +216,18 @@ class SharpScript(object):
             i += 1
 
         return None
+
+    @staticmethod
+    def replace_semicolons(text):
+        """Replace all not-escaped semi-colons."""
+        i = 0
+        while i < len(text):
+            remaining = text[i:]
+            if remaining.startswith(";;"):
+                i += 2
+                continue
+            elif remaining.startswith(";"):
+                text = text[:i] + "\n" + text[i + 1:]
+            i += 1
+
+        return text.replace(";;", ";")

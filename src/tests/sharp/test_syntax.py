@@ -101,3 +101,15 @@ class TestSyntax(unittest.TestCase):
         self.assertEqual(statements, [
             "compile('print 1\nprint 3', 'SharpScript', 'exec')",
         ])
+
+    def test_semicolons(self):
+        """Test the semi-colons."""
+        # A test with simple text
+        statements = self.engine.feed("#macro F1 north;south;;east")
+        self.assertEqual(statements, ["macro('F1', 'north\nsouth;east')"])
+
+        # A test with SharpScript
+        statements = self.engine.feed("#trigger ok {#play new.wav;#stop}")
+        self.assertEqual(statements, [
+                "trigger('ok', '#play new.wav\n#stop')",
+        ])
