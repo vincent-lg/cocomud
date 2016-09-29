@@ -90,6 +90,7 @@ class ClientWindow(wx.Frame):
         self.SetTitle("CocoMUD client")
         self.Maximize()
         self.Show()
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
@@ -104,7 +105,12 @@ class ClientWindow(wx.Frame):
         dialog.Destroy()
 
     def OnQuit(self, e):
-        self.Close()
+        self.OnClose(e)
+
+    def OnClose(self, e):
+        if self.panel.client:
+            self.panel.client.running = False
+        self.Destroy()
 
     # Methods to handle client's events
     def handle_message(self, message):
