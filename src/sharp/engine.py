@@ -169,7 +169,8 @@ class SharpScript(object):
 
             # If the function_name is not defined, take the first parameter
             if not function_name:
-                if remaining.startswith("#"):
+                if remaining.startswith("#") and not remaining.startswith(
+                        "##"):
                     # This is obviously a function name
                     function_name = remaining.splitlines()[0].split(" ")[0]
                     arguments = []
@@ -178,15 +179,25 @@ class SharpScript(object):
                     function_name = "#send"
                     argument = remaining.splitlines()[0]
                     i += len(argument)
+
+                    if argument.startswith("##"):
+                        argument = argument[1:]
+
                     arguments = [argument]
             elif remaining[0] == "{":
                 end = self.find_right_brace(remaining)
                 argument = remaining[:end + 1]
-                arguments.append(argument)
                 i += end + 1
+                if argument.startswith("##"):
+                    argument = argument[1:]
+
+                arguments.append(argument)
             else:
                 argument = remaining.splitlines()[0].split(" ")[0]
                 i += len(argument)
+                if argument.startswith("##"):
+                    argument = argument[1:]
+
                 arguments.append(argument)
 
         return statements

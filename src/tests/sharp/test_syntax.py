@@ -113,3 +113,13 @@ class TestSyntax(unittest.TestCase):
         self.assertEqual(statements, [
                 "trigger('ok', '#play new.wav\n#stop')",
         ])
+
+    def test_escape_sharp(self):
+        """Test the escaped sharp symbol."""
+        # A sharp escaping with plain text
+        statements = self.engine.feed("##out")
+        self.assertEqual(statements, ["send('#out')"])
+
+        # A sharp escaping with SharpScript
+        statements = self.engine.feed("#macro ##ok")
+        self.assertEqual(statements, ["macro('#ok')"])
