@@ -37,6 +37,8 @@ from yaml import safe_dump, safe_load
 from configobj import ConfigObj
 from validate import Validator
 
+from world import World
+
 class Configuration(object):
 
     """Class describing CocoMUD's configuration.
@@ -123,9 +125,10 @@ class Configuration(object):
         """Load the configuration."""
         raise NotImplementedError
 
-    def load_config_file(self, filename, spec):
+    def load_config_file(self, filename, spec, root_dir=None):
         """Load the specified file using ConfigObj."""
-        fullpath = self.root_dir + os.sep + filename
+        root_dir = root_dir or self.root_dir
+        fullpath = os.path.join(root_dir, filename)
 
         # Create the directory structure if necessary
         directories = os.path.dirname(fullpath).split("/")
@@ -134,11 +137,9 @@ class Configuration(object):
             os.mkdir(base)
 
         for directory in directories[1:]:
-            base += os.path + directory
+            base += os.path.sep + directory
             if not os.path.exists(base):
                 os.mkdir(base)
-
-        filename = os.path.basename(fullpath) + ".conf"
 
         # Create the ConfigObj
         config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"))
@@ -149,7 +150,7 @@ class Configuration(object):
 
         # Saves the ConfigObj
         values = self.values
-        for path in os.path.dirname(fullpath).split("/")[1:]:
+        for path in os.path.dirname(filename).split("/")[1:]:
             if path not in values:
                 values[path] = {}
             values = values[path]
@@ -221,6 +222,14 @@ class Settings(Configuration):
     def load(self):
         """Load all the files."""
         self.load_options()
+
+        # Load the world configuration
+        for directory in os.listdir("worlds"):
+            world = World(location=directory)
+            settings = GameSettings(self.engine, world)
+            settings.load()
+            self.engine.worlds[world.name] = world
+
         self.load_YAML_file("macros")
 
     def load_options(self):
@@ -244,3 +253,30 @@ class Settings(Configuration):
             macros[macro.shortcut] = macro.action
 
         self.write_YAML_file("macros", macros)
+
+class GameSettings(Configuration):
+
+    """Game settings (specific to a game/world)."""
+
+    def __init__(self, engine, world):
+        Configuration.__init__(self, "settings", engine)
+        self.world = world
+
+    def load(self):
+        """Load all the files."""
+        self.load_options()
+
+    def load_options(self):
+        """Load the file containing the options."""
+        world = self.world
+        spec = dedent("""
+            [connection]
+                name = string
+                hostname = string
+                port = integer
+        """).strip("\n")
+        self.load_config_file("options", spec, world.path)
+        world.name = self["options.connection.name"]
+        world.hostname = self["options.connection.hostname"]
+        world.port = self["options.connection.port"]
+        world.settings = self["options"]
