@@ -174,7 +174,8 @@ class MUDPanel(wx.Panel):
         """One of the input fields is sending text."""
         self.input.Clear()
         self.password.Clear()
-        msg = event.GetString().encode("utf-8", "replace")
+        encoding = self.engine.settings["options.general.encoding"]
+        msg = event.GetString().encode(encoding, "replace")
         self.client.write(msg + "\r\n")
 
     def OnFocus(self, evt):

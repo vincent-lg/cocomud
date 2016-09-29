@@ -119,7 +119,8 @@ class GUIClient(Client):
 
     def handle_message(self, msg):
         """When the client receives a message."""
-        msg = msg.decode("utf-8", "replace")
+        encoding = self.engine.settings["options.general.encoding"]
+        msg = msg.decode(encoding, "replace")
         msg = ANSI_ESCAPE.sub('', msg)
         if self.window:
             self.window.handle_message(msg)

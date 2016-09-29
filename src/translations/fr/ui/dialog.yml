@@ -1,3 +1,5 @@
+display: Affichage
+encodings: Encodages
 TTS:
     'on': Activer le TTS (Text-To-Speech)
     outside: "Activer le TTS hors de la fen\xEAtre"

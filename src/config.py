@@ -229,6 +229,7 @@ class Settings(Configuration):
         spec = dedent("""
             [general]
                 language = option('en', 'fr', default='{lang}')
+                encoding = string(default="iso8859_15")
 
             [TTS]
                 on = boolean(default=True)

@@ -1,6 +1,8 @@
 ﻿general: General
+display: Display
 accessibility: Accessibility
 macros: Macros
+encodings: Encodings
 shortcut: Shortcut
 action: Action
 macro:
