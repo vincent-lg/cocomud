@@ -221,4 +221,11 @@ class MUDPanel(wx.Panel):
             if code == (key, modifiers):
                 macro.execute(self.engine, self.client)
 
-        e.Skip()
+        if not modifiers and e.GetEventObject() is self.output:
+            print "Trying to redirect..."
+            #self.input.SetFocus()
+            e.SetEventObject(self.input)
+            #wx.PostEvent(self.input, e)
+            e.Skip()
+        else:
+            e.Skip()
