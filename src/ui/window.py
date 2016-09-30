@@ -142,6 +142,8 @@ class MUDPanel(wx.Panel):
         self.engine = engine
         self.client = None
         self.world = world
+        self.index = -1
+        self.history = []
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
@@ -191,13 +193,17 @@ class MUDPanel(wx.Panel):
         msg = event.GetString().encode(encoding, "replace")
         self.client.write(msg + "\r\n")
 
+        # Write in the history
+        if event.GetEventObject() == self.input:
+            if self.index == -1 and msg:
+                self.history.append(msg)
+
     def OnFocus(self, evt):
         """The GUIClient requires a change of focus.
 
         This event is triggered when the GUIClient asks a change of
         focus in the input field (hiding the password field) or in
         the password field (hiding the input field).
-
         """
         val = evt.GetValue()
         if val == "input":
@@ -211,10 +217,14 @@ class MUDPanel(wx.Panel):
 
     def OnKeyDown(self, e):
         """A key is pressed in the window."""
+        skip = True
         modifiers = e.GetModifiers()
         key = e.GetUnicodeKey()
         if not key:
             key = e.GetKeyCode()
+
+        if e.GetEventObject() == self.input:
+            skip = self.HandleHistory(modifiers, key)
 
         # Look for matching macros
         for code, macro in self.engine.macros.items():
@@ -227,5 +237,50 @@ class MUDPanel(wx.Panel):
             e.SetEventObject(self.input)
             #wx.PostEvent(self.input, e)
             e.Skip()
-        else:
+        elif skip:
             e.Skip()
+
+    def HandleHistory(self, modifiers, key):
+        """Handle the history commands."""
+        if modifiers == 0:
+            if key == wx.WXK_UP:
+                self.HistoryGoUp()
+                return False
+            elif key == wx.WXK_DOWN:
+                self.HistoryGoDown()
+                return False
+
+        return True
+
+    def HistoryGoUp(self):
+        """Go up in the history."""
+        if self.index == -1:
+            self.index = len(self.history) - 1
+        elif self.index > 0:
+            self.index -= 1
+        else:
+            return
+
+        message = self.history[self.index]
+        encoding = self.engine.settings["options.general.encoding"]
+        message = message.decode(encoding, "replace")
+        self.input.Clear()
+        self.input.SetValue(message)
+        self.input.SetInsertionPoint(len(message) + 1)
+
+    def HistoryGoDown(self):
+        """Go down in the history."""
+        if self.index == -1:
+            return
+        elif self.index >= len(self.history) - 1:
+            self.index = -1
+            message = ""
+        else:
+            self.index += 1
+            message = self.history[self.index]
+
+        encoding = self.engine.settings["options.general.encoding"]
+        message = message.decode(encoding, "replace")
+        self.input.Clear()
+        self.input.SetValue(message)
+        self.input.SetInsertionPoint(len(message) + 1)
