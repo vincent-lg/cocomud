@@ -32,6 +32,7 @@ import wx
 
 from ytranslate.tools import t
 
+from scripting.key import key_name
 from ui.dialogs.connection import ConnectionDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
@@ -232,11 +233,19 @@ class MUDPanel(wx.Panel):
                 macro.execute(self.engine, self.client)
 
         if not modifiers and e.GetEventObject() is self.output:
-            print "Trying to redirect..."
-            #self.input.SetFocus()
-            e.SetEventObject(self.input)
-            #wx.PostEvent(self.input, e)
-            e.Skip()
+            shortcut = key_name(key, modifiers)
+            if shortcut:
+                print "Trying to redirect...", shortcut
+            if shortcut and len(shortcut) == 1:
+                self.input.AppendText(shortcut.lower())
+                self.input.SetFocus()
+            elif shortcut == "Backspace":
+                message = self.input.GetValue()
+                if message:
+                    message = message[:-1]
+                    self.input.SetValue(message)
+                self.input.SetFocus()
+                self.input.SetInsertionPoint(len(message) + 1)
         elif skip:
             e.Skip()
 
