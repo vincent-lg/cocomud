@@ -33,3 +33,4 @@ message:
     missing_action: >
         The action field is empty.  Please specify the actions
         associated with this macro.
+tab_end: Go to the end of output when pressing tab

@@ -258,7 +258,9 @@ class MUDPanel(wx.Panel):
                     self.input.SetInsertionPoint(len(message) + 1)
         elif e.GetEventObject() == self.input:
             if key == wx.WXK_TAB:
-                pass
+                if self.engine.settings["options.accessibility.tab_end"]:
+                    message = self.output.GetValue()
+                    self.output.SetInsertionPoint(-1)
 
         if skip:
             e.Skip()
@@ -289,7 +291,7 @@ class MUDPanel(wx.Panel):
         message = message.decode(encoding, "replace")
         self.input.Clear()
         self.input.SetValue(message)
-        self.input.SetInsertionPoint(len(message) + 1)
+        self.input.SetInsertionPoint(-1)
 
     def HistoryGoDown(self):
         """Go down in the history."""
@@ -306,4 +308,4 @@ class MUDPanel(wx.Panel):
         message = message.decode(encoding, "replace")
         self.input.Clear()
         self.input.SetValue(message)
-        self.input.SetInsertionPoint(len(message) + 1)
+        self.input.SetInsertionPoint(-1)

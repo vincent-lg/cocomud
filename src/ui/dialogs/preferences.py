@@ -238,6 +238,10 @@ class AccessibilityTab(wx.Panel):
         sizer = wx.GridBagSizer(15, 15)
         self.SetSizer(sizer)
 
+        # Tabbing
+        self.tab_end = wx.CheckBox(self, label=t("ui.dialog.tab_end"))
+        self.tab_end.SetValue(settings["options.accessibility.tab_end"])
+
         # TTS preferendces
         self.TTS_on = wx.CheckBox(self, label=t("ui.dialog.TTS.on"))
         self.TTS_on.SetValue(settings["options.TTS.on"])
@@ -245,8 +249,9 @@ class AccessibilityTab(wx.Panel):
         self.TTS_outside.SetValue(settings["options.TTS.outside"])
 
         # Append to the sizer
-        sizer.Add(self.TTS_on, pos=(0, 0))
-        sizer.Add(self.TTS_outside, pos=(0, 1))
+        sizer.Add(self.tab_end, pos=(0, 0))
+        sizer.Add(self.TTS_on, pos=(0, 1))
+        sizer.Add(self.TTS_outside, pos=(0, 2))
 
 
 class PreferencesTabs(wx.Notebook):
@@ -307,6 +312,8 @@ class PreferencesDialog(wx.Dialog):
         old_language = settings["options.general.language"]
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
+        tab_end = accessibility.tab_end.GetValue()
+        settings["options.accessibility.tab_end"] = tab_end
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options"].write()

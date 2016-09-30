@@ -34,3 +34,4 @@ message:
         \ red\xE9marrer le programme pour voir ces modifications.\n"
 restart: "Red\xE9marrage"
 shortcut: Raccourci
+tab_end: Descend en bas du contenu quand TAB est pressé
