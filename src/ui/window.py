@@ -171,7 +171,7 @@ class MUDPanel(wx.Panel):
         # Ouput
         l_output = wx.StaticText(self, -1, t("ui.client.output"))
         t_output = wx.TextCtrl(self, -1, "",
-                size=(600, 400), style=wx.TE_MULTILINE|wx.TE_READONLY)
+                size=(600, 400), style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_PROCESS_TAB)
         self.output = t_output
 
         # Add the output fields in the sizer
@@ -183,6 +183,7 @@ class MUDPanel(wx.Panel):
         t_password.Bind(wx.EVT_TEXT_ENTER, self.EvtText)
         self.Bind(EVT_FOCUS, self.OnFocus)
         t_input.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        t_input.Bind(wx.EVT_SET_FOCUS, self.OnInputFocused)
         t_password.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         t_output.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 
@@ -216,6 +217,13 @@ class MUDPanel(wx.Panel):
             self.password.SetFocus()
             self.input.Hide()
 
+    def OnInputFocused(self, e):
+        """Input gains the focus."""
+        message = self.input.GetValue()
+        if message:
+            self.input.SetInsertionPoint(len(message) + 1)
+        e.Skip()
+
     def OnKeyDown(self, e):
         """A key is pressed in the window."""
         skip = True
@@ -232,21 +240,27 @@ class MUDPanel(wx.Panel):
             if code == (key, modifiers):
                 macro.execute(self.engine, self.client)
 
-        if not modifiers and e.GetEventObject() is self.output:
+        if e.GetEventObject() is self.output:
             shortcut = key_name(key, modifiers)
             if shortcut:
-                print "Trying to redirect...", shortcut
-            if shortcut and len(shortcut) == 1:
-                self.input.AppendText(shortcut.lower())
-                self.input.SetFocus()
-            elif shortcut == "Backspace":
-                message = self.input.GetValue()
-                if message:
-                    message = message[:-1]
-                    self.input.SetValue(message)
-                self.input.SetFocus()
-                self.input.SetInsertionPoint(len(message) + 1)
-        elif skip:
+                if len(shortcut) == 1:
+                    self.input.AppendText(shortcut.lower())
+                    self.input.SetFocus()
+                elif shortcut.startswith("Shift + ") and len(shortcut) == 9:
+                    self.input.AppendText(shortcut[8])
+                    self.input.SetFocus()
+                elif shortcut == "Backspace":
+                    message = self.input.GetValue()
+                    if message:
+                        message = message[:-1]
+                        self.input.SetValue(message)
+                    self.input.SetFocus()
+                    self.input.SetInsertionPoint(len(message) + 1)
+        elif e.GetEventObject() == self.input:
+            if key == wx.WXK_TAB:
+                pass
+
+        if skip:
             e.Skip()
 
     def HandleHistory(self, modifiers, key):
