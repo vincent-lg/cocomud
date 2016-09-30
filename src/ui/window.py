@@ -243,19 +243,9 @@ class MUDPanel(wx.Panel):
         if e.GetEventObject() is self.output:
             shortcut = key_name(key, modifiers)
             if shortcut:
-                if len(shortcut) == 1:
-                    self.input.AppendText(shortcut.lower())
-                    self.input.SetFocus()
-                elif shortcut.startswith("Shift + ") and len(shortcut) == 9:
-                    self.input.AppendText(shortcut[8])
-                    self.input.SetFocus()
-                elif shortcut == "Backspace":
-                    message = self.input.GetValue()
-                    if message:
-                        message = message[:-1]
-                        self.input.SetValue(message)
-                    self.input.SetFocus()
-                    self.input.SetInsertionPoint(len(message) + 1)
+                if shortcut == "Backspace" or len(shortcut) == 1 or (
+                        shortcut.startswith("Shift +") and len(shortcut) == 9):
+                    self.input.EmulateKeyPress(e)
         elif e.GetEventObject() == self.input:
             if key == wx.WXK_TAB:
                 if self.engine.settings["options.accessibility.tab_end"]:

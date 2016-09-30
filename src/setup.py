@@ -35,6 +35,7 @@ exe = Executable(
 
 includefiles = [
     "translations",
+    "worlds",
     "../dolapi.dll",
     "../jfwapi.dll",
     "../nvdaControllerClient.dll",
