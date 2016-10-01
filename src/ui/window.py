@@ -117,6 +117,13 @@ class ClientWindow(wx.Frame):
     def handle_message(self, message):
         """The client has just received a message."""
         pos = self.panel.output.GetInsertionPoint()
+        lines = message.splitlines()
+        lines = [line for line in lines if line]
+        message = "\n".join(lines)
+        output = self.panel.output.GetValue()
+        if output and not output.endswith("\n"):
+            message = "\n" + message
+
         self.panel.output.write(message)
         self.panel.output.SetInsertionPoint(pos)
 
