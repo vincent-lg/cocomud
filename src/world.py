@@ -28,6 +28,11 @@
 
 """This file contains the World class."""
 
+import os
+from textwrap import dedent
+
+from configobj import ConfigObj
+
 class World:
 
     """A class representing a World object.
@@ -40,9 +45,9 @@ class World:
     def __init__(self, location):
         self.location = location
         self.settings = None
-        self.name = None
-        self.hostname = None
-        self.port = None
+        self.name = ""
+        self.hostname = ""
+        self.port = 4000
         self.characters = {}
 
     def __repr__(self):
@@ -52,3 +57,25 @@ class World:
     @property
     def path(self):
         return "worlds/" + self.location
+
+    def save(self):
+        """Save the world in its configuraiton file."""
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+
+        spec = dedent("""
+            [connection]
+                name = "unknown"
+                hostname = "unknown.ext"
+                port = 0
+        """).strip("\n")
+
+        if self.settings is None:
+            self.settings = ConfigObj(spec.split("\n"))
+
+        connection = self.settings["connection"]
+        connection["name"] = self.name
+        connection["hostname"] = self.hostname
+        connection["port"] = self.port
+        self.settings.filename = os.path.join(self.path, "options.conf")
+        self.settings.write()

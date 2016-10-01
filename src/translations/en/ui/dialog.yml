@@ -14,6 +14,7 @@ TTS:
     "on": Enable TTS (Text-To Speech)
     outside: Enable TTS when on a different window
 message:
+    invalid: Invalid information
     update_language: >
         You have changed the CocoMUD anguage.  You have to restart the
         application to see these changes.
@@ -34,3 +35,6 @@ message:
         The action field is empty.  Please specify the actions
         associated with this macro.
 tab_end: Go to the end of output when pressing tab
+world:
+    add: Add a new world
+    edit: Edit an existing world

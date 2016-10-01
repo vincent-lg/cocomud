@@ -12,6 +12,7 @@ macro:
     edit: Édition d'un macro
 macros: Macros
 message:
+    invalid: Information invalide
     missing: Information manquante
     missing_action: >
         Le champ de texte contenant l'action est vide. Veuillez préciser
@@ -35,3 +36,6 @@ message:
 restart: "Red\xE9marrage"
 shortcut: Raccourci
 tab_end: Descend en bas du contenu quand TAB est pressé
+world:
+    add: Ajouter un univers
+    edit: Éditer un univers existant

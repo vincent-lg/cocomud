@@ -32,6 +32,8 @@ import wx
 
 from ytranslate import t
 
+from world import World
+
 class ConnectionDialog(wx.Dialog):
 
     """Connection dialog to choose a server and character."""
@@ -77,9 +79,9 @@ class ConnectionDialog(wx.Dialog):
 
         # Event binding
         connect.Bind(wx.EVT_BUTTON, self.OnConnect)
-        #b_edit.Bind(wx.EVT_BUTTON, self.OnEdit)
+        edit.Bind(wx.EVT_BUTTON, self.OnEdit)
         #remove.Bind(wx.EVT_BUTTON, self.OnRemove)
-        #add.Bind(wx.EVT_BUTTON, self.OnAdd)
+        add.Bind(wx.EVT_BUTTON, self.OnAdd)
 
     def populate_list(self, selection=0):
         """Populate the list with existing worlds."""
@@ -94,25 +96,32 @@ class ConnectionDialog(wx.Dialog):
 
     def OnAdd(self, e):
         """The 'add' button is pressed."""
-        dialog = EditMacroDialog(self.engine, self.macro_list,
-                Macro(0, 0, ""))
+        world = World("")
+        dialog = EditWorldDialog(self.engine, world)
         dialog.ShowModal()
-        self.populate_list(len(self.macro_list) - 1)
-        self.macros.SetFocus()
+        worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
+        try:
+            index = worlds.index(world)
+        except IndexError:
+            index = 0
+
+        self.populate_list(index)
+        self.worlds.SetFocus()
 
     def OnEdit(self, e):
         """The 'edit' button is pressed."""
-        index = self.macros.GetFirstSelected()
+        index = self.worlds.GetFirstSelected()
+        worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         try:
-            macro = self.macro_list[index]
+            world = worlds[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected macro.",
+            wx.MessageBox("Unable to find the selected world",
                     wx.OK | wx.ICON_ERROR)
         else:
-            dialog = EditMacroDialog(self.engine, self.macro_list, macro)
+            dialog = EditWorldDialog(self.engine, world)
             dialog.ShowModal()
             self.populate_list(index)
-            self.macros.SetFocus()
+            self.worlds.SetFocus()
 
     def OnRemove(self, e):
         """The 'remove' button is pressed."""
@@ -133,42 +142,113 @@ class ConnectionDialog(wx.Dialog):
                 self.populate_list(0)
                 self.macros.SetFocus()
 
-    def OnOK(self, e):
-        """Save the macros."""
-        macros = self.engine.macros
-        macros.clear()
-        for macro in self.macro_list:
-            macros[(macro.key, macro.modifiers)] = macro
-
-        self.engine.settings.write_macros()
-        self.Destroy()
-
-    def OnClose(self, e):
-        """Simply exit the dialog."""
-        # First, check that there hasn't been any modification
-        dlg_macros = {}
-        for macro in self.macro_list:
-            dlg_macros[macro.key, macro.modifiers] = macro.action
-
-        # Active macros
-        act_macros = {}
-        for macro in self.engine.macros.values():
-            act_macros[macro.key, macro.modifiers] = macro.action
-
-        if dlg_macros == act_macros:
-            self.Destroy()
-        else:
-            value = wx.MessageBox(t("ui.dialog.message.unsaved_macros"),
-                    t("ui.dialog.confirm"),
-                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-
-            if value == wx.YES:
-                self.Destroy()
-
     def OnConnect(self, e):
         """Exit the window."""
         worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         index = self.worlds.GetFirstSelected()
         world = worlds[index]
         self.engine.default_world = world
+        self.Destroy()
+
+class EditWorldDialog(wx.Dialog):
+
+    """Dialog to add/edit a world."""
+
+    def __init__(self, engine, world=None):
+        if world.name:
+            title = t("ui.dialog.world.edit")
+        else:
+            title = t("ui.dialog.world.add")
+
+        super(EditWorldDialog, self).__init__(None, title=title)
+        self.engine = engine
+        self.worlds = engine.worlds
+        self.world = world
+
+        self.InitUI()
+        self.Center()
+
+    def InitUI(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        s_name = wx.BoxSizer(wx.HORIZONTAL)
+        s_hostname = wx.BoxSizer(wx.HORIZONTAL)
+        s_port = wx.BoxSizer(wx.HORIZONTAL)
+        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+        self.SetSizer(sizer)
+
+        # Create the name field
+        l_name = wx.StaticText(self, label=t("common.name"))
+        t_name = wx.TextCtrl(self, value=self.world.name)
+        self.name = t_name
+        s_name.Add(l_name)
+        s_name.Add(t_name)
+        sizer.Add(s_name)
+
+        # Create the hostname field
+        l_hostname = wx.StaticText(self, label=t("common.hostname"))
+        t_hostname = wx.TextCtrl(self, value=self.world.hostname)
+        self.hostname = t_hostname
+        s_hostname.Add(l_hostname)
+        s_hostname.Add(t_hostname)
+        sizer.Add(s_hostname)
+
+        # Create the port field
+        l_port = wx.StaticText(self, label=t("common.port"))
+        t_port = wx.TextCtrl(self, value=str(self.world.port))
+        self.port = t_port
+        s_port.Add(l_port)
+        s_port.Add(t_port)
+        sizer.Add(s_port)
+
+        # Main sizer
+        sizer.Add(buttons)
+        sizer.Fit(self)
+
+        self.name.SetFocus()
+
+        # Event binding
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=wx.ID_CANCEL)
+
+    def OnOK(self, e):
+        """Save the world."""
+        name = self.name.GetValue()
+        hostname = self.hostname.GetValue()
+        port = self.port.GetValue()
+        if not name:
+            wx.MessageBox(t("ui.message.world.missing"),
+                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+            self.name.SetFocus()
+        elif not hostname:
+            wx.MessageBox(t("ui.message.world.hostname"),
+                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+            self.hostname.SetFocus()
+        elif not port:
+            wx.MessageBox(t("ui.message.world.port"),
+                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+            self.port.SetFocus()
+        elif not port.isdigit() or int(port) < 0 or int(port) > 65535:
+            wx.MessageBox(t("ui.message.world.invalid_port"),
+                    t("ui.dialog.message.invalid"), wx.OK | wx.ICON_ERROR)
+            self.port.SetFocus()
+        else:
+            name = name.encode("utf-8", "replace")
+            hostname = hostname.encode("utf-8", "replace")
+            port = int(port)
+            if not self.world.location:
+                self.world.location = name.lower()
+
+            self.world.name = name
+            self.world.hostname = hostname
+            self.world.port = port
+            if self.world not in self.worlds.values():
+                for name, t_world in tuple(self.worlds.items()):
+                    if t_world is self.world:
+                        del self.worlds[name]
+            self.worlds[self.world.name] = self.world
+            self.world.save()
+            self.Destroy()
+
+    def OnCancel(self, e):
+        """Simply exit the dialog."""
         self.Destroy()
