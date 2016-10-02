@@ -1,5 +1,5 @@
-file: '&Fichier'
-game: '&Jeu'
-macro: '&Macro'
-preferences: '&Options\tAlt+Enter'
-quit: '&Quitter'
+file: "&Fichier"
+game: "&Jeu"
+macro: "&Macro"
+preferences: "&Options\tAlt+Enter"
+quit: "&Quitter"

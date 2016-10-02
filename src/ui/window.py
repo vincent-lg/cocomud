@@ -124,6 +124,9 @@ class ClientWindow(wx.Frame):
         if output and not output.endswith("\n"):
             message = "\n" + message
 
+        if self.engine.settings["options.accessibility.nl_end"]:
+            message += "\n"
+
         self.panel.output.write(message)
         self.panel.output.SetInsertionPoint(pos)
 

@@ -241,7 +241,8 @@ class Settings(Configuration):
                 encoding = string(default="iso8859_15")
 
             [accessibility]
-                tab_end = boolean(default=true)
+                tab_end = boolean(default=True)
+                nl_end = boolean(default=True)
 
             [TTS]
                 on = boolean(default=True)

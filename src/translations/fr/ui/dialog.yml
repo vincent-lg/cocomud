@@ -36,6 +36,7 @@ message:
 restart: "Red\xE9marrage"
 shortcut: Raccourci
 tab_end: Descend en bas du contenu quand TAB est pressé
+nl_end: Ajoute une nouvelle ligne à la fin du contenu
 world:
     add: Ajouter un univers
     edit: Éditer un univers existant
