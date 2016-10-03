@@ -78,6 +78,7 @@ class ConnectionDialog(wx.Dialog):
         self.worlds.SetFocus()
 
         # Event binding
+        worlds.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         connect.Bind(wx.EVT_BUTTON, self.OnConnect)
         edit.Bind(wx.EVT_BUTTON, self.OnEdit)
         #remove.Bind(wx.EVT_BUTTON, self.OnRemove)
@@ -93,6 +94,13 @@ class ConnectionDialog(wx.Dialog):
         if worlds:
             self.worlds.Select(selection)
             self.worlds.Focus(selection)
+
+    def OnKeyDown(self, e):
+        """If Enter is pressed, connect to the selected world."""
+        if e.GetKeyCode() == wx.WXK_RETURN:
+            self.OnConnect(e)
+
+        e.Skip()
 
     def OnAdd(self, e):
         """The 'add' button is pressed."""
