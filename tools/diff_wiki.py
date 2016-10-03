@@ -42,10 +42,13 @@ parser = argparse.ArgumentParser(
         description="prepare wiki pages for translation")
 parser.add_argument("lang", help="the language code (en, fr, es...)",
         choices=["fr"])
+parser.add_argument("-i", "--interactive", action="store_true",
+        help="should confirmation be asked for each file?")
 args = parser.parse_args()
 
 # Configure the system
 lang = args.lang
+interactive = args.interactive
 
 # Connects to the REST API
 redmine = Redmine("https://cocomud.plan.io")
@@ -98,8 +101,15 @@ for page in pages.values():
             tr_file.close()
 
             # Call 'diff3' on these three files
-            diff3 = os.popen("diff3 -m {old} {new} {tr}".format(
-                    old=old_path, new=new_path, tr=tr_path)).read()
+            if interactive:
+                answer = raw_input("Should the 'diff3' operation be " \
+                        "performed for fhe file '{}' (Y/N)?".format(title))
+                if answer.lower() != "y":
+                    continue
+
+            diff3 = os.popen("diff3 -m {tr} {old} {new} -L translated " \
+                    "-L common -L newer".format(old=old_path,
+                    new=new_path, tr=tr_path)).read()
 
             # Write the result in the file
             file = open(filepath, "w")
