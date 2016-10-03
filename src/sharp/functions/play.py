@@ -28,8 +28,7 @@
 
 """Module containing the Play function class."""
 
-from pygame import mixer
-mixer.init()
+import winsound
 
 from sharp import Function
 
@@ -41,16 +40,6 @@ class Play(Function):
 
     """
 
-    def init(self):
-        """Initialize the cache of sounds."""
-        self.cache = {}
-
     def run(self, filename):
         """Say the text."""
-        if filename in self.cache:
-            sound = self.cache[filename]
-        else:
-            sound = mixer.Sound(filename)
-            self.cache[filename] = sound
-
-        sound.play()
+        winsound.PlaySound(filename, winsound.SND_ASYNC | winsound.SND_FILENAME)

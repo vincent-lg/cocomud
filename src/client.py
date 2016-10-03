@@ -32,6 +32,7 @@ It is launched in a new thread, so as not to block the main thread.
 
 """
 
+import os
 import re
 from telnetlib import Telnet, WONT, WILL, ECHO
 import threading
@@ -104,6 +105,18 @@ class GUIClient(Client):
         if self.client:
             self.client.set_option_negotiation_callback(self.handle_option)
 
+    def load_script(self, world):
+        """Load the config.set script."""
+        path = world.path
+        path = os.path.join(path, "config.set")
+        if os.path.exists(path):
+            file = open(path, "r")
+            content = file.read()
+            file.close()
+
+            # Execute the script
+            self.sharp_engine.execute(content)
+
     def link_window(self, window):
         """Link to a window (a GUI object).
 
@@ -116,6 +129,7 @@ class GUIClient(Client):
         """
         self.window = window
         window.client = self
+        self.load_script(window.world)
 
     def handle_message(self, msg):
         """When the client receives a message."""

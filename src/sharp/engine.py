@@ -63,6 +63,7 @@ class SharpScript(object):
         globals = self.globals
         locals = self.locals
         for instruction in instructions:
+            print "Execute", instruction
             exec(instruction, globals, locals)
 
     def feed(self, content):

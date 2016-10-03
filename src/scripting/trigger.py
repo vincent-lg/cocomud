@@ -66,6 +66,7 @@ class Trigger:
         # The '*' sign will be replaced by a group
         reaction = reaction.replace("\\*", "(.*?)")
         reaction = "^" + reaction + "$"
+        print "test", reaction
 
         return re.compile(reaction, re.IGNORECASE)
 
@@ -76,4 +77,5 @@ class Trigger:
 
     def execute(self):
         """Execute the trigger."""
+        print "execute the trigger", self
         self.sharp_engine.execute(self.action)

@@ -46,6 +46,10 @@ class ClientWindow(wx.Frame):
         self.CreateMenuBar()
         self.InitUI(world)
 
+    @property
+    def world(self):
+        return self.panel and self.panel.world or None
+
     def _get_client(self):
         return self.panel.client
     def _set_client(self, client):
