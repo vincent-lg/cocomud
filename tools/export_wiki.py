@@ -94,3 +94,15 @@ for page in pages:
     file = open(path, "w")
     file.write(exported)
     file.close()
+
+# If exporting in HTML, also get the full file
+if format == "html":
+    print "Downloading the complete HTML export."
+    url = "https://cocomud.plan.io/projects/{id}/wiki/export.html".format(
+            id=project_id)
+    response = urllib2.urlopen(url)
+    content = response.read()
+    path = os.path.join(doc, "index.html")
+    file = open(path, "w")
+    file.write(content)
+    file.close()
