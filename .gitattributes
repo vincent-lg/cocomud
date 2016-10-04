@@ -1,5 +1,5 @@
 # Declare files that will always have LF line endings on checkout.
+*py text eol=lf
 *.txt text eol=crlf
 *.set text eol=crlf
 *.conf text eol=crlf
-* text eol=lf
