@@ -22,6 +22,8 @@ parser.add_argument("lang", help="the language code (en, fr, es...)",
         nargs='?', choices=["en", "fr"], default="en")
 parser.add_argument("-k", "--key", required=True,
         help="your Redmine API key")
+parser.add_argument("-i", "--interactive", action="store_true",
+        help="should the program ask a confirmation for each file?")
 args = parser.parse_args()
 
 # Configure the system
@@ -51,25 +53,35 @@ for page in pages:
 
 # Determine the parents
 for page in defaults:
-    page.refresh()
-    print list(page)
-    parents[page.title] = page.parent
+    parent = getattr(page, "parent", None)
+    if parent:
+        parents[page.title] = parent.title
 
-print parents
-exit(1)
 # Import the pages from disk
 path = os.path.join("..", "doctext", lang)
 for filename in os.listdir(path):
     filepath = os.path.join(path, filename)
     title = filename[:-4]
-    answer = raw_input("Do you want to export '{}' (Y/N)?".format(title))
-    if answer.lower() != "y":
-        continue
+    parent = parents.get(title, "")
+    if args.interactive:
+        answer = raw_input("Do you want to export '{}' (Y/N)?".format(
+                title))
+        if answer.lower() != "y":
+            continue
 
     file = open(filepath, "r")
     text = file.read()
     file.close()
 
+    # Skip the version number
+    lines = text.splitlines()
+    if lines[0].isdigit():
+        version = int(lines[0])
+        text = "\n".join(lines[1:])
+    else:
+        text = "\n".join(lines)
+
+    text = text.decode("latin-1")
     # Create the page if needed
     if title in existing.keys():
         page = existing[title]
@@ -77,6 +89,6 @@ for filename in os.listdir(path):
         page.save()
     else:
         page = redmine.wiki_page.create(project_id=project_id,
-                title=title, text=text)
+                title=title, text=text, parent_title=parent)
 
-    print "Imported '{}' in wiki '{}'.".format(lang, project_id)
+    print "Imported '{}' in wiki '{}'.".format(title, project_id)

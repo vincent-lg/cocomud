@@ -88,10 +88,24 @@ for page in pages:
     else:
         raise ValueError("unknown format {}".format(format))
 
-    # Write the exported HTML file
+    # Write the exported file
     path = os.path.join(doc, page.title + "." + format)
-    print "Writing", page.title, "in", path
+
+    # If the file contains a version number, do not override it
+    version = None
+    if os.path.exists(path):
+        file = open(path, "r")
+        content = file.read()
+        file.close()
+        lines = content.splitlines()
+        if lines[0].isdigit():
+            version = int(lines[0])
+
+    print "Writing", page.title, "in", path, "version", version
+    exported = exported.replace("\r", "").decode("utf-8").encode("latin-1")
     file = open(path, "w")
+    if version is not None:
+        file.write(str(version) + "\n")
     file.write(exported)
     file.close()
 
