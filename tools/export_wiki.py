@@ -102,7 +102,7 @@ for page in pages:
             version = int(lines[0])
 
     print "Writing", page.title, "in", path, "version", version
-    exported = exported.replace("\r", "").decode("utf-8").encode("latin-1")
+    exported = exported.decode("utf-8").encode("latin-1").replace("\r", "")
     file = open(path, "w")
     if version is not None:
         file.write(str(version) + "\n")
