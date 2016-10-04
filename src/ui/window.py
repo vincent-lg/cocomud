@@ -43,6 +43,7 @@ class ClientWindow(wx.Frame):
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
         self.engine = engine
+        self.focus = True
         self.CreateMenuBar()
         self.InitUI(world)
 
@@ -96,6 +97,7 @@ class ClientWindow(wx.Frame):
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
@@ -116,6 +118,11 @@ class ClientWindow(wx.Frame):
         if self.panel.client:
             self.panel.client.running = False
         self.Destroy()
+
+    def OnActivate(self, e):
+        """The window gains focus."""
+        self.focus = e.GetActive()
+        e.Skip()
 
     # Methods to handle client's events
     def handle_message(self, message):
@@ -159,6 +166,7 @@ class MUDPanel(wx.Panel):
         self.world = world
         self.index = -1
         self.history = []
+        self.focused = True
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 

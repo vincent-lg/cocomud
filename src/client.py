@@ -141,6 +141,12 @@ class GUIClient(Client):
 
         # In any case, tries to find the TTS
         if self.engine.TTS_on:
+            # If outside of the window
+            window = self.window
+            focus = window.focus if window else True
+            if not focus and not self.engine.settings["options.TTS.outside"]:
+                return
+
             if say and braille:
                 say(msg, interrupt=False)
                 braille(msg)
