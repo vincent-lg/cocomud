@@ -118,6 +118,9 @@ class GUIClient(Client):
 
     def load_script(self, world):
         """Load the config.set script."""
+        from game import Level
+        level = self.engine.level
+        self.engine.level = Level.world
         path = world.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
@@ -127,6 +130,9 @@ class GUIClient(Client):
 
             # Execute the script
             self.sharp_engine.execute(content)
+
+        # Put the engine level back
+        self.engine.level = level
 
     def link_window(self, window):
         """Link to a window (a GUI object).

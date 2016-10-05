@@ -28,10 +28,31 @@
 
 """This file contains the GameEngine class."""
 
+from enum import Enum
+
 from client import GUIClient
 from config import Settings
 from scripting.key import key_code
 from scripting.macro import Macro
+
+class Level(Enum):
+
+    """Enumeration for a feature level.
+
+    Features at the top level have the value "engine". They will be
+    common across all worlds and characters. Features are often defined
+    at the world level (common across characters) or at the character
+    level (specific to this character).
+
+    For instance, look at the macros, triggers and aliases.
+
+    """
+
+    engine = 1
+    world = 2
+    character = 3
+    category = 4
+
 
 class GameEngine:
 
@@ -50,6 +71,7 @@ class GameEngine:
         self.worlds = {}
         self.default_world = None
         self.macros = {}
+        self.level = Level.engine
 
     def load(self):
         """Load the configuration."""

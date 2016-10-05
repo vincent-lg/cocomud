@@ -47,8 +47,12 @@ class Trigger:
         self.re_reaction = self.find_regex(reaction)
         self.action = action
 
+        # Set the trigger's level
+        self.level = sharp.engine.level
+
     def __repr__(self):
-        return "<Trigger for {}>".format(repr(self.reaction))
+        return "<Trigger for {} (level={})>".format(
+                repr(self.reaction), self.level.name)
 
     def find_regex(self, reaction):
         """Find and compile the reaction given as argument.
