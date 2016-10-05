@@ -1,4 +1,4 @@
-﻿"""This script exports the wiki pages from Redmine.
+﻿"""This script exports the wiki pages from Redmine in HTML.
 
 All wiki pages on Redmine (https://cocomud.plan.io) are saved in the
 'doc' directory.
@@ -24,22 +24,12 @@ parser = argparse.ArgumentParser(
         description="export wiki pages in various formats")
 parser.add_argument("lang", help="the language code (en, fr, es...)",
         nargs='?', choices=["en", "fr"], default="en")
-group = parser.add_mutually_exclusive_group()
-group.add_argument("-t", "--txt", help="export in txt format",
-        action="store_true")
-group.add_argument("-l", "--html", help="export in html format",
-        action="store_true")
 args = parser.parse_args()
 
 # Configure the system
 lang = args.lang
-if args.txt:
-    format = "txt"
-elif args.html:
-    format = "html"
-else:
-    print "You must specify the format in which to export."
-    sys.exit(1)
+format = "html"
+doc = os.path.join("..", "doc", lang)
 
 # Connects to the REST API
 redmine = Redmine("https://cocomud.plan.io")
@@ -54,69 +44,45 @@ if lang == "en":
 else:
     project_id = lang
 
-# If the exported format is txt, the directory differs
-if format == "txt":
-    doc = "../doctext/{lang}".format(lang=lang)
-else:
-    doc = "../doc/{lang}".format(lang=lang)
-
 pages = redmine.wiki_page.filter(project_id=project_id)
 for page in pages:
-    # HTML export if needed
     url = "https://cocomud.plan.io/projects/{id}/wiki/{title}.html".format(
             id=project_id, title=page.title)
-    if format == "txt":
-        exported = page.text
-    elif format == "html":
-        response = urllib2.urlopen(url)
-        content = response.read()
-        soup = BeautifulSoup(content)
+    response = urllib2.urlopen(url)
+    content = response.read()
+    soup = BeautifulSoup(content)
 
-        # Find the links
-        for link in soup.findAll("a"):
-            try:
-                href = link["href"]
-            except KeyError:
-                continue
+    # Find the links
+    for link in soup.findAll("a"):
+        try:
+            href = link["href"]
+        except KeyError:
+            continue
 
-            if href.startswith("/projects/{}/wiki/".format(project_id)):
-                link["href"] = href[16 + len(project_id):] + ".html"
-            elif href.startswith("/"):
-                link["href"] = "https://cocomud.plan.io" + href
+        if href.startswith("/projects/{}/wiki/".format(project_id)):
+            link["href"] = href[16 + len(project_id):] + ".html"
+        elif href.startswith("/"):
+            link["href"] = "https://cocomud.plan.io" + href
 
-        exported = str(soup)
-    else:
-        raise ValueError("unknown format {}".format(format))
+    exported = str(soup)
 
     # Write the exported file
     path = os.path.join(doc, page.title + "." + format)
 
-    # If the file contains a version number, do not override it
-    version = None
-    if os.path.exists(path):
-        file = open(path, "r")
-        content = file.read()
-        file.close()
-        lines = content.splitlines()
-        if lines[0].isdigit():
-            version = int(lines[0])
-
-    print "Writing", page.title, "in", path, "version", version
-    exported = exported.decode("utf-8").encode("latin-1").replace("\r", "")
+    print "Writing", page.title, "in", path
+    exported = exported.replace("\r", "")
     file = open(path, "w")
-    if version is not None:
-        file.write(str(version) + "\n")
     file.write(exported)
     file.close()
 
-# If exporting in HTML, also get the full file
-if format == "html":
-    print "Downloading the complete HTML export."
-    url = "https://cocomud.plan.io/projects/{id}/wiki/export.html".format(
-            id=project_id)
-    response = urllib2.urlopen(url)
-    content = response.read()
-    path = os.path.join(doc, "index.html")
-    file = open(path, "w")
-    file.write(content)
-    file.close()
+# Export the full wiki
+print "Downloading the complete HTML export."
+url = "https://cocomud.plan.io/projects/{id}/wiki/export.html".format(
+        id=project_id)
+response = urllib2.urlopen(url)
+content = response.read()
+content = content.replace("\r", "")
+path = os.path.join(doc, "index.html")
+file = open(path, "w")
+file.write(content)
+file.close()
