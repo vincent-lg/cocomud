@@ -43,7 +43,7 @@ try:
     from UniversalSpeech import braille as display_braille
 except ImportError:
     say = None
-    braille = None
+    display_braille = None
 
 from sharp.engine import SharpScript
 
@@ -80,12 +80,14 @@ class Client(threading.Thread):
 
                 self.handle_message(msg)
 
-    def handle_message(self, msg, force_TTS=False, speech=True, braille=True):
+    def handle_message(self, msg, force_TTS=False, screen=True,
+            speech=True, braille=True):
         """When the client receives a message.
 
         Parameters
-            text: the text to be displayed (str)
+            msg: the text to be displayed (str)
             force_TTS: should the text be spoken regardless?
+            screen: should the text appear on screen?
             speech: should the speech be enabled?
             braille: should the braille be enabled?
 
@@ -140,12 +142,14 @@ class GUIClient(Client):
         window.client = self
         self.load_script(window.world)
 
-    def handle_message(self, msg, force_TTS=False, speech=True, braille=True):
+    def handle_message(self, msg, force_TTS=False, screen=True,
+            speech=True, braille=True):
         """When the client receives a message.
 
         Parameters
             msg: the text to be displayed (str)
             force_TTS: should the text be spoken regardless?
+            screen: should the text appear on screen?
             speech: should the speech be enabled?
             braille: should the braille be enabled?
 
@@ -153,7 +157,7 @@ class GUIClient(Client):
         encoding = self.engine.settings["options.general.encoding"]
         msg = msg.decode(encoding, "replace")
         msg = ANSI_ESCAPE.sub('', msg)
-        if self.window:
+        if self.window and screen:
             self.window.handle_message(msg)
 
         # In any case, tries to find the TTS
@@ -167,7 +171,7 @@ class GUIClient(Client):
 
             if say and speech:
                 say(msg, interrupt=False)
-            if braille:
+            if braille and display_braille:
                 display_braille(msg)
 
     def handle_option(self, socket, command, option):

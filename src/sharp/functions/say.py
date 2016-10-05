@@ -39,7 +39,8 @@ class Say(Function):
 
     """
 
-    def run(self, text):
+    def run(self, text, screen=True, speech=True, braille=True):
         """Say the text."""
         if self.client:
-            self.client.handle_message(text)
+            self.client.handle_message(text, screen=screen,
+                    speech=speech, braille=braille)
