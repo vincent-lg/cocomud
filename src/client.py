@@ -39,7 +39,8 @@ import threading
 import time
 
 try:
-    from UniversalSpeech import say, braille
+    from UniversalSpeech import say
+    from UniversalSpeech import braille as display_braille
 except ImportError:
     say = None
     braille = None
@@ -79,8 +80,16 @@ class Client(threading.Thread):
 
                 self.handle_message(msg)
 
-    def handle_message(self, msg):
-        """When the client receives a message."""
+    def handle_message(self, msg, force_TTS=False, speech=True, braille=True):
+        """When the client receives a message.
+
+        Parameters
+            text: the text to be displayed (str)
+            force_TTS: should the text be spoken regardless?
+            speech: should the speech be enabled?
+            braille: should the braille be enabled?
+
+        """
         pass
 
     def write(self, text):
@@ -131,8 +140,16 @@ class GUIClient(Client):
         window.client = self
         self.load_script(window.world)
 
-    def handle_message(self, msg):
-        """When the client receives a message."""
+    def handle_message(self, msg, force_TTS=False, speech=True, braille=True):
+        """When the client receives a message.
+
+        Parameters
+            msg: the text to be displayed (str)
+            force_TTS: should the text be spoken regardless?
+            speech: should the speech be enabled?
+            braille: should the braille be enabled?
+
+        """
         encoding = self.engine.settings["options.general.encoding"]
         msg = msg.decode(encoding, "replace")
         msg = ANSI_ESCAPE.sub('', msg)
@@ -140,16 +157,18 @@ class GUIClient(Client):
             self.window.handle_message(msg)
 
         # In any case, tries to find the TTS
-        if self.engine.TTS_on:
+        if self.engine.TTS_on or force_TTS:
             # If outside of the window
             window = self.window
             focus = window.focus if window else True
             if not focus and not self.engine.settings["options.TTS.outside"]:
-                return
+                if not force_TTS:
+                    return
 
-            if say and braille:
+            if say and speech:
                 say(msg, interrupt=False)
-                braille(msg)
+            if braille:
+                display_braille(msg)
 
     def handle_option(self, socket, command, option):
         """Handle a received option."""

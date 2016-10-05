@@ -26,31 +26,23 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from cx_Freeze import setup, Executable
+"""Module containing the TTS function class."""
 
-exe = Executable(
-    script="cocomud.py",
-    base="Win32GUI",
-)
+from sharp import Function
 
-includefiles = [
-    "translations",
-    "worlds",
-    "../doc",
-    "../settings",
+class TTS(Function):
 
-    # UniversalSpeech DLLs
-    "../dolapi.dll",
-    "../jfwapi.dll",
-    "../nvdaControllerClient.dll",
-    "../SAAPI32.dll",
-    "../UniversalSpeech.dll",
-]
+    """Function SharpScript 'tts'.
 
-setup(
-    name = "CocoMUD client",
-    version = "0.2",
-    description = "The CocoMUD client.",
-    options = {'build_exe': {'include_files': includefiles}},
-    executables = [exe]
-)
+    This function can be used to switch the TTS on or off in a setting
+    that won't be saved.
+
+    """
+
+    def run(self):
+        """Switch TTS."""
+        self.engine.TTS_on = not self.engine.TTS_on
+        flag = "on" if self.engine.TTS_on else "off"
+        if self.client:
+            self.client.handle_message("TTS {}.".format(flag),
+                    force_TTS=True)
