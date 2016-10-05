@@ -26,46 +26,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Class containing the Macro class."""
+"""Module containing the Macro function class."""
 
-from scripting.key import key_name
+from scripting.key import key_code
+from scripting.macro import Macro as ObjMacro
+from sharp import Function
 
-class Macro:
+class Macro(Function):
 
-    """A macro object.
+    """Function SharpScript 'macro'."""
 
-    In a MUD client terminology, a macro is a link between a shortcut
-    key and an action that is sent to the MUD.  For example, the F1
-    shortcut could send 'north' to the MUD.
-
-    """
-
-    def __init__(self, key, modifiers, action, sharp):
-        self.key = key
-        self.modifiers = modifiers
-        self.action = action
-        self.sharp_engine = sharp
-
-        # Set the trigger's level
-        self.level = sharp.engine.level
-
-    def __repr__(self):
-        return "<Macro {}: {} (level={})>".format(self.shortcut,
-                self.action, self.level.name)
-
-    @property
-    def shortcut(self):
-        """Return the key name."""
-        return key_name(self.key, self.modifiers)
-
-    @property
-    def copied(self):
-        """Return another object of the Macro class with identical info."""
-        copy = Macro(self.key, self.modifiers, self.action,
-                self.sharp_engine)
-        copy.level = self.level
-        return copy
-
-    def execute(self, engine, client):
-        """Execute the macro."""
-        client.write(self.action + "\r\n")
+    def run(self, shortcut, action):
+        """Creates the macro."""
+        key, modifiers = key_code(shortcut)
+        macro = ObjMacro(key, modifiers, action, self.sharp_engine)
+        self.sharp_engine.engine.macros[key, modifiers] = macro

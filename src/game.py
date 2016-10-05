@@ -32,8 +32,6 @@ from enum import Enum
 
 from client import GUIClient
 from config import Settings
-from scripting.key import key_code
-from scripting.macro import Macro
 
 class Level(Enum):
 
@@ -78,12 +76,6 @@ class GameEngine:
         self.settings.load()
         self.TTS_on = self.settings["options.TTS.on"]
         self.TTS_outside = self.settings["options.TTS.outside"]
-
-        # Load the macros
-        for key_name, action in self.settings["macros"].items():
-            code = key_code(key_name)
-            key, modifiers = code
-            self.macros[code] = Macro(key, modifiers, action)
 
     def open(self, host, port):
         """Connect to the specified host and port.
