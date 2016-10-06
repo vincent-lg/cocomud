@@ -93,7 +93,7 @@ class ClientWindow(wx.Frame):
             world = self.engine.default_world
 
         self.panel = MUDPanel(self, self.engine, world)
-        self.SetTitle("CocoMUD client")
+        self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
