@@ -63,6 +63,7 @@ class Client(threading.Thread):
         self.running = False
         self.sharp_engine = SharpScript(engine, self)
         self.triggers = []
+        self.macros = []
 
         # Try to connect to the specified host and port
         self.client = Telnet(host, port)

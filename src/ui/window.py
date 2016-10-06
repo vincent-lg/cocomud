@@ -258,7 +258,8 @@ class MUDPanel(wx.Panel):
             skip = self.HandleHistory(modifiers, key)
 
         # Look for matching macros
-        for code, macro in self.engine.macros.items():
+        for macro in self.client.macros:
+            code = (macro.key, macro.modifiers)
             if code == (key, modifiers):
                 macro.execute(self.engine, self.client)
 

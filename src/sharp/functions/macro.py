@@ -40,4 +40,4 @@ class Macro(Function):
         """Creates the macro."""
         key, modifiers = key_code(shortcut)
         macro = ObjMacro(key, modifiers, action, self.sharp_engine)
-        self.sharp_engine.engine.macros[key, modifiers] = macro
+        self.client.macros.append(macro)

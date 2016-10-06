@@ -68,7 +68,6 @@ class GameEngine:
         self.settings = Settings(self)
         self.worlds = {}
         self.default_world = None
-        self.macros = {}
         self.level = Level.engine
 
     def load(self):
