@@ -246,6 +246,12 @@ class AccessibilityTab(wx.Panel):
         self.nl_end = wx.CheckBox(self, label=t("ui.dialog.nl_end"))
         self.nl_end.SetValue(settings["options.accessibility.nl_end"])
 
+        # SmartCurstor
+        self.smart_cursor = wx.CheckBox(self,
+                label=t("ui.dialog.smart_cursor"))
+        self.smart_cursor.SetValue(
+                settings["options.accessibility.smart_cursor"])
+
         # TTS preferendces
         self.TTS_on = wx.CheckBox(self, label=t("ui.dialog.TTS.on"))
         self.TTS_on.SetValue(settings["options.TTS.on"])
@@ -255,6 +261,7 @@ class AccessibilityTab(wx.Panel):
         # Append to the sizer
         sizer.Add(self.tab_end, pos=(0, 0))
         sizer.Add(self.nl_end, pos=(1, 0))
+        sizer.Add(self.smart_cursor, pos=(2, 0))
         sizer.Add(self.TTS_on, pos=(0, 1))
         sizer.Add(self.TTS_outside, pos=(1, 1))
 
@@ -319,8 +326,10 @@ class PreferencesDialog(wx.Dialog):
         settings["options.general.encoding"] = encoding
         tab_end = accessibility.tab_end.GetValue()
         nl_end = accessibility.nl_end.GetValue()
+        smart_cursor = accessibility.smart_cursor.GetValue()
         settings["options.accessibility.tab_end"] = tab_end
         settings["options.accessibility.nl_end"] = nl_end
+        settings["options.accessibility.smart_cursor"] = smart_cursor
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options"].write()

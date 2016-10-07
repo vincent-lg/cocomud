@@ -218,8 +218,10 @@ class MUDPanel(wx.Panel):
         msg = event.GetString().encode(encoding, "replace")
         self.client.write(msg)
 
+        # SmartCursor
         # If the client was in the output field, switch back there
-        if self.was_output:
+        if self.was_output and self.engine.settings[
+                "options.accessibility.smart_cursor"]:
             self.output.SetFocus()
 
         # Write in the history

@@ -5,6 +5,7 @@ macros: Macros
 encodings: Encodings
 shortcut: Shortcut
 action: Action
+smart_cursor: Enable the smart cursor
 macro:
     add: Add a new macro
     edit: Edit a macro

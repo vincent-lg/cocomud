@@ -35,6 +35,7 @@ message:
         \ red\xE9marrer le programme pour voir ces modifications.\n"
 restart: "Red\xE9marrage"
 shortcut: Raccourci
+smart_cursor: Activer le curseur intelligent
 tab_end: Descend en bas du contenu quand TAB est pressé
 nl_end: Ajoute une nouvelle ligne à la fin du contenu
 world:

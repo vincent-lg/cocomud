@@ -241,6 +241,7 @@ class Settings(Configuration):
                 encoding = string(default="iso8859_15")
 
             [accessibility]
+                smart_cursor = boolean(default=True)
                 tab_end = boolean(default=True)
                 nl_end = boolean(default=True)
 
