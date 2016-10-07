@@ -54,16 +54,16 @@ class Client(threading.Thread):
 
     """Class to receive data from the MUD."""
 
-    def __init__(self, host, port=4000, timeout=0.1, engine=None):
+    def __init__(self, host, port=4000, timeout=0.1, engine=None,
+            world=None):
         """Connects to the MUD."""
         threading.Thread.__init__(self)
         self.client = None
         self.timeout = timeout
         self.engine = engine
+        self.world = world
         self.running = False
-        self.sharp_engine = SharpScript(engine, self)
-        self.triggers = []
-        self.macros = []
+        self.sharp_engine = SharpScript(engine, self, world)
 
         # Try to connect to the specified host and port
         self.client = Telnet(host, port)
@@ -76,7 +76,7 @@ class Client(threading.Thread):
             msg = self.client.read_very_eager()
             if msg:
                 for line in msg.splitlines():
-                    for trigger in self.triggers:
+                    for trigger in self.world.triggers:
                         trigger.feed(line)
 
                 self.handle_message(msg)
@@ -111,29 +111,12 @@ class GUIClient(Client):
 
     """
 
-    def __init__(self, host, port=4000, timeout=0.1, engine=None):
-        Client.__init__(self, host, port, timeout, engine)
+    def __init__(self, host, port=4000, timeout=0.1, engine=None,
+            world=None):
+        Client.__init__(self, host, port, timeout, engine, world)
         self.window = None
         if self.client:
             self.client.set_option_negotiation_callback(self.handle_option)
-
-    def load_script(self, world):
-        """Load the config.set script."""
-        from game import Level
-        level = self.engine.level
-        self.engine.level = Level.world
-        path = world.path
-        path = os.path.join(path, "config.set")
-        if os.path.exists(path):
-            file = open(path, "r")
-            content = file.read()
-            file.close()
-
-            # Execute the script
-            self.sharp_engine.execute(content)
-
-        # Put the engine level back
-        self.engine.level = level
 
     def link_window(self, window):
         """Link to a window (a GUI object).
@@ -147,7 +130,6 @@ class GUIClient(Client):
         """
         self.window = window
         window.client = self
-        self.load_script(window.world)
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True):

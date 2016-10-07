@@ -107,7 +107,7 @@ class ClientWindow(wx.Frame):
 
     def OnMacro(self, e):
         """Open the macro dialog box."""
-        dialog = MacroDialog(self.engine)
+        dialog = MacroDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -258,10 +258,11 @@ class MUDPanel(wx.Panel):
             skip = self.HandleHistory(modifiers, key)
 
         # Look for matching macros
-        for macro in self.client.macros:
-            code = (macro.key, macro.modifiers)
-            if code == (key, modifiers):
-                macro.execute(self.engine, self.client)
+        if self.world:
+            for macro in self.world.macros:
+                code = (macro.key, macro.modifiers)
+                if code == (key, modifiers):
+                    macro.execute(self.engine, self.client)
 
         if e.GetEventObject() is self.output:
             shortcut = key_name(key, modifiers)

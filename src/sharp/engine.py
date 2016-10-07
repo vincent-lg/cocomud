@@ -42,15 +42,16 @@ class SharpScript(object):
 
     """
 
-    def __init__(self, engine, client):
+    def __init__(self, engine, client, world):
         self.engine = engine
         self.client = client
+        self.world = world
         self.locals = {}
         self.globals = globals()
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
-            function = function(engine, client, self)
+            function = function(engine, client, self, world)
             self.globals[name] = function.run
 
     def execute(self, code):

@@ -32,11 +32,12 @@ class Function(object):
 
     """The function class, parent of all SharpScript functions."""
 
-    def __init__(self, engine, client, sharp):
+    def __init__(self, engine, client, sharp, world=None):
         self.engine = engine
         self.client = client
         self.sharp_engine = sharp
         self.init()
+        self.world = world
 
     def init(self):
         """Another secondary constructor."""

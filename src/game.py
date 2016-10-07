@@ -76,12 +76,18 @@ class GameEngine:
         self.TTS_on = self.settings["options.TTS.on"]
         self.TTS_outside = self.settings["options.TTS.outside"]
 
-    def open(self, host, port):
+        # For each world, set the game engine
+        for world in self.worlds.values():
+            world.engine = self
+
+    def open(self, host, port, world):
         """Connect to the specified host and port.
 
         This method creates and returns a 'GUIClient' class initialized
         with the specified information.
 
         """
-        client = GUIClient(host, port, engine=self)
+        client = GUIClient(host, port, engine=self, world=world)
+        world.client = client
+        world.sharp_engine = client.sharp_engine
         return client

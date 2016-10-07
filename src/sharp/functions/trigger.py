@@ -38,5 +38,5 @@ class Trigger(Function):
     def run(self, reaction, action):
         """Say the text."""
         trigger = ObjTrigger(self.sharp_engine, reaction, action)
-        if self.client:
-            self.client.triggers.append(trigger)
+        if self.world:
+            self.world.triggers.append(trigger)
