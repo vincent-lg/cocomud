@@ -40,14 +40,17 @@ class Macro:
 
     """
 
-    def __init__(self, key, modifiers, action, sharp):
+    def __init__(self, key, modifiers, action, sharp=None):
         self.key = key
         self.modifiers = modifiers
         self.action = action
         self.sharp_engine = sharp
 
         # Set the trigger's level
-        self.level = sharp.engine.level
+        if sharp:
+            self.level = sharp.engine.level
+        else:
+            self.level = None
 
     def __repr__(self):
         return "<Macro {}: {} (level={})>".format(self.shortcut,
