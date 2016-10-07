@@ -56,6 +56,7 @@ class World:
         self.sharp_engine = None
 
         # World's configuration
+        self.aliases = []
         self.macros = []
         self.triggers = []
 

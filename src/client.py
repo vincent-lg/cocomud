@@ -100,7 +100,12 @@ class Client(threading.Thread):
         if text.startswith("#"):
             self.sharp_engine.execute(text)
         else:
-            self.client.write(text)
+            # Test the aliases
+            for alias in self.world.aliases:
+                if alias.test(text):
+                    return
+
+            self.client.write(text + "\r\n")
 
 
 class GUIClient(Client):

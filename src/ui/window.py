@@ -215,7 +215,7 @@ class MUDPanel(wx.Panel):
         self.password.Clear()
         encoding = self.engine.settings["options.general.encoding"]
         msg = event.GetString().encode(encoding, "replace")
-        self.client.write(msg + "\r\n")
+        self.client.write(msg)
 
         # Write in the history
         if event.GetEventObject() == self.input:
