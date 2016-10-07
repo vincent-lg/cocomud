@@ -107,3 +107,26 @@ class World:
         connection["port"] = self.port
         self.settings.filename = os.path.join(self.path, "options.conf")
         self.settings.write()
+
+        # Save the 'config.set' script file
+        lines = []
+
+        # Aliases
+        for alias in self.aliases:
+            lines.append(alias.sharp_script)
+
+        # Macros
+        for macro in self.macros:
+            lines.append(macro.sharp_script)
+
+        # Triggers
+        for trigger in self.triggers:
+            lines.append(trigger.sharp_script)
+
+        content = "\n".join(lines)
+        path = self.path
+        print "Writing the config file..."
+        path = os.path.join(path, "config.set")
+        file = open(path, "w")
+        file.write(content)
+        file.close()

@@ -54,6 +54,11 @@ class Trigger:
         return "<Trigger for {} (level={})>".format(
                 repr(self.reaction), self.level.name)
 
+    @property
+    def sharp_script(self):
+        """Return the SharpScript code to create this trigger."""
+        return self.sharp_engine.format((("#trigger", self.reaction,
+                self.action), ))
     def find_regex(self, reaction):
         """Find and compile the reaction given as argument.
 

@@ -53,6 +53,12 @@ class Alias:
         return "<Alias for {} (level={})>".format(
                 repr(self.alias), self.level.name)
 
+    @property
+    def sharp_script(self):
+        """Return the SharpScript code to create this alias."""
+        return self.sharp_engine.format((("#alias", self.alias,
+                self.action), ))
+
     def find_regex(self, alias):
         """Find and compile the alias given as argument.
 

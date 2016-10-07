@@ -254,7 +254,10 @@ class SharpScript(object):
         * If the argument contains semi colons, keep it on one line.
 
         """
-        instructions = self.split_statements(content)
+        if isinstance(content, str):
+            instructions = self.split_statements(content)
+        else:
+            instructions = content
 
         # At this stage, the instructions are formatted in Python
         lines = []

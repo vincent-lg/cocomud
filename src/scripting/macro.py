@@ -59,6 +59,12 @@ class Macro:
         return key_name(self.key, self.modifiers)
 
     @property
+    def sharp_script(self):
+        """Return the SharpScript code to create this macro."""
+        return self.sharp_engine.format((("#macro", self.shortcut,
+                self.action), ))
+
+    @property
     def copied(self):
         """Return another object of the Macro class with identical info."""
         copy = Macro(self.key, self.modifiers, self.action,
