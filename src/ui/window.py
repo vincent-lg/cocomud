@@ -167,6 +167,7 @@ class MUDPanel(wx.Panel):
         self.index = -1
         self.history = []
         self.focused = True
+        self.was_output = False
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
@@ -201,15 +202,15 @@ class MUDPanel(wx.Panel):
         sizer.Add(t_output, proportion=8)
 
         # Event handler
-        t_input.Bind(wx.EVT_TEXT_ENTER, self.EvtText)
-        t_password.Bind(wx.EVT_TEXT_ENTER, self.EvtText)
+        t_input.Bind(wx.EVT_TEXT_ENTER, self.OnText)
+        t_password.Bind(wx.EVT_TEXT_ENTER, self.OnText)
         self.Bind(EVT_FOCUS, self.OnFocus)
         t_input.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         t_input.Bind(wx.EVT_SET_FOCUS, self.OnInputFocused)
         t_password.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         t_output.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 
-    def EvtText(self, event):
+    def OnText(self, event):
         """One of the input fields is sending text."""
         self.input.Clear()
         self.password.Clear()
@@ -217,10 +218,17 @@ class MUDPanel(wx.Panel):
         msg = event.GetString().encode(encoding, "replace")
         self.client.write(msg + "\r\n")
 
+        # If the client was in the output field, switch back there
+        if self.was_output:
+            self.output.SetFocus()
+
         # Write in the history
         if event.GetEventObject() == self.input:
             if self.index == -1 and msg:
                 self.history.append(msg)
+
+        # Reset the 'was_output'
+        self.was_output = False
 
     def OnFocus(self, evt):
         """The GUIClient requires a change of focus.
@@ -267,6 +275,7 @@ class MUDPanel(wx.Panel):
             if shortcut:
                 if shortcut == "Backspace" or len(shortcut) == 1 or (
                         shortcut.startswith("Shift +") and len(shortcut) == 9):
+                    self.was_output = True
                     self.input.EmulateKeyPress(e)
         elif e.GetEventObject() == self.input:
             if key == wx.WXK_TAB:
