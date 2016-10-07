@@ -39,9 +39,10 @@ class MacroDialog(wx.Dialog):
 
     """Macro dialog."""
 
-    def __init__(self, engine):
+    def __init__(self, engine, world):
         super(MacroDialog, self).__init__(None, title=t("ui.dialog.macros"))
         self.engine = engine
+        self.world = world
 
         self.InitUI()
         self.Center()
@@ -90,7 +91,7 @@ class MacroDialog(wx.Dialog):
 
         # Populate the list
         self.macro_list = []
-        macro_list = sorted(list(self.engine.macros.values()),
+        macro_list = sorted(list(self.world.macros),
                 key=lambda macro: macro.shortcut)
         for macro in macro_list:
             # Copy the macro, so it can be modified by the dialog
@@ -205,12 +206,13 @@ class MacroDialog(wx.Dialog):
 
     def OnOK(self, e):
         """Save the macros."""
-        macros = self.engine.macros
-        macros.clear()
+        macros = self.world.macros
+        macros[:] = []
         for macro in self.macro_list:
-            macros[(macro.key, macro.modifiers)] = macro
+            macro.sharp_engine = self.world.sharp_engine
+            macros.append(macro)
 
-        self.engine.settings.write_macros()
+        self.world.save_config()
         self.Destroy()
 
     def OnClose(self, e):
@@ -222,7 +224,7 @@ class MacroDialog(wx.Dialog):
 
         # Active macros
         act_macros = {}
-        for macro in self.engine.macros.values():
+        for macro in self.world.macros:
             act_macros[macro.key, macro.modifiers] = macro.action
 
         if dlg_macros == act_macros:
@@ -241,7 +243,7 @@ class EditMacroDialog(wx.Dialog):
     """Dialog to add/edit a macro."""
 
     def __init__(self, engine, macros, macro=None):
-        if macro:
+        if macro.shortcut:
             title = t("ui.dialog.macro.edit")
         else:
             title = t("ui.dialog.macro.add")

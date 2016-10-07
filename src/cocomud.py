@@ -48,9 +48,11 @@ select(lang)
 
 # Create the client and ClientWindow
 window = ClientWindow(engine)
+world = window.world
 hostname = window.panel.world.hostname
 port = window.panel.world.port
-client = engine.open(hostname, port)
+client = engine.open(hostname, port, world)
 client.link_window(window)
+world.load()
 client.start()
 app.MainLoop()

@@ -26,63 +26,66 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Class containing the Trigger class."""
+"""Class containing the Alias class."""
 
 import re
 
-class Trigger:
+class Alias:
 
-    """A trigger object.
+    """An alias object.
 
-    In a MUD client terminology, a trigger can "watch" the information
-    received by the client, and do something in return, like sending
-    an information to the server, playing a sound, calling a script
-    and so on.
+    In a MUD client terminology, an alias is here to speed up command
+    inputs by associating a certain (short) command with a desired
+    input.  For instance, "co" could be associated with "crew order".
 
     """
 
-    def __init__(self, sharp, reaction, action):
+    def __init__(self, sharp, alias, action):
         self.sharp_engine = sharp
-        self.reaction = reaction
-        self.re_reaction = self.find_regex(reaction)
+        self.alias = alias
+        self.re_alias = self.find_regex(alias)
         self.action = action
 
-        # Set the trigger's level
+        # Set the alias's level
         self.level = sharp.engine.level
 
     def __repr__(self):
-        return "<Trigger for {} (level={})>".format(
-                repr(self.reaction), self.level.name)
+        return "<Alias for {} (level={})>".format(
+                repr(self.alias), self.level.name)
 
     @property
     def sharp_script(self):
-        """Return the SharpScript code to create this trigger."""
-        return self.sharp_engine.format((("#trigger", self.reaction,
+        """Return the SharpScript code to create this alias."""
+        return self.sharp_engine.format((("#alias", self.alias,
                 self.action), ))
-    def find_regex(self, reaction):
-        """Find and compile the reaction given as argument.
 
-        If the reaction begins with '^', the reaction is already a
+    def find_regex(self, alias):
+        """Find and compile the alias given as argument.
+
+        If the alias begins with '^', the alias is already a
         regular expression that just needs to be compiled.  Otherwise,
         some automatic actions will be performed on it.
 
         """
-        if reaction.startswith("^"):
-            return re.compile(reaction)
+        if alias.startswith("^"):
+            return re.compile(alias)
 
-        reaction = re.escape(reaction)
+        alias = re.escape(alias)
 
         # The '*' sign will be replaced by a group
-        reaction = reaction.replace("\\*", "(.*?)")
-        reaction = "^" + reaction + "$"
+        alias = alias.replace("\\*", "(.*?)")
+        alias = "^" + alias + "$"
 
-        return re.compile(reaction, re.IGNORECASE)
+        return re.compile(alias, re.IGNORECASE)
 
-    def feed(self, line):
-        """Should the trigger be triggered by the text?"""
-        if self.re_reaction.search(line):
+    def test(self, command):
+        """Should the alias be triggered by the text?"""
+        if self.re_alias.search(command):
             self.execute()
+            return True
+
+        return False
 
     def execute(self):
-        """Execute the trigger."""
+        """Execute the alias."""
         self.sharp_engine.execute(self.action)

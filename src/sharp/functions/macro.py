@@ -26,17 +26,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module containing the Trigger function class."""
+"""Module containing the Macro function class."""
 
-from scripting.trigger import Trigger as ObjTrigger
+from scripting.key import key_code
+from scripting.macro import Macro as ObjMacro
 from sharp import Function
 
-class Trigger(Function):
+class Macro(Function):
 
-    """Function SharpScript 'trigger'."""
+    """Function SharpScript 'macro'."""
 
-    def run(self, reaction, action):
-        """Say the text."""
-        trigger = ObjTrigger(self.sharp_engine, reaction, action)
+    def run(self, shortcut, action):
+        """Creates the macro."""
+        key, modifiers = key_code(shortcut)
+        macro = ObjMacro(key, modifiers, action, self.sharp_engine)
         if self.world:
-            self.world.triggers.append(trigger)
+            self.world.macros.append(macro)

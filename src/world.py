@@ -44,11 +44,21 @@ class World:
 
     def __init__(self, location):
         self.location = location
-        self.settings = None
         self.name = ""
         self.hostname = ""
         self.port = 4000
         self.characters = {}
+        self.settings = None
+
+        # World's access to general data
+        self.client = None
+        self.engine = None
+        self.sharp_engine = None
+
+        # World's configuration
+        self.aliases = []
+        self.macros = []
+        self.triggers = []
 
     def __repr__(self):
         return "<World {} (hostname={}, port={})>".format(
@@ -58,8 +68,26 @@ class World:
     def path(self):
         return "worlds/" + self.location
 
+    def load(self):
+        """Load the config.set script."""
+        from game import Level
+        level = self.engine.level
+        self.engine.level = Level.world
+        path = self.path
+        path = os.path.join(path, "config.set")
+        if os.path.exists(path):
+            file = open(path, "r")
+            content = file.read()
+            file.close()
+
+            # Execute the script
+            self.sharp_engine.execute(content)
+
+        # Put the engine level back
+        self.engine.level = level
+
     def save(self):
-        """Save the world in its configuraiton file."""
+        """Save the world in its configuration file."""
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
@@ -79,3 +107,27 @@ class World:
         connection["port"] = self.port
         self.settings.filename = os.path.join(self.path, "options.conf")
         self.settings.write()
+        self.save_config()
+
+    def save_config(self):
+        """Save the 'config.set' script file."""
+        lines = []
+
+        # Aliases
+        for alias in self.aliases:
+            lines.append(alias.sharp_script)
+
+        # Macros
+        for macro in self.macros:
+            lines.append(macro.sharp_script)
+
+        # Triggers
+        for trigger in self.triggers:
+            lines.append(trigger.sharp_script)
+
+        content = "\n".join(lines) + "\n"
+        path = self.path
+        path = os.path.join(path, "config.set")
+        file = open(path, "w")
+        file.write(content)
+        file.close()

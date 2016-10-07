@@ -42,15 +42,16 @@ class SharpScript(object):
 
     """
 
-    def __init__(self, engine, client):
+    def __init__(self, engine, client, world):
         self.engine = engine
         self.client = client
+        self.world = world
         self.locals = {}
         self.globals = globals()
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
-            function = function(engine, client, self)
+            function = function(engine, client, self, world)
             self.globals[name] = function.run
 
     def execute(self, code):
@@ -242,3 +243,46 @@ class SharpScript(object):
             i += 1
 
         return text.replace(";;", ";")
+
+    def format(self, content):
+        """Write SharpScript and return a string.
+
+        This method takes as argument the SharpScript content and formats it.  It therefore replaces the default formatting.  Arguments are escaped this way:
+
+        * If the argument contains space, escape it with braces.
+        * If the argument contains new line, indent it.
+        * If the argument contains semi colons, keep it on one line.
+
+        """
+        if isinstance(content, str):
+            instructions = self.split_statements(content)
+        else:
+            instructions = content
+
+        # At this stage, the instructions are formatted in Python
+        lines = []
+        for arguments in instructions:
+            function = arguments[0].lower()
+            arguments = list(arguments[1:])
+
+            # Escape the arguments if necessary
+            for i, argument in enumerate(arguments):
+                arguments[i] = self.escape_argument(argument)
+
+            line = function + " " + " ".join(arguments)
+            lines.append(line.rstrip(" "))
+
+        return "\n".join(lines)
+
+    @staticmethod
+    def escape_argument(argument):
+        """Escape the argument if needed."""
+        if argument.startswith("{"):
+            pass
+        elif "\n" in argument:
+            lines = argument.splitlines()
+            argument = "{" + "\n    ".join(lines) + "\n}"
+        elif " " in argument:
+            argument = "{" + argument + "}"
+
+        return argument

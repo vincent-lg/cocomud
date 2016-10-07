@@ -26,17 +26,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module containing the Trigger function class."""
+"""Module containing the Alias function class."""
 
-from scripting.trigger import Trigger as ObjTrigger
+from scripting.alias import Alias as ObjAlias
 from sharp import Function
 
-class Trigger(Function):
+class Alias(Function):
 
-    """Function SharpScript 'trigger'."""
+    """Function SharpScript 'alias'."""
 
-    def run(self, reaction, action):
-        """Say the text."""
-        trigger = ObjTrigger(self.sharp_engine, reaction, action)
+    def run(self, alias, action):
+        """Create an alias."""
+        alias = ObjAlias(self.sharp_engine, alias, action)
         if self.world:
-            self.world.triggers.append(trigger)
+            self.world.aliases.append(alias)

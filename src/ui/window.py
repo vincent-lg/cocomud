@@ -93,7 +93,7 @@ class ClientWindow(wx.Frame):
             world = self.engine.default_world
 
         self.panel = MUDPanel(self, self.engine, world)
-        self.SetTitle("CocoMUD client")
+        self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -107,7 +107,7 @@ class ClientWindow(wx.Frame):
 
     def OnMacro(self, e):
         """Open the macro dialog box."""
-        dialog = MacroDialog(self.engine)
+        dialog = MacroDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -216,7 +216,7 @@ class MUDPanel(wx.Panel):
         self.password.Clear()
         encoding = self.engine.settings["options.general.encoding"]
         msg = event.GetString().encode(encoding, "replace")
-        self.client.write(msg + "\r\n")
+        self.client.write(msg)
 
         # If the client was in the output field, switch back there
         if self.was_output:
@@ -266,9 +266,11 @@ class MUDPanel(wx.Panel):
             skip = self.HandleHistory(modifiers, key)
 
         # Look for matching macros
-        for code, macro in self.engine.macros.items():
-            if code == (key, modifiers):
-                macro.execute(self.engine, self.client)
+        if self.world:
+            for macro in self.world.macros:
+                code = (macro.key, macro.modifiers)
+                if code == (key, modifiers):
+                    macro.execute(self.engine, self.client)
 
         if e.GetEventObject() is self.output:
             shortcut = key_name(key, modifiers)

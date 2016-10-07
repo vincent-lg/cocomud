@@ -40,13 +40,21 @@ class Macro:
 
     """
 
-    def __init__(self, key, modifiers, action):
+    def __init__(self, key, modifiers, action, sharp=None):
         self.key = key
         self.modifiers = modifiers
         self.action = action
+        self.sharp_engine = sharp
+
+        # Set the trigger's level
+        if sharp:
+            self.level = sharp.engine.level
+        else:
+            self.level = None
 
     def __repr__(self):
-        return "<Macro {}: {}>".format(self.shortcut, self.action)
+        return "<Macro {}: {} (level={})>".format(self.shortcut,
+                self.action, self.level.name)
 
     @property
     def shortcut(self):
@@ -54,9 +62,17 @@ class Macro:
         return key_name(self.key, self.modifiers)
 
     @property
+    def sharp_script(self):
+        """Return the SharpScript code to create this macro."""
+        return self.sharp_engine.format((("#macro", self.shortcut,
+                self.action), ))
+
+    @property
     def copied(self):
         """Return another object of the Macro class with identical info."""
-        copy = Macro(self.key, self.modifiers, self.action)
+        copy = Macro(self.key, self.modifiers, self.action,
+                self.sharp_engine)
+        copy.level = self.level
         return copy
 
     def execute(self, engine, client):

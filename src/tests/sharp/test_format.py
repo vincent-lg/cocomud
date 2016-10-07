@@ -26,13 +26,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from textwrap import dedent
 import unittest
 
 from sharp.engine import SharpScript
 
-class TestSyntax(unittest.TestCase):
+class TestFormat(unittest.TestCase):
 
-    """Unittest for the SharpScript syntax."""
+    """Unittest for the SharpScript format."""
 
     def setUp(self):
         """Create the SharpScript instance."""
@@ -41,85 +42,69 @@ class TestSyntax(unittest.TestCase):
     def test_single(self):
         """Test a single statement."""
         # Test a statement on one line with one argument
-        statements = self.engine.feed("#play file.wav")
-        self.assertEqual(statements, ["play('file.wav')"])
+        content = self.engine.format("#play file.wav")
+        self.assertEqual(content, "#play file.wav")
 
         # Test a statement with an new line and no argument
-        statements = self.engine.feed("#stop\n")
-        self.assertEqual(statements, ["stop()"])
+        content = self.engine.format("#stop\n")
+        self.assertEqual(content, "#stop")
 
         # Same test, but with some useless spaces
-        statements = self.engine.feed("  #stop  \n  ")
-        self.assertEqual(statements, ["stop()"])
+        content = self.engine.format("  #stop  \n  ")
+        self.assertEqual(content, "#stop")
 
         # Test a statement with arguments surrounded by braces
-        statements = self.engine.feed("#macro {Alt + Enter} north")
-        self.assertEqual(statements, ["macro('Alt + Enter', 'north')"])
+        content = self.engine.format("#macro {Alt + Enter} north")
+        self.assertEqual(content, "#macro {Alt + Enter} north")
 
         # Same test but with some useless spaces
-        statements = self.engine.feed("  #macro  {Alt + Enter}  north\n  ")
-        self.assertEqual(statements, ["macro('Alt + Enter', 'north')"])
+        content = self.engine.format("  #macro  {Alt + Enter}  north\n  ")
+        self.assertEqual(content, "#macro {Alt + Enter} north")
 
         # Test what happens without function names
-        statements = self.engine.feed("say Hello all!\n  ")
-        self.assertEqual(statements, ["send('say Hello all!')"])
+        content = self.engine.format("say Hello all!\n  ")
+        self.assertEqual(content, "#send {say Hello all!}")
 
     def test_multiple(self):
         """Test multiple statements at once."""
         # Test two statements on two lines without useless spaces
-        statements = self.engine.feed("#play file.wav\n#stop")
-        self.assertEqual(statements, ["play('file.wav')", "stop()"])
+        content = self.engine.format("#play file.wav\n#stop")
+        self.assertEqual(content, "#play file.wav\n#stop")
 
         # Same test, but with some useless spaces
-        statements = self.engine.feed("  #play   file.wav  \n#stop  \n  ")
-        self.assertEqual(statements, ["play('file.wav')", "stop()"])
+        content = self.engine.format("  #play   file.wav  \n#stop  \n  ")
+        self.assertEqual(content, "#play file.wav\n#stop")
 
     def test_python(self):
-        """Test Python syntax embeeded in SharpScript."""
-        statements = self.engine.feed("""#trigger {Should it work?} {+
+        """Test Python format embeeded in SharpScript."""
+        content = self.engine.format(dedent("""
+        #trigger {Should it work?} {+
             var = 2 + 3
             print var
-        }""")
-        self.assertEqual(statements, [
-            "trigger('Should it work?', compile('var = 2 + 3\nprint var', " \
-            "'SharpScript', 'exec'))"
-        ])
+        }""".strip("\n")))
+        self.assertEqual(content, dedent("""
+        #trigger {Should it work?} {+
+            var = 2 + 3
+            print var
+        }""".strip("\n")))
 
     def test_flag(self):
-        """Test the SharpScript syntax with flags in funciton calls."""
-        statements = self.engine.feed("#say {A message} -braille +speech")
-        self.assertEqual(statements, [
-            "say('A message', braille=False, speech=True)"
-        ])
-
-    def test_python_top(self):
-        """Test Python code in SharpScript at the top level."""
-        statements = self.engine.feed("""{+
-            print 1
-            print 3
-        }""")
-        self.assertEqual(statements, [
-            "compile('print 1\nprint 3', 'SharpScript', 'exec')",
-        ])
+        """Test the SharpScript format with flags in funciton calls."""
+        content = self.engine.format("#say {A message} -braille +speech")
+        self.assertEqual(content, "#say {A message} -braille +speech")
 
     def test_semicolons(self):
         """Test the semi-colons."""
         # A test with simple text
-        statements = self.engine.feed("#macro F1 north;south;;east")
-        self.assertEqual(statements, ["macro('F1', 'north\nsouth;east')"])
+        content = self.engine.format("#macro F1 north;south;;east")
+        self.assertEqual(content, "#macro F1 north;south;;east")
 
         # A test with SharpScript
-        statements = self.engine.feed("#trigger ok {#play new.wav;#stop}")
-        self.assertEqual(statements, [
-                "trigger('ok', '#play new.wav\n#stop')",
-        ])
+        content = self.engine.format("#trigger ok {#play new.wav;#stop}")
+        self.assertEqual(content, "#trigger ok {#play new.wav;#stop}")
 
     def test_escape_sharp(self):
         """Test the escaped sharp symbol."""
         # A sharp escaping with plain text
-        statements = self.engine.feed("##out")
-        self.assertEqual(statements, ["send('#out')"])
-
-        # A sharp escaping with SharpScript
-        statements = self.engine.feed("#macro ##ok")
-        self.assertEqual(statements, ["macro('#ok')"])
+        content = self.engine.format("##out")
+        self.assertEqual(content, "#send #out")
