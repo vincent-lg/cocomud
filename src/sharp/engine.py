@@ -46,12 +46,15 @@ class SharpScript(object):
         self.engine = engine
         self.client = client
         self.world = world
-        self.locals = {}
         self.globals = globals()
+        self.locals = {}
+        self.functions = {}
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
+            function.name = name
             function = function(engine, client, self, world)
+            self.functions[name] = function
             self.globals[name] = function.run
 
     def execute(self, code):
@@ -244,7 +247,7 @@ class SharpScript(object):
 
         return text.replace(";;", ";")
 
-    def format(self, content):
+    def format(self, content, return_str=True):
         """Write SharpScript and return a string.
 
         This method takes as argument the SharpScript content and formats it.  It therefore replaces the default formatting.  Arguments are escaped this way:
@@ -272,7 +275,7 @@ class SharpScript(object):
             line = function + " " + " ".join(arguments)
             lines.append(line.rstrip(" "))
 
-        return "\n".join(lines)
+        return "\n".join(lines) if return_str else lines
 
     @staticmethod
     def escape_argument(argument):

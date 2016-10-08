@@ -1,4 +1,21 @@
-﻿world:
+﻿alias:
+    missing_action: >
+        Le champ de texte contenant l'action est vide. Veuillez préciser
+        l'action à associer à cet alias.
+    missing_alias: >
+        Le champ de texte contenant le nom de l'alias est vide.
+        Vous devez préciser un nom pour cet alias.
+    remove: >
+        êtes-vous sûr de vouloir retirer l'alias {alias} ?
+    unknown: >
+        Impossible de trouver cet alias.
+    unsaved: >
+        Il se trouve plusieurs alias non sauvegardés dans la
+        configuraiton. Si vous fermez cette boîte de dialogue sans
+        sauvegarde, ces modifications seront perdues. Pour sauvegarder,
+        cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
+        cette boîte de dialogue sans sauvegarder ?
+world:
     hostname: >
         Vous devez préciser un nom d'hôte valide pour cet univers.  Ce
         peut être une adresse IP (comme 10.35.1.128) ou un nom d'hôte (comme

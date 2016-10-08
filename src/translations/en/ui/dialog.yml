@@ -5,6 +5,9 @@ macros: Macros
 encodings: Encodings
 shortcut: Shortcut
 action: Action
+alias:
+    add: Add a new alias
+    edit: Edit an alias
 macro:
     add: Add a new macro
     edit: Edit a macro

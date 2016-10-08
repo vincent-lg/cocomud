@@ -78,6 +78,13 @@ class Alias:
 
         return re.compile(alias, re.IGNORECASE)
 
+    @property
+    def copied(self):
+        """Return a copied version of the alias."""
+        copy = Alias(self.sharp_engine, self.alias, self.action)
+        copy.level = self.level
+        return copy
+
     def test(self, command):
         """Should the alias be triggered by the text?"""
         if self.re_alias.search(command):

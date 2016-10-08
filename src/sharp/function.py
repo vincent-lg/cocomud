@@ -32,6 +32,8 @@ class Function(object):
 
     """The function class, parent of all SharpScript functions."""
 
+    description = ""
+
     def __init__(self, engine, client, sharp, world=None):
         self.engine = engine
         self.client = client
@@ -45,4 +47,8 @@ class Function(object):
 
     def run(self, *args, **kwargs):
         """Execute the function with arguments."""
+        raise NotImplementedError
+
+    def display(self, panel):
+        """Display the function's argument."""
         raise NotImplementedError

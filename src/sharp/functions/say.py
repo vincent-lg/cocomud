@@ -28,6 +28,8 @@
 
 """Module containing the Say function class."""
 
+import wx
+
 from sharp import Function
 
 class Say(Function):
@@ -39,8 +41,18 @@ class Say(Function):
 
     """
 
+    description = "Say a message"
+
     def run(self, text, screen=True, speech=True, braille=True):
         """Say the text."""
         if self.client:
             self.client.handle_message(text, screen=screen,
                     speech=speech, braille=braille)
+
+    def display(self, panel):
+        """Display the function's argument."""
+        l_text = wx.StaticText(panel, label="Text to be said")
+        t_text = wx.TextCtrl(panel, value="",
+                style=wx.TE_MULTILINE)
+        panel.options.Add(l_text)
+        panel.options.Add(t_text)

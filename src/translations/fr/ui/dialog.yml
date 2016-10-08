@@ -7,6 +7,9 @@ accessibility: "Accessibilit\xE9"
 action: Action
 confirm: Confirmer
 general: "G\xE9n\xE9ral"
+alias:
+    add: Add a new alias
+    edit: Edit an alias
 macro:
     add: Ajout d'un nouveau macro
     edit: Édition d'un macro

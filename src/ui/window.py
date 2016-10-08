@@ -33,6 +33,7 @@ import wx
 from ytranslate.tools import t
 
 from scripting.key import key_name
+from ui.dialogs.alias import AliasDialog
 from ui.dialogs.connection import ConnectionDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
@@ -65,18 +66,24 @@ class ClientWindow(wx.Frame):
         fileMenu = wx.Menu()
         gameMenu = wx.Menu()
 
-        # File menu
-        ## Preferences
+        ## File menu
+        # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
 
-        ## Quit
+        # Quit
         quit = wx.MenuItem(fileMenu, -1, t("ui.menu.quit"))
         self.Bind(wx.EVT_MENU, self.OnQuit, quit)
         fileMenu.AppendItem(quit)
 
-        # Game menu
+        ## Game menu
+        # Aliases
+        alias = wx.MenuItem(fileMenu, -1, t("ui.menu.aliases"))
+        self.Bind(wx.EVT_MENU, self.OnAlias, alias)
+        gameMenu.AppendItem(alias)
+
+        # Macros
         macro = wx.MenuItem(fileMenu, -1, t("ui.menu.macro"))
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
         gameMenu.AppendItem(macro)
@@ -102,6 +109,12 @@ class ClientWindow(wx.Frame):
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
         dialog = PreferencesDialog(self.engine)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def OnAlias(self, e):
+        """Open the alias dialog box."""
+        dialog = AliasDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
 

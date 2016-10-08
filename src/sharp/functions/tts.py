@@ -39,6 +39,8 @@ class TTS(Function):
 
     """
 
+    description = "Enable/Disable TTS"
+
     def run(self):
         """Switch TTS."""
         self.engine.TTS_on = not self.engine.TTS_on
@@ -46,3 +48,8 @@ class TTS(Function):
         if self.client:
             self.client.handle_message("TTS {}.".format(flag),
                     force_TTS=True)
+
+
+    def display(self, panel):
+        """Display the function's argument."""
+        pass

@@ -1,4 +1,9 @@
-﻿connection: Connection
-name: Name
+﻿action: Action
+alias:
+    0: Alias
+    1: Alias
+    2+: Aliases
+connection: Connection
 hostname: Hostname
+name: Name
 port: Port
