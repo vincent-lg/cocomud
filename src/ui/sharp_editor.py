@@ -136,6 +136,7 @@ class SharpEditor(wx.Panel):
         else:
             dialog = AddEditFunctionDialog(self.engine, self.sharp_engine, function, self.object, self.attribute)
             dialog.ShowModal()
+            self.populate_existing()
 
 
 class AddEditFunctionDialog(wx.Dialog):
@@ -169,8 +170,20 @@ class AddEditFunctionDialog(wx.Dialog):
 
     def OnOk(self, e):
         """The 'OK' button is pressed."""
-        print "ok"
+        arguments = self.function.complete(self)
+        if arguments is not None:
+            function = "#" + self.function.name
+            lines = (((function, ) + arguments), )
+            line = self.sharp_engine.format(lines)
+
+            # Add to the entire content
+            content = getattr(self.object, self.attribute)
+            if content:
+                content += "\n"
+
+            content += line
+            setattr(self.object, self.attribute, content)
 
     def OnCancel(self, e):
         """The 'cancel' button is pressed."""
-        print "Cancel"
+        self.Destroy()

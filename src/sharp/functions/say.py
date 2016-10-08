@@ -54,5 +54,17 @@ class Say(Function):
         l_text = wx.StaticText(dialog, label="Text to be said")
         t_text = wx.TextCtrl(dialog, value="",
                 style=wx.TE_MULTILINE)
+        dialog.text = t_text
         dialog.top.Add(l_text)
         dialog.top.Add(t_text)
+
+    def complete(self, dialog):
+        """The user pressed 'ok' in the dialog."""
+        text = dialog.text.GetValue().encode("utf-8", "replace")
+        if not text:
+            wx.MessageBox("The 'text' field is empty.  What should I say?",
+                    "Error", wx.OK | wx.ICON_ERROR)
+            dialog.text.SetFocus()
+            return None
+
+        return (text, )

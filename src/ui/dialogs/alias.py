@@ -214,16 +214,6 @@ class EditAliasDialog(wx.Dialog):
         top.Add(s_alias)
         top.Add((15, -1))
 
-        # Create the action field
-        s_action = wx.BoxSizer(wx.VERTICAL)
-        l_action = wx.StaticText(self, label=t("common.action"))
-        t_action = wx.TextCtrl(self, value=self.alias.action,
-                style=wx.TE_MULTILINE)
-        self.action = t_action
-        s_action.Add(l_action)
-        s_action.Add(t_action)
-        top.Add(s_action)
-
         # Main sizer
         sizer.Add(top, proportion=4)
 
@@ -243,7 +233,7 @@ class EditAliasDialog(wx.Dialog):
     def OnOK(self, e):
         """Save the alias."""
         alias = self.t_alias.GetValue()
-        action = self.action.GetValue()
+        action = self.alias.action
         if not alias:
             wx.MessageBox(t("ui.message.alias.missing_alias"),
                     t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
@@ -251,7 +241,6 @@ class EditAliasDialog(wx.Dialog):
         elif not action:
             wx.MessageBox(t("ui.message.alias.missing_action"),
                     t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
-            self.action.SetFocus()
         else:
             alias = alias.encode("utf-8", "replace")
             action = action.encode("utf-8", "replace")
