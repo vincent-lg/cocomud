@@ -1,9 +1,9 @@
 ﻿action: Action
 alias:
-    0: Alias
     1: Alias
     2+: Aliases
 connection: Connection
+function: Function
 hostname: Hostname
 name: Name
 port: Port

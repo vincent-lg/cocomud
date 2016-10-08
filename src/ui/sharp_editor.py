@@ -39,10 +39,8 @@ class SharpEditor(wx.Panel):
     This panel can be added into dialogs that have to support SharpScript
     editing.  On the top, at the left of the panel, is a list of
     SharpScript functions which could be added to the edited SharpScript.
-    On the right of this list is a set of options that will vary
-    depending on the selected function.  For instance, if the user
-    selects the #play SharpScript function, he/she is prompted with the
-    path of the file to be played.
+    On the right of this list is a button to add the selected function
+    to the action field.
 
     At the bottom of this panel is the list of functions currently
     used in the selected attribute.
@@ -105,7 +103,7 @@ class SharpEditor(wx.Panel):
         bottom.Add(remove)
 
         # Event binding
-        self.choices.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
+        add.Bind(wx.EVT_BUTTON, self.OnAdd)
 
     def populate_list(self):
         """Populate the list with function names."""
@@ -127,23 +125,52 @@ class SharpEditor(wx.Panel):
         self.existing.Select(0)
         self.existing.Focus(0)
 
-    def OnSelect(self, e):
-        """When the selection changes."""
+    def OnAdd(self, e):
+        """The 'add' button is pressed."""
         index = self.choices.GetFirstSelected()
         try:
             function = self.functions[index]
         except IndexError:
-            pass
+            wx.MessageBox("Unable to find the selected function.",
+                    wx.OK | wx.ICON_ERROR)
         else:
-            self.display(function)
-        finally:
-            e.Skip()
+            dialog = AddEditFunctionDialog(self.engine, self.sharp_engine, function, self.object, self.attribute)
+            dialog.ShowModal()
 
-    def display(self, function):
-        """Display the function arguments."""
-        for widget in list(self.options.GetChildren()):
-            widget = widget.GetWindow()
-            self.options.Detach(widget)
-            widget.Destroy()
 
-        function.display(self)
+class AddEditFunctionDialog(wx.Dialog):
+
+    """Add or edit a function."""
+
+    def __init__(self, engine, sharp_engine, function, object, attribute):
+        super(AddEditFunctionDialog, self).__init__(None,
+                title=t("common.action"))
+        self.engine = engine
+        self.sharp_engine = sharp_engine
+        self.world = sharp_engine.world
+        self.function = function
+        self.object = object
+        self.attribute = attribute
+
+        # Dialog
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.top = wx.BoxSizer(wx.VERTICAL)
+        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+        self.SetSizer(sizer)
+
+        # Add the function-specific configuration
+        sizer.Add(self.top)
+        self.function.display(self)
+        sizer.Add(buttons)
+
+        # Event binding
+        self.Bind(wx.EVT_BUTTON, self.OnOk, id=wx.ID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=wx.ID_CANCEL)
+
+    def OnOk(self, e):
+        """The 'OK' button is pressed."""
+        print "ok"
+
+    def OnCancel(self, e):
+        """The 'cancel' button is pressed."""
+        print "Cancel"
