@@ -28,6 +28,7 @@
 
 """This file contains the World class."""
 
+from codecs import open
 import os
 from textwrap import dedent
 
@@ -76,8 +77,8 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
-            file = open(path, "r")
-            content = file.read()
+            file = open(path, "r", encoding="latin-1", errors="replace")
+            content = file.read().replace("\r", "")
             file.close()
 
             # Execute the script
@@ -126,8 +127,9 @@ class World:
             lines.append(trigger.sharp_script)
 
         content = "\n".join(lines) + "\n"
+        content = content.replace("\n", "\r\n")
         path = self.path
         path = os.path.join(path, "config.set")
-        file = open(path, "w")
+        file = open(path, "w", encoding="latin-1", errors="replace")
         file.write(content)
         file.close()

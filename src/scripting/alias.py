@@ -29,6 +29,7 @@
 """Class containing the Alias class."""
 
 import re
+from textwrap import dedent
 
 class Alias:
 
@@ -44,7 +45,7 @@ class Alias:
         self.sharp_engine = sharp
         self.alias = alias
         self.re_alias = self.find_regex(alias)
-        self.action = action
+        self.action = dedent(action.strip("\n"))
 
         # Set the alias's level
         self.level = sharp.engine.level

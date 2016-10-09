@@ -134,7 +134,7 @@ class AliasDialog(wx.Dialog):
             alias = self.alias_list[index]
         except IndexError:
             wx.MessageBox(t("ui.message.alias.unknown"),
-                    wx.OK | wx.ICON_ERROR)
+                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.alias.remove"),
                     t("ui.dialog.confirm"),
@@ -204,7 +204,7 @@ class EditAliasDialog(wx.Dialog):
         buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         self.SetSizer(sizer)
 
-        # Create the shortcut field
+        # Create the alias field
         s_alias = wx.BoxSizer(wx.VERTICAL)
         l_alias = wx.StaticText(self, label=t("common.alias", 1))
         t_alias = wx.TextCtrl(self, value=self.alias.alias)
@@ -242,8 +242,7 @@ class EditAliasDialog(wx.Dialog):
             wx.MessageBox(t("ui.message.alias.missing_action"),
                     t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
         else:
-            alias = alias.encode("utf-8", "replace")
-            action = action.encode("utf-8", "replace")
+            alias = alias
             self.alias.alias = alias
             self.alias.action = action
             if self.alias not in self.aliases:

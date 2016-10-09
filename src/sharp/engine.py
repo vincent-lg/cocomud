@@ -57,15 +57,18 @@ class SharpScript(object):
             self.functions[name] = function
             self.globals[name] = function.run
 
-    def execute(self, code):
+    def execute(self, code, debug=False):
         """Execute the SharpScript code given as an argument."""
-        if isinstance(code, str):
+        if isinstance(code, basestring):
             instructions = self.feed(code)
         else:
             instructions = [code]
 
         globals = self.globals
         locals = self.locals
+        if debug:
+            print "exec", instructions
+
         for instruction in instructions:
             exec(instruction, globals, locals)
 
@@ -257,7 +260,7 @@ class SharpScript(object):
         * If the argument contains semi colons, keep it on one line.
 
         """
-        if isinstance(content, str):
+        if isinstance(content, basestring):
             instructions = self.split_statements(content)
         else:
             instructions = content
@@ -284,7 +287,7 @@ class SharpScript(object):
             pass
         elif "\n" in argument:
             lines = argument.splitlines()
-            argument = "{\n" + "\n    ".join(lines) + "\n}"
+            argument = "{\n    " + "\n    ".join(lines) + "\n}"
         elif " " in argument:
             argument = "{" + argument + "}"
 

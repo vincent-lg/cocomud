@@ -177,8 +177,8 @@ class SharpEditor(wx.Panel):
             wx.MessageBox(t("ui.message.sharp.missing"),
                     t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
-            value = wx.MessageBox(t("ui.message.sharp.remove", line=line),
-                    t("ui.dialog.confirm"),
+            value = wx.MessageBox(t("ui.message.sharp.remove",
+                    line=line), t("ui.dialog.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
