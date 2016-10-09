@@ -15,6 +15,9 @@
         sauvegarde, ces modifications seront perdues. Pour sauvegarder,
         cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
         cette boîte de dialogue sans sauvegarder ?
+sharp:
+    remove: >
+        êtes-vous sûr de vouloir supprimer cette action ? {line}
 world:
     hostname: >
         Vous devez préciser un nom d'hôte valide pour cet univers.  Ce

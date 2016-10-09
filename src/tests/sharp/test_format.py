@@ -37,7 +37,7 @@ class TestFormat(unittest.TestCase):
 
     def setUp(self):
         """Create the SharpScript instance."""
-        self.engine = SharpScript(None, None)
+        self.engine = SharpScript(None, None, None)
 
     def test_single(self):
         """Test a single statement."""

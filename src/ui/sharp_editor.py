@@ -96,14 +96,16 @@ class SharpEditor(wx.Panel):
         self.populate_existing()
 
         # Buttons
-        b_edit = wx.Button(self, label=t("ui.button.edit"))
+        edit = wx.Button(self, label=t("ui.button.edit"))
         remove = wx.Button(self, label=t("ui.button.remove"))
         bottom.Add(self.existing)
-        bottom.Add(b_edit)
+        bottom.Add(edit)
         bottom.Add(remove)
 
         # Event binding
         add.Bind(wx.EVT_BUTTON, self.OnAdd)
+        edit.Bind(wx.EVT_BUTTON, self.OnEdit)
+        remove.Bind(wx.EVT_BUTTON, self.OnRemove)
 
     def populate_list(self):
         """Populate the list with function names."""
@@ -138,12 +140,53 @@ class SharpEditor(wx.Panel):
             dialog.ShowModal()
             self.populate_existing()
 
+    def OnEdit(self, e):
+        """The 'edit' button is pressed."""
+        index = self.existing.GetFirstSelected()
+        script = getattr(self.object, self.attribute)
+        lines = self.sharp_engine.format(script, return_str=False)
+        try:
+            line = lines[index]
+        except IndexError:
+            wx.MessageBox("Unable to find the selected line.",
+                    wx.OK | wx.ICON_ERROR)
+        else:
+            name, arguments, flags = self.sharp_engine.extract_arguments(line)
+            function = self.sharp_engine.functions[name[1:]]
+            dialog = AddEditFunctionDialog(self.engine, self.sharp_engine,
+                    function, self.object, self.attribute, index)
+            dialog.ShowModal()
+            self.populate_existing()
+
+    def OnRemove(self, e):
+        """The 'remove' button is pressed."""
+        index = self.existing.GetFirstSelected()
+        script = getattr(self.object, self.attribute)
+        lines = self.sharp_engine.format(script, return_str=False)
+        try:
+            line = lines[index]
+        except IndexError:
+            wx.MessageBox("Unable to find the selected line.",
+                    wx.OK | wx.ICON_ERROR)
+        else:
+            value = wx.MessageBox(t("ui.message.sharp.remove", line=line),
+                    t("ui.dialog.confirm"),
+                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+
+            if value == wx.YES:
+                del lines[index]
+                content = "\n".join(lines)
+                setattr(self.object, self.attribute, content)
+                self.populate_existing()
+                self.existing.SetFocus()
+
 
 class AddEditFunctionDialog(wx.Dialog):
 
     """Add or edit a function."""
 
-    def __init__(self, engine, sharp_engine, function, object, attribute):
+    def __init__(self, engine, sharp_engine, function, object, attribute,
+            index=-1):
         super(AddEditFunctionDialog, self).__init__(None,
                 title=t("common.action"))
         self.engine = engine
@@ -152,6 +195,12 @@ class AddEditFunctionDialog(wx.Dialog):
         self.function = function
         self.object = object
         self.attribute = attribute
+        self.index = index
+        if index >= 0:
+            script = getattr(self.object, self.attribute)
+            lines = self.sharp_engine.format(script, return_str=False)
+            line = lines[index]
+            function, arguments, flags = self.sharp_engine.extract_arguments(line)
 
         # Dialog
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -161,7 +210,7 @@ class AddEditFunctionDialog(wx.Dialog):
 
         # Add the function-specific configuration
         sizer.Add(self.top)
-        self.function.display(self)
+        self.function.display(self, *arguments, **flags)
         sizer.Add(buttons)
 
         # Event binding
@@ -177,12 +226,19 @@ class AddEditFunctionDialog(wx.Dialog):
             line = self.sharp_engine.format(lines)
 
             # Add to the entire content
-            content = getattr(self.object, self.attribute)
-            if content:
-                content += "\n"
+            lines = self.sharp_engine.format(getattr(self.object,
+                    self.attribute), return_str=False)
+            if self.index >= 0:
+                lines[self.index] = line
+                content = "\n".join(lines)
+            else:
+                content = "\n".join(lines)
+                if content:
+                    content += "\n"
 
-            content += line
+                content += line
             setattr(self.object, self.attribute, content)
+            self.Destroy()
 
     def OnCancel(self, e):
         """The 'cancel' button is pressed."""

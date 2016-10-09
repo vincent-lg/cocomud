@@ -284,8 +284,42 @@ class SharpScript(object):
             pass
         elif "\n" in argument:
             lines = argument.splitlines()
-            argument = "{" + "\n    ".join(lines) + "\n}"
+            argument = "{\n" + "\n    ".join(lines) + "\n}"
         elif " " in argument:
             argument = "{" + argument + "}"
 
         return argument
+
+    def extract_arguments(self, line):
+        """Extract the funciton name and arguments.
+
+        This function returns a tuple of three informations:
+
+        * The funciton name (a string)
+        * A list of arguments (all strings)
+        * A dictionary of flags (True or False as values)
+
+        """
+        instructions = self.split_statements(line)
+        line = instructions[0]
+        function = line[0]
+        arguments = []
+        flags = {}
+
+        # Browse through the list of arguments
+        for argument in line[1:]:
+            if argument[0] in "-+":
+                flag = argument[1:].lower()
+                if argument[0] == "-":
+                    flags[flag] = False
+                else:
+                    flags[flag] = True
+                continue
+            elif argument.startswith("{"):
+                argument = argument[1:-1]
+                if "\n" in argument:
+                    argument = dedent(argument.strip("\n"))
+
+            arguments.append(argument)
+
+        return function, arguments, flags

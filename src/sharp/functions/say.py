@@ -49,10 +49,10 @@ class Say(Function):
             self.client.handle_message(text, screen=screen,
                     speech=speech, braille=braille)
 
-    def display(self, dialog):
+    def display(self, dialog, text=""):
         """Display the function's argument."""
         l_text = wx.StaticText(dialog, label="Text to be said")
-        t_text = wx.TextCtrl(dialog, value="",
+        t_text = wx.TextCtrl(dialog, value=text,
                 style=wx.TE_MULTILINE)
         dialog.text = t_text
         dialog.top.Add(l_text)
