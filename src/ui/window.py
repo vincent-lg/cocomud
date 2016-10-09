@@ -45,6 +45,7 @@ class ClientWindow(wx.Frame):
         super(ClientWindow, self).__init__(None)
         self.engine = engine
         self.focus = True
+        self.interrupt = False
         self.CreateMenuBar()
         self.InitUI(world)
 
@@ -153,6 +154,7 @@ class ClientWindow(wx.Frame):
 
         self.panel.output.write(message)
         self.panel.output.SetInsertionPoint(pos)
+        self.interrupt = False
 
     def handle_option(self, command):
         """Handle the specified option.
@@ -174,6 +176,7 @@ class MUDPanel(wx.Panel):
 
     def __init__(self, parent, engine, world):
         wx.Panel.__init__(self, parent)
+        self.parent = parent
         self.engine = engine
         self.client = None
         self.world = world
@@ -236,6 +239,7 @@ class MUDPanel(wx.Panel):
         if self.was_output and self.engine.settings[
                 "options.accessibility.smart_cursor"]:
             self.output.SetFocus()
+            self.parent.interrupt = True
 
         # Write in the history
         if event.GetEventObject() == self.input:
