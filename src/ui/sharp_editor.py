@@ -80,7 +80,7 @@ class SharpEditor(wx.Panel):
 
         # List of functions
         self.choices = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.choices.InsertColumn(0, "Description")
+        self.choices.InsertColumn(0, t("common.description"))
         self.populate_list()
         top.Add(self.choices)
         top.Add(self.options, proportion=3)
@@ -92,7 +92,7 @@ class SharpEditor(wx.Panel):
         # List of current functions
         self.existing = wx.ListCtrl(self,
                 style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.existing.InsertColumn(0, "Function")
+        self.existing.InsertColumn(0, t("common.action"))
         self.populate_existing()
 
         # Buttons
@@ -111,7 +111,13 @@ class SharpEditor(wx.Panel):
         """Populate the list with function names."""
         self.choices.DeleteAllItems()
         for function in self.functions:
-            self.choices.Append((function.description, ))
+            try:
+                description = t("sharp.{name}.description".format(
+                        name=function.name))
+            except ValueError:
+                description = function.description
+
+            self.choices.Append((description, ))
 
         self.choices.Select(0)
         self.choices.Focus(0)
@@ -133,12 +139,13 @@ class SharpEditor(wx.Panel):
         try:
             function = self.functions[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected function.",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.sharp.missing"),
+                    t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
             dialog = AddEditFunctionDialog(self.engine, self.sharp_engine, function, self.object, self.attribute)
             dialog.ShowModal()
             self.populate_existing()
+            self.existing.SetFocus()
 
     def OnEdit(self, e):
         """The 'edit' button is pressed."""
@@ -148,8 +155,8 @@ class SharpEditor(wx.Panel):
         try:
             line = lines[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected line.",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.sharp.missing"),
+                    t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
             name, arguments, flags = self.sharp_engine.extract_arguments(line)
             function = self.sharp_engine.functions[name[1:]]
@@ -157,6 +164,7 @@ class SharpEditor(wx.Panel):
                     function, self.object, self.attribute, index)
             dialog.ShowModal()
             self.populate_existing()
+            self.existing.SetFocus()
 
     def OnRemove(self, e):
         """The 'remove' button is pressed."""
@@ -166,8 +174,8 @@ class SharpEditor(wx.Panel):
         try:
             line = lines[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected line.",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.sharp.missing"),
+                    t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.sharp.remove", line=line),
                     t("ui.dialog.confirm"),
@@ -196,6 +204,8 @@ class AddEditFunctionDialog(wx.Dialog):
         self.object = object
         self.attribute = attribute
         self.index = index
+        arguments = []
+        flags = {}
         if index >= 0:
             script = getattr(self.object, self.attribute)
             lines = self.sharp_engine.format(script, return_str=False)

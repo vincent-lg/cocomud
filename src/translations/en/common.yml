@@ -3,6 +3,7 @@ alias:
     1: Alias
     2+: Aliases
 connection: Connection
+description: Description
 function: Function
 hostname: Hostname
 name: Name

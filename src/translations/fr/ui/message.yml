@@ -15,7 +15,10 @@
         sauvegarde, ces modifications seront perdues. Pour sauvegarder,
         cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
         cette boîte de dialogue sans sauvegarder ?
+error: Erreur
 sharp:
+    missing: >
+        Impossible de trouver la ligne d'action sélectionnée.
     remove: >
         êtes-vous sûr de vouloir supprimer cette action ? {line}
 world:

@@ -30,6 +30,8 @@
 
 import wx
 
+from ytranslate import t
+
 from sharp import Function
 
 class Say(Function):
@@ -51,7 +53,12 @@ class Say(Function):
 
     def display(self, dialog, text=""):
         """Display the function's argument."""
-        l_text = wx.StaticText(dialog, label="Text to be said")
+        try:
+            label = t("sharp.say.text")
+        except ValueError:
+            label = "Text to be displayed"
+
+        l_text = wx.StaticText(dialog, label=label)
         t_text = wx.TextCtrl(dialog, value=text,
                 style=wx.TE_MULTILINE)
         dialog.text = t_text
@@ -61,9 +68,14 @@ class Say(Function):
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
         text = dialog.text.GetValue().encode("utf-8", "replace")
+        try:
+            empty_text = t("sharp.say.empty_text")
+        except ValueError:
+            empty_text = "The text field is empty.  What should I say?"
+
         if not text:
-            wx.MessageBox("The 'text' field is empty.  What should I say?",
-                    "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(empty_text, t("ui.message.error"),
+                    wx.OK | wx.ICON_ERROR)
             dialog.text.SetFocus()
             return None
 

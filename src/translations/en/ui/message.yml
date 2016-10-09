@@ -13,7 +13,10 @@
         close this dialog without saving, they will be lost.  To save,
         click on 'no' and then on 'ok'.  Are you sure you want to close
         this dialog without saving?
+error: Error
 sharp:
+    missing: >
+        Unable to find the selected line of action.
     remove: >
         Are you sure you want to remove this action? {line}
 world:
