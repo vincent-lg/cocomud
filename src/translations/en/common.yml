@@ -1,4 +1,10 @@
-﻿connection: Connection
-name: Name
+﻿action: Action
+alias:
+    1: Alias
+    2+: Aliases
+connection: Connection
+description: Description
+function: Function
 hostname: Hostname
+name: Name
 port: Port

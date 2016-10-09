@@ -46,23 +46,29 @@ class SharpScript(object):
         self.engine = engine
         self.client = client
         self.world = world
-        self.locals = {}
         self.globals = globals()
+        self.locals = {}
+        self.functions = {}
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
+            function.name = name
             function = function(engine, client, self, world)
+            self.functions[name] = function
             self.globals[name] = function.run
 
-    def execute(self, code):
+    def execute(self, code, debug=False):
         """Execute the SharpScript code given as an argument."""
-        if isinstance(code, str):
+        if isinstance(code, basestring):
             instructions = self.feed(code)
         else:
             instructions = [code]
 
         globals = self.globals
         locals = self.locals
+        if debug:
+            print "exec", instructions
+
         for instruction in instructions:
             exec(instruction, globals, locals)
 
@@ -244,7 +250,7 @@ class SharpScript(object):
 
         return text.replace(";;", ";")
 
-    def format(self, content):
+    def format(self, content, return_str=True):
         """Write SharpScript and return a string.
 
         This method takes as argument the SharpScript content and formats it.  It therefore replaces the default formatting.  Arguments are escaped this way:
@@ -254,7 +260,7 @@ class SharpScript(object):
         * If the argument contains semi colons, keep it on one line.
 
         """
-        if isinstance(content, str):
+        if isinstance(content, basestring):
             instructions = self.split_statements(content)
         else:
             instructions = content
@@ -272,7 +278,7 @@ class SharpScript(object):
             line = function + " " + " ".join(arguments)
             lines.append(line.rstrip(" "))
 
-        return "\n".join(lines)
+        return "\n".join(lines) if return_str else lines
 
     @staticmethod
     def escape_argument(argument):
@@ -281,8 +287,42 @@ class SharpScript(object):
             pass
         elif "\n" in argument:
             lines = argument.splitlines()
-            argument = "{" + "\n    ".join(lines) + "\n}"
+            argument = "{\n    " + "\n    ".join(lines) + "\n}"
         elif " " in argument:
             argument = "{" + argument + "}"
 
         return argument
+
+    def extract_arguments(self, line):
+        """Extract the funciton name and arguments.
+
+        This function returns a tuple of three informations:
+
+        * The funciton name (a string)
+        * A list of arguments (all strings)
+        * A dictionary of flags (True or False as values)
+
+        """
+        instructions = self.split_statements(line)
+        line = instructions[0]
+        function = line[0]
+        arguments = []
+        flags = {}
+
+        # Browse through the list of arguments
+        for argument in line[1:]:
+            if argument[0] in "-+":
+                flag = argument[1:].lower()
+                if argument[0] == "-":
+                    flags[flag] = False
+                else:
+                    flags[flag] = True
+                continue
+            elif argument.startswith("{"):
+                argument = argument[1:-1]
+                if "\n" in argument:
+                    argument = dedent(argument.strip("\n"))
+
+            arguments.append(argument)
+
+        return function, arguments, flags

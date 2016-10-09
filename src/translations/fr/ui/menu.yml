@@ -1,5 +1,6 @@
 file: "&Fichier"
-game: "&Jeu"
-macro: "&Macro"
 preferences: "&Options\tAlt+Enter"
 quit: "&Quitter"
+game: "&Jeu"
+aliases: "&Alias"
+macro: "&Macro"

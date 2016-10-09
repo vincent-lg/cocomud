@@ -1,0 +1,3 @@
+﻿description: Affiche un message et l'envoie au lecteur d'écran
+empty_text: Le champ de texte est vide. Que dois-je dire ?
+text: Texte à afficher et envoyer au lecteur d'écran
