@@ -81,7 +81,7 @@ class ConnectionDialog(wx.Dialog):
         worlds.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         connect.Bind(wx.EVT_BUTTON, self.OnConnect)
         edit.Bind(wx.EVT_BUTTON, self.OnEdit)
-        #remove.Bind(wx.EVT_BUTTON, self.OnRemove)
+        remove.Bind(wx.EVT_BUTTON, self.OnRemove)
         add.Bind(wx.EVT_BUTTON, self.OnAdd)
 
     def populate_list(self, selection=0):
@@ -123,8 +123,8 @@ class ConnectionDialog(wx.Dialog):
         try:
             world = worlds[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected world",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.world.unknown"),
+                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
         else:
             dialog = EditWorldDialog(self.engine, world)
             dialog.ShowModal()
@@ -133,22 +133,24 @@ class ConnectionDialog(wx.Dialog):
 
     def OnRemove(self, e):
         """The 'remove' button is pressed."""
-        index = self.macros.GetFirstSelected()
+        index = self.worlds.GetFirstSelected()
+        worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         try:
-            macro = self.macro_list[index]
+            world = worlds[index]
         except IndexError:
-            wx.MessageBox(t("ui.dialog.message.unknown_macro"),
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.world.unknown"),
+                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
         else:
-            value = wx.MessageBox(t("ui.dialog.message.remove_macro",
-            shortcut=macro.shortcut, action=macro.action),
-            t("ui.dialog.confirm"),
-            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+            value = wx.MessageBox(t("ui.message.world.remove"),
+                    t("ui.dialog.confirm"),
+                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                self.macro_list.remove(macro)
+                del self.engine.worlds[world.name]
+                world.remove()
                 self.populate_list(0)
-                self.macros.SetFocus()
+                self.worlds.SetFocus()
+
 
     def OnConnect(self, e):
         """Exit the window."""

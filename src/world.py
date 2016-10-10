@@ -29,6 +29,7 @@
 """This file contains the World class."""
 
 from codecs import open
+import shutil
 import os
 from textwrap import dedent
 
@@ -133,3 +134,7 @@ class World:
         file = open(path, "w", encoding="latin-1", errors="replace")
         file.write(content)
         file.close()
+
+    def remove(self):
+        """Remove the world."""
+        shutil.rmtree(self.path)

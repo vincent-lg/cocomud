@@ -31,3 +31,7 @@ world:
         You have to specify a name for this world.
     port: >
         You have to specify a port number to connect to this world.
+    remove: >
+        Are you sure you want to remove this world?
+    unknown: >
+        The selected world couldn't be found.

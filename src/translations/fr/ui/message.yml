@@ -34,3 +34,7 @@ world:
     port: >
         Vous devez préciser un numéro de port pour se connecter à cet
         univers.
+    remove: >
+        êtes-vous sûr de vouloir supprimer cet univers ?
+    unknown: >
+        L'univers sélectionné n'a pas pu être trouvé.
