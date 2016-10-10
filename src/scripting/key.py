@@ -34,6 +34,7 @@
 MOD_ALT = 1
 MOD_CTRL = 2
 MOD_SHIFT = 4
+MOD_WINDOWS = 8
 
 # Key codes
 CODE_TO_KEY = {
@@ -97,12 +98,15 @@ def key_name(code, modifiers):
     ctrl = modifiers & MOD_CTRL != 0
     alt = modifiers & MOD_ALT != 0
     shift = modifiers & MOD_SHIFT != 0
+    windows = modifiers & MOD_WINDOWS != 0
     if shift:
         name = "Shift + " + name
     if alt:
         name = "Alt + " + name
     if ctrl:
         name = "Ctrl + " + name
+    if windows:
+        name = "Windows + " + name
 
     return name
 
