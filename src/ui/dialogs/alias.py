@@ -136,8 +136,8 @@ class AliasDialog(wx.Dialog):
             wx.MessageBox(t("ui.message.alias.unknown"),
                     t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
         else:
-            value = wx.MessageBox(t("ui.message.alias.remove"),
-                    t("ui.dialog.confirm"),
+            value = wx.MessageBox(t("ui.message.alias.remove",
+                    alias=alias.alias), t("ui.dialog.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
