@@ -1,0 +1,4 @@
+﻿command: Commands to be sent to the server
+description: Send one or more commands to the server
+empty_commands: >
+    The commands field is empty.  What commands do you want to send?

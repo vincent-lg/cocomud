@@ -26,7 +26,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import shutil
+
 from cx_Freeze import setup, Executable
 
 exe = Executable(
@@ -47,6 +49,9 @@ includefiles = [
     "../SAAPI32.dll",
     "../UniversalSpeech.dll",
 ]
+
+if os.path.exists("build/CocoMUD"):
+    shutil.rmtree("build/CocoMUD")
 
 setup(
     name = "CocoMUD client",

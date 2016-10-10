@@ -95,15 +95,16 @@ class Client(threading.Thread):
         """
         pass
 
-    def write(self, text):
+    def write(self, text, alias=True):
         """Write text to the client."""
         if text.startswith("#"):
             self.sharp_engine.execute(text)
         else:
             # Test the aliases
-            for alias in self.world.aliases:
-                if alias.test(text):
-                    return
+            if alias:
+                for alias in self.world.aliases:
+                    if alias.test(text):
+                        return
 
             self.client.write(text + "\r\n")
 

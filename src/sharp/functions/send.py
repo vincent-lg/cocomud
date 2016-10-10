@@ -26,33 +26,60 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module containing the Function class."""
+"""Module containing the Send function class."""
 
-class Function(object):
+from textwrap import dedent
 
-    """The function class, parent of all SharpScript functions."""
+import wx
+from ytranslate import t
 
-    description = ""
+from sharp import Function
 
-    def __init__(self, engine, client, sharp, world=None):
-        self.engine = engine
-        self.client = client
-        self.sharp_engine = sharp
-        self.init()
-        self.world = world
+class Send(Function):
 
-    def init(self):
-        """Another secondary constructor."""
-        pass
+    """Function SharpScript 'send'.
 
-    def run(self, *args, **kwargs):
-        """Execute the function with arguments."""
-        raise NotImplementedError
+    This function expects an argument as a parameter and sends it
+    to the client and the server behind it.
 
-    def display(self, panel):
+    """
+
+    description = "Send a message"
+
+    def run(self, text):
+        """Send the text."""
+        text = dedent(text.strip("\n"))
+        if self.client:
+            for line in text.splitlines():
+                line = line.encode("latin-1")
+                self.client.write(line)
+
+    def display(self, dialog, commands=""):
         """Display the function's argument."""
-        pass
+        try:
+            label = t("sharp.send.command")
+        except ValueError:
+            label = "Commands to be sent"
 
-    def complete(self, dialog, *args, **kwargs):
-        """Complete the action."""
-        return ()
+        l_commands = wx.StaticText(dialog, label=label)
+        t_commands = wx.TextCtrl(dialog, value=commands,
+                style=wx.TE_MULTILINE)
+        dialog.commands = t_commands
+        dialog.top.Add(l_commands)
+        dialog.top.Add(t_commands)
+
+    def complete(self, dialog):
+        """The user pressed 'ok' in the dialog."""
+        commands = dialog.commands.GetValue().encode("utf-8", "replace")
+        try:
+            empty_commands = t("sharp.send.empty_commands")
+        except ValueError:
+            empty_commands = "The commands field is empty."
+
+        if not commands:
+            wx.MessageBox(empty_commands, t("ui.message.error"),
+                    wx.OK | wx.ICON_ERROR)
+            dialog.commands.SetFocus()
+            return None
+
+        return (commands, )

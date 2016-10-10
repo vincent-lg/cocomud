@@ -1,0 +1,5 @@
+﻿command: Commandes à envoyer au serveur
+description: Envoie une ou plusieurs commandes au serveur
+empty_commands: >
+    Le champ de texte contenant les commandes est vide. Quelles commandes
+    dois-je envoyer au serveur ?
