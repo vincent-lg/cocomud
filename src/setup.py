@@ -38,7 +38,7 @@ client = Executable(
 
 updater = Executable(
     script="updater.py",
-    #base="Win32GUI",
+    base="Win32GUI",
 )
 
 includefiles = [

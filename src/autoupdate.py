@@ -234,22 +234,30 @@ class AutoUpdate(Thread):
         batch = "timeout 1 /NOBREAK"
         for name in os.listdir(os.path.join("updating", "CocoMUD")):
             path = os.path.join("updating", "CocoMUD", name)
-            if os.path.exists(name):
+            if os.path.isfile(name):
                 batch += "\ndel /F /Q " + name
+                batch += "\ncopy /V " + path + " " + name
+            elif os.path.isdir(name):
+                batch += "\nrmdir /Q /S " + name
+                batch += "\nmd " + name
+                batch += "\nxcopy /S " + path + " " + name
 
-            batch += "\ncopy /V " + path + " " + name
 
         # Add instructions to delete the clean update
-        batch += "\ndel /F /Q updating"
-        batch += "\nstart /b \"\" cmd /c del \"%~f0\"&exit /b"
+        batch += "\nrmdir /S /Q updating"
+        batch += "\nexit /B"
 
         # Write the batch file
         with open("updating.bat", "w") as file:
             file.write(batch)
+        with open("bgupdating.bat", "w") as file:
+            cmd = "start /B \"\" \"cmd /C updating.bat\" >> update.log 2>&1"
+            cmd += "\nexit"
+            file.write(cmd)
 
         if self.object:
             self.object.AskDestroy()
-        os.startfile("updating.bat")
+        os.startfile("bgupdating.bat")
         sys.exit(0)
 
 
