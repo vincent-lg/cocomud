@@ -26,11 +26,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
+import shutil
+
 from cx_Freeze import setup, Executable
 
-exe = Executable(
+client = Executable(
     script="cocomud.py",
     base="Win32GUI",
+)
+
+updater = Executable(
+    script="updater.py",
+    #base="Win32GUI",
 )
 
 includefiles = [
@@ -47,10 +55,15 @@ includefiles = [
     "../UniversalSpeech.dll",
 ]
 
+if os.path.exists("build/CocoMUD"):
+    shutil.rmtree("build/CocoMUD")
+
 setup(
     name = "CocoMUD client",
     version = "0.2",
     description = "The CocoMUD client.",
     options = {'build_exe': {'include_files': includefiles}},
-    executables = [exe]
+    executables = [client, updater]
 )
+
+shutil.move("build/exe.win32-2.7", "build/CocoMUD")
