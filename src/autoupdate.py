@@ -33,10 +33,8 @@ import os
 import shutil
 import sys
 from threading import Thread
-from urllib2 import urlopen # Python 2
+from urllib2 import urlopen
 from zipfile import ZipFile, BadZipfile
-
-from redmine import Redmine
 
 class AutoUpdate(Thread):
 
@@ -49,7 +47,7 @@ class AutoUpdate(Thread):
 
     """
 
-    def __init__(self, current_version, object):
+    def __init__(self, current_version, object=None):
         Thread.__init__(self)
         if isinstance(current_version, basestring):
             if not current_version.isdigit():
@@ -67,7 +65,7 @@ class AutoUpdate(Thread):
         """Run the thread."""
         if self.check():
             self.download()
-            #self.update()
+            self.update()
 
     def check(self):
         """Check for updates."""
@@ -75,15 +73,19 @@ class AutoUpdate(Thread):
             self.object.UpdateText("Checking for updates.")
             self.object.UpdateGauge(0)
 
-        redmine = Redmine("https://cocomud.plan.io")
-        project = redmine.project.get("cocomud-client")
+        url = "https://cocomud.plan.io/projects/cocomud-client.json"
+        response = urlopen(url)
+        try:
+            info = json.loads(response.read())
+        except ValueError:
+            raise UpdateDecodeError
 
         # The latest builds are in a custom field
-        customs = project.custom_fields
+        customs = info.get("project", {}).get("custom_fields")
         recent_build = None
         for field in customs:
-            if field.name == "build":
-                recent_build = field.value
+            if field['name'] == "build":
+                recent_build = field['value']
 
         # If a recent build has been found, try to read it
         if recent_build:
@@ -170,6 +172,9 @@ class AutoUpdate(Thread):
         """Update the archive.
 
         This method must be called after downloading the new archive.
+        Since it cannot perform all updates by itself (it would delete
+        the updater and a couple of libraries), it needs to pass a batch
+        file at the end that will delete itself.
 
         """
         if self.path_archive is None:
@@ -222,24 +227,30 @@ class AutoUpdate(Thread):
         except BadZipfile:
             raise InvalidSyntaxUpdateError
 
+        # Delete the archive
+        os.remove(self.path_archive)
+
         # Move the content of the archive
+        batch = "timeout 1 /NOBREAK"
         for name in os.listdir(os.path.join("updating", "CocoMUD")):
             path = os.path.join("updating", "CocoMUD", name)
-            if name.startswith("updater"):
-                name = "new" + name
-
             if os.path.exists(name):
-                if os.path.isfile(name):
-                    os.remove(name)
-                else:
-                    shutil.rmtree(name)
+                batch += "\ndel /F /Q " + name
 
-            shutil.move(path, name)
+            batch += "\ncopy /V " + path + " " + name
 
-        # Update completed
-        if os.path.exists("cocomud.exe"):
-            os.startfile("cocomud.exe")
+        # Add instructions to delete the clean update
+        batch += "\ndel /F /Q updating"
+        batch += "\nstart /b \"\" cmd /c del \"%~f0\"&exit /b"
 
+        # Write the batch file
+        with open("updating.bat", "w") as file:
+            file.write(batch)
+
+        if self.object:
+            self.object.AskDestroy()
+        os.startfile("updating.bat")
+        sys.exit(0)
 
 
 # Exceptions

@@ -64,6 +64,7 @@ class Updater(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnCancel, self.cancel)
         self.Bind(EVT_GAUGE, self.OnGauge)
         self.Bind(EVT_TEXT, self.OnText)
+        self.Bind(EVT_FORCE_DESTROY, self.OnForceDestroy)
 
     def OnGauge(self, e):
         self.gauge.SetValue(e.GetValue())
@@ -74,6 +75,9 @@ class Updater(wx.Frame):
     def OnText(self, e):
         self.default_text = e.GetValue()
         self.text.SetValue(e.GetValue())
+
+    def OnForceDestroy(self, e):
+        self.Destroy()
 
     def OnCancel(self, e):
         """The user clicks on 'cancel'."""
@@ -91,6 +95,10 @@ class Updater(wx.Frame):
     def UpdateText(self, text):
         """Change the text."""
         evt = TextEvent(myEVT_TEXT, -1, text)
+        wx.PostEvent(self, evt)
+
+    def AskDestroy(self):
+        evt = ForceDestroyEvent(myEVT_FORCE_DESTROY, -1, None)
         wx.PostEvent(self, evt)
 
 
@@ -116,6 +124,22 @@ EVT_TEXT = wx.PyEventBinder(myEVT_TEXT, 1)
 class TextEvent(wx.PyCommandEvent):
 
     """Change the value of the text field."""
+
+    def __init__(self, etype, eid, value=None):
+        wx.PyCommandEvent.__init__(self, etype, eid)
+        self._value = value
+
+    def GetValue(self):
+        """Return the event's value."""
+        return self._value
+
+
+myEVT_FORCE_DESTROY = wx.NewEventType()
+EVT_FORCE_DESTROY = wx.PyEventBinder(myEVT_FORCE_DESTROY, 1)
+
+class ForceDestroyEvent(wx.PyCommandEvent):
+
+    """Force the application to terminate."""
 
     def __init__(self, etype, eid, value=None):
         wx.PyCommandEvent.__init__(self, etype, eid)
