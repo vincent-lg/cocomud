@@ -171,9 +171,8 @@ class ClientWindow(DummyUpdater):
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
         if value == wx.YES:
+            self.Close()
             os.startfile("updater.exe")
-            self.Destroy()
-            sys.exit(0)
 
     # Methods to handle client's events
     def handle_message(self, message):
