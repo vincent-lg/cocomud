@@ -98,7 +98,7 @@ class ClientWindow(DummyUpdater):
 
         ## Help menu
         # Check for updates
-        updates = wx.MenuItem(helpMenu, -1, "Check for updates")
+        updates = wx.MenuItem(helpMenu, -1, "Check for available updates")
         self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
         helpMenu.AppendItem(updates)
 
