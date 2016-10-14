@@ -98,13 +98,13 @@ class ClientWindow(DummyUpdater):
 
         ## Help menu
         # Check for updates
-        updates = wx.MenuItem(helpMenu, -1, "Check for available updates")
+        updates = wx.MenuItem(helpMenu, -1, t("ui.menu.updates"))
         self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
         helpMenu.AppendItem(updates)
 
         menubar.Append(fileMenu, t("ui.menu.file"))
         menubar.Append(gameMenu, t("ui.menu.game"))
-        menubar.Append(helpMenu, "Help")
+        menubar.Append(helpMenu, t("ui.menu.help"))
 
         self.SetMenuBar(menubar)
 
@@ -143,7 +143,7 @@ class ClientWindow(DummyUpdater):
     def OnCheckForUpdates(self, e):
         """Open the 'check for updates' dialog box."""
         self.create_updater(just_checking=True)
-        dialog = LoadingDialog("Checking for updates...")
+        dialog = LoadingDialog(t("ui.message.update.loading"))
         self.loading = dialog
         dialog.ShowModal()
 
@@ -166,10 +166,8 @@ class ClientWindow(DummyUpdater):
         if self.loading:
             self.loading.Destroy()
 
-        message = "There's an update available (build={}). Do you want " \
-                "to install it?".format(build)
-
-        value = wx.MessageBox(message, "Available update",
+        message = t("ui.message.update.available", build=build)
+        value = wx.MessageBox(message, t("ui.message.update.title"),
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
         if value == wx.YES:

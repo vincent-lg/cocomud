@@ -67,7 +67,6 @@ class AutoUpdate(Thread):
         """Run the thread."""
         build = self.check()
         if build:
-            print "found new build"
             if self.object:
                 self.object.AvailableUpdate(build)
 
@@ -77,9 +76,8 @@ class AutoUpdate(Thread):
 
     def check(self):
         """Check for updates."""
-        print "Checking..."
         if self.object:
-            self.object.UpdateText("Checking for updates.")
+            self.object.UpdateText("ui.message.update.checking")
             self.object.UpdateGauge(0)
 
         url = "https://cocomud.plan.io/projects/cocomud-client.json"
@@ -131,7 +129,7 @@ class AutoUpdate(Thread):
     def download(self, stdout=False):
         """Download the build."""
         if self.object:
-            self.object.UpdateText("Downloading...")
+            self.object.UpdateText("ui.message.update.downloading")
             self.object.UpdateGauge(0)
 
         # Creates a new folder for updates
@@ -191,7 +189,7 @@ class AutoUpdate(Thread):
             raise ValueError("the updated archive hasn't been downloaded")
 
         if self.object:
-            self.object.UpdateText("Extracting files...")
+            self.object.UpdateText("ui.message.update.extracting")
             self.object.UpdateGauge(0)
 
         # Analyze the zip file

@@ -35,3 +35,15 @@ world:
         Are you sure you want to remove this world?
     unknown: >
         The selected world couldn't be found.
+update:
+    available: >
+        A new update (build {build}) is available for download.  Do
+        you want to download and install it?  If you select 'yes', the
+        client will be closed while the update proceeds, and will be
+        open again when the installation is over.
+    checking: Checking for available updates...
+    confirm_cancel: Are you sure you want to cancel installation of this update?
+    downloading: Downloading the new update...
+    extracting: Extracting files...
+    loading: Loading...
+    title: Checking for updates

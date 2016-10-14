@@ -29,10 +29,31 @@
 
 """Auto-updater of the CocoMUD client."""
 
+import os
+
+from configobj import ConfigObj
+from ytranslate import init, select, t
 import wx
 
 from autoupdate import AutoUpdate
 from version import BUILD
+
+# Determines the user's language
+AVAILABLE_LANGUAGES = ("en", "fr")
+DEFAULT_LANGUAGE = "en"
+path = os.path.join("settings", "options.conf")
+config = ConfigObj(path)
+try:
+    lang = config["general"]["language"]
+    assert lang in AVAILABLE_LANGUAGES
+except (KeyError, AssertionError):
+    lang = DEFAULT_LANGUAGE
+
+# Translation
+init(root_dir="translations")
+select(lang)
+
+# Classes
 
 class DummyUpdater(wx.Frame):
 
@@ -41,7 +62,7 @@ class DummyUpdater(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent)
         self.autoupdater = None
-        self.default_text = "Loading..."
+        self.default_text = t("ui.message.update.loading")
         self.progress = 0
 
         # Event binding
@@ -106,8 +127,8 @@ class Updater(DummyUpdater):
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel.SetSizer(sizer)
-        self.text = wx.TextCtrl(panel, value="Loading...", size=(200, 400),
-                style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.text = wx.TextCtrl(panel, value=self.default_text,
+                size=(200, 400), style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.gauge = wx.Gauge(panel, range=100, size=(250, 25))
         self.cancel = wx.Button(panel, wx.ID_CANCEL)
 
@@ -126,16 +147,16 @@ class Updater(DummyUpdater):
         self.text.SetValue(text)
 
     def OnText(self, e):
-        self.default_text = e.GetValue()
-        self.text.SetValue(e.GetValue())
+        self.default_text = t(e.GetValue())
+        self.text.SetValue(t(e.GetValue()))
 
     def OnForceDestroy(self, e):
         self.Destroy()
 
     def OnCancel(self, e):
         """The user clicks on 'cancel'."""
-        value = wx.MessageBox("Do you really want to cancel this update?",
-                "Confirm", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        value = wx.MessageBox(t("ui.message.update.confirm_cancel"),
+                t("ui.dialog.confirm"), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
         if value == wx.YES:
             self.Destroy()
