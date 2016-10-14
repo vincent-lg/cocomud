@@ -288,6 +288,8 @@ class MUDPanel(wx.Panel):
         # If the client was in the output field, switch back there
         if self.was_output and self.engine.settings[
                 "options.accessibility.smart_cursor"]:
+            if self.engine.settings["options.accessibility.tab_end"]:
+                self.output.SetInsertionPoint(-1)
             self.output.SetFocus()
             self.parent.interrupt = True
 
@@ -351,7 +353,6 @@ class MUDPanel(wx.Panel):
         elif e.GetEventObject() == self.input:
             if key == wx.WXK_TAB:
                 if self.engine.settings["options.accessibility.tab_end"]:
-                    message = self.output.GetValue()
                     self.output.SetInsertionPoint(-1)
 
         if skip:

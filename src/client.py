@@ -166,8 +166,6 @@ class GUIClient(Client):
                     return
 
             if say and speech:
-                if interrupt:
-                    print "interrupting"
                 say(msg, interrupt=interrupt)
             if braille and display_braille:
                 display_braille(msg)
