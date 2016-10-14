@@ -32,15 +32,72 @@
 import wx
 
 from autoupdate import AutoUpdate
+from version import BUILD
 
-class Updater(wx.Frame):
+class DummyUpdater(wx.Frame):
+
+    """Dummy updater, to which updaters should inherit."""
+
+    def __init__(self, parent):
+        wx.Frame.__init__(self, parent)
+        self.autoupdater = None
+        self.default_text = "Loading..."
+        self.progress = 0
+
+        # Event binding
+        self.Bind(EVT_GAUGE, self.OnGauge)
+        self.Bind(EVT_TEXT, self.OnText)
+        self.Bind(EVT_FORCE_DESTROY, self.OnForceDestroy)
+        self.Bind(EVT_AVAILABLE_UPDATE, self.OnAvailableUpdate)
+
+    def create_updater(self, just_checking=False):
+        """Create a new autoupdater instance."""
+        self.autoupdate = AutoUpdate(BUILD, self, just_checking=just_checking)
+        self.autoupdate.start()
+
+    def OnGauge(self, e):
+        """The progress indicator changes."""
+        pass
+
+    def OnText(self, e):
+        """The text of the indicator changes."""
+        pass
+
+    def OnForceDestroy(self, e):
+        """Ask for the window's destruction."""
+        pass
+
+    def OnAvailableUpdate(self, e):
+        """An update is available."""
+        pass
+
+    def UpdateGauge(self, value):
+        """Change the level indicator."""
+        evt = GaugeEvent(myEVT_GAUGE, -1, value)
+        wx.PostEvent(self, evt)
+
+    def UpdateText(self, text):
+        """Change the text."""
+        evt = TextEvent(myEVT_TEXT, -1, text)
+        wx.PostEvent(self, evt)
+
+    def AskDestroy(self):
+        evt = ForceDestroyEvent(myEVT_FORCE_DESTROY, -1, None)
+        wx.PostEvent(self, evt)
+
+    def AvailableUpdate(self, build):
+        """Updates are available."""
+        evt = AvailableUpdateEvent(myEVT_AVAILABLE_UPDATE, -1, build)
+        wx.PostEvent(self, evt)
+
+
+class Updater(DummyUpdater):
 
     """Graphical updater with a gauge."""
 
-    def __init__(self, *args, **kw):
-        super(Updater, self).__init__(*args, **kw)
-        self.autoupdate = AutoUpdate("5", self)
-        self.autoupdate.start()
+    def __init__(self, parent, just_checking=False):
+        DummyUpdater.__init__(self, parent)
+        self.create_updater(just_checking)
         self.InitUI()
         self.Show()
         self.Center()
@@ -49,7 +106,6 @@ class Updater(wx.Frame):
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel.SetSizer(sizer)
-        self.default_text = "Loading..."
         self.text = wx.TextCtrl(panel, value="Loading...", size=(200, 400),
                 style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.gauge = wx.Gauge(panel, range=100, size=(250, 25))
@@ -62,9 +118,6 @@ class Updater(wx.Frame):
 
         # Event binding
         self.Bind(wx.EVT_BUTTON, self.OnCancel, self.cancel)
-        self.Bind(EVT_GAUGE, self.OnGauge)
-        self.Bind(EVT_TEXT, self.OnText)
-        self.Bind(EVT_FORCE_DESTROY, self.OnForceDestroy)
 
     def OnGauge(self, e):
         self.gauge.SetValue(e.GetValue())
@@ -86,20 +139,6 @@ class Updater(wx.Frame):
 
         if value == wx.YES:
             self.Destroy()
-
-    def UpdateGauge(self, value):
-        """Change the level indicator."""
-        evt = GaugeEvent(myEVT_GAUGE, -1, value)
-        wx.PostEvent(self, evt)
-
-    def UpdateText(self, text):
-        """Change the text."""
-        evt = TextEvent(myEVT_TEXT, -1, text)
-        wx.PostEvent(self, evt)
-
-    def AskDestroy(self):
-        evt = ForceDestroyEvent(myEVT_FORCE_DESTROY, -1, None)
-        wx.PostEvent(self, evt)
 
 
 # Events
@@ -150,7 +189,24 @@ class ForceDestroyEvent(wx.PyCommandEvent):
         return self._value
 
 
+myEVT_AVAILABLE_UPDATE = wx.NewEventType()
+EVT_AVAILABLE_UPDATE = wx.PyEventBinder(myEVT_AVAILABLE_UPDATE, 1)
+
+class AvailableUpdateEvent(wx.PyCommandEvent):
+
+    """Signal that an update is available."""
+
+    def __init__(self, etype, eid, value=None):
+        wx.PyCommandEvent.__init__(self, etype, eid)
+        self._value = value
+
+    def GetValue(self):
+        """Return the event's value."""
+        return self._value
+
+
 # AppMainLoop
-app = wx.App()
-frame = Updater(None)
-app.MainLoop()
+if __name__ == "__main__":
+    app = wx.App()
+    frame = Updater(None)
+    app.MainLoop()

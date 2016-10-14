@@ -28,24 +28,30 @@
 
 """This file contains the ClientWindow class."""
 
+import os
+import sys
 import wx
-
 from ytranslate.tools import t
 
+from autoupdate import AutoUpdate
 from scripting.key import key_name
 from ui.dialogs.alias import AliasDialog
 from ui.dialogs.connection import ConnectionDialog
+from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
+from updater import *
+from version import BUILD
 
-class ClientWindow(wx.Frame):
+class ClientWindow(DummyUpdater):
 
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
         self.engine = engine
         self.focus = True
         self.interrupt = False
+        self.loading = None
         self.CreateMenuBar()
         self.InitUI(world)
 
@@ -66,6 +72,7 @@ class ClientWindow(wx.Frame):
         # Differemtn menus
         fileMenu = wx.Menu()
         gameMenu = wx.Menu()
+        helpMenu = wx.Menu()
 
         ## File menu
         # Preferences
@@ -80,21 +87,29 @@ class ClientWindow(wx.Frame):
 
         ## Game menu
         # Aliases
-        alias = wx.MenuItem(fileMenu, -1, t("ui.menu.aliases"))
+        alias = wx.MenuItem(gameMenu, -1, t("ui.menu.aliases"))
         self.Bind(wx.EVT_MENU, self.OnAlias, alias)
         gameMenu.AppendItem(alias)
 
         # Macros
-        macro = wx.MenuItem(fileMenu, -1, t("ui.menu.macro"))
+        macro = wx.MenuItem(gameMenu, -1, t("ui.menu.macro"))
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
         gameMenu.AppendItem(macro)
 
+        ## Help menu
+        # Check for updates
+        updates = wx.MenuItem(helpMenu, -1, "Check for updates")
+        self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
+        helpMenu.AppendItem(updates)
+
         menubar.Append(fileMenu, t("ui.menu.file"))
         menubar.Append(gameMenu, t("ui.menu.game"))
+        menubar.Append(helpMenu, "Help")
 
         self.SetMenuBar(menubar)
 
     def InitUI(self, world=None):
+        self.create_updater(just_checking=True)
         if world is None:
             dialog = ConnectionDialog(self.engine)
             dialog.ShowModal()
@@ -125,6 +140,13 @@ class ClientWindow(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
+    def OnCheckForUpdates(self, e):
+        """Open the 'check for updates' dialog box."""
+        self.create_updater(just_checking=True)
+        dialog = LoadingDialog("Checking for updates...")
+        self.loading = dialog
+        dialog.ShowModal()
+
     def OnQuit(self, e):
         self.OnClose(e)
 
@@ -137,6 +159,23 @@ class ClientWindow(wx.Frame):
         """The window gains focus."""
         self.focus = e.GetActive()
         e.Skip()
+
+    def OnAvailableUpdate(self, e):
+        """An update is available."""
+        build = e.GetValue()
+        if self.loading:
+            self.loading.Destroy()
+
+        message = "There's an update available (build={}). Do you want " \
+                "to install it?".format(build)
+
+        value = wx.MessageBox(message, "Available update",
+                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+
+        if value == wx.YES:
+            os.startfile("updater.exe")
+            self.Destroy()
+            sys.exit(0)
 
     # Methods to handle client's events
     def handle_message(self, message):

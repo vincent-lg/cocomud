@@ -1,4 +1,5 @@
 # Copyright (c) 2016, LE GOFF Vincent
+# Copyright (c) 2016, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -47,7 +48,7 @@ class AutoUpdate(Thread):
 
     """
 
-    def __init__(self, current_version, object=None):
+    def __init__(self, current_version, object=None, just_checking=False):
         Thread.__init__(self)
         if isinstance(current_version, basestring):
             if not current_version.isdigit():
@@ -60,15 +61,23 @@ class AutoUpdate(Thread):
         self.location = None
         self.path_archive = None
         self.object = object
+        self.just_checking = just_checking
 
     def run(self):
         """Run the thread."""
-        if self.check():
-            self.download()
-            self.update()
+        build = self.check()
+        if build:
+            print "found new build"
+            if self.object:
+                self.object.AvailableUpdate(build)
+
+            if not self.just_checking:
+                self.download()
+                self.update()
 
     def check(self):
         """Check for updates."""
+        print "Checking..."
         if self.object:
             self.object.UpdateText("Checking for updates.")
             self.object.UpdateGauge(0)
@@ -113,10 +122,11 @@ class AutoUpdate(Thread):
             location = recent_build[str(new_build)].get(platform)
             if location:
                 self.location = location
-                return True
+                return new_build
             else:
                 raise UknownPlatformUpdateError
 
+        return None
 
     def download(self, stdout=False):
         """Download the build."""
@@ -245,14 +255,15 @@ class AutoUpdate(Thread):
 
         # Add instructions to delete the clean update
         batch += "\nrmdir /S /Q updating"
-        batch += "\nexit /B"
+        batch += "\nstart /B \"\" cocomud.exe"
+        batch += "\nexit"
 
         # Write the batch file
         with open("updating.bat", "w") as file:
             file.write(batch)
         with open("bgupdating.bat", "w") as file:
-            cmd = "start /B \"\" \"cmd /C updating.bat\" >> update.log 2>&1"
-            cmd += "\nexit"
+            cmd = "cmd /C updating.bat >> update.log 2>&1"
+            cmd += "exit"
             file.write(cmd)
 
         if self.object:
