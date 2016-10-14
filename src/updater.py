@@ -69,7 +69,7 @@ class DummyUpdater(wx.Frame):
         self.Bind(EVT_GAUGE, self.OnGauge)
         self.Bind(EVT_TEXT, self.OnText)
         self.Bind(EVT_FORCE_DESTROY, self.OnForceDestroy)
-        self.Bind(EVT_AVAILABLE_UPDATE, self.OnAvailableUpdate)
+        self.Bind(EVT_RESPONSE_UPDATE, self.OnResponseUpdate)
 
     def create_updater(self, just_checking=False):
         """Create a new autoupdater instance."""
@@ -88,8 +88,8 @@ class DummyUpdater(wx.Frame):
         """Ask for the window's destruction."""
         pass
 
-    def OnAvailableUpdate(self, e):
-        """An update is available."""
+    def OnResponseUpdate(self, e):
+        """The check for updates is complete."""
         pass
 
     def UpdateGauge(self, value):
@@ -106,9 +106,14 @@ class DummyUpdater(wx.Frame):
         evt = ForceDestroyEvent(myEVT_FORCE_DESTROY, -1, None)
         wx.PostEvent(self, evt)
 
-    def AvailableUpdate(self, build):
-        """Updates are available."""
-        evt = AvailableUpdateEvent(myEVT_AVAILABLE_UPDATE, -1, build)
+    def ResponseUpdate(self, build):
+        """The check for updates has responded.
+
+        Note: the build parameter may be None (no update is available)
+        or a number (updates are available).
+
+        """
+        evt = ResponseUpdateEvent(myEVT_RESPONSE_UPDATE, -1, build)
         wx.PostEvent(self, evt)
 
 
@@ -210,12 +215,12 @@ class ForceDestroyEvent(wx.PyCommandEvent):
         return self._value
 
 
-myEVT_AVAILABLE_UPDATE = wx.NewEventType()
-EVT_AVAILABLE_UPDATE = wx.PyEventBinder(myEVT_AVAILABLE_UPDATE, 1)
+myEVT_RESPONSE_UPDATE = wx.NewEventType()
+EVT_RESPONSE_UPDATE = wx.PyEventBinder(myEVT_RESPONSE_UPDATE, 1)
 
-class AvailableUpdateEvent(wx.PyCommandEvent):
+class ResponseUpdateEvent(wx.PyCommandEvent):
 
-    """Signal that an update is available."""
+    """Signal that the check for updates is complete."""
 
     def __init__(self, etype, eid, value=None):
         wx.PyCommandEvent.__init__(self, etype, eid)

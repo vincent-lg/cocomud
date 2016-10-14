@@ -160,19 +160,24 @@ class ClientWindow(DummyUpdater):
         self.focus = e.GetActive()
         e.Skip()
 
-    def OnAvailableUpdate(self, e):
-        """An update is available."""
+    def OnResponseUpdate(self, e):
+        """The check for updates has returned."""
         build = e.GetValue()
         if self.loading:
             self.loading.Destroy()
+            if build is None:
+                message = t("ui.message.update.noupdate")
+                wx.MessageBox(message, t("ui.message.information"),
+                        wx.OK | wx.ICON_INFORMATION)
 
-        message = t("ui.message.update.available", build=build)
-        value = wx.MessageBox(message, t("ui.message.update.title"),
-                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        if build is not None:
+            message = t("ui.message.update.available", build=build)
+            value = wx.MessageBox(message, t("ui.message.update.title"),
+                    wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
-        if value == wx.YES:
-            self.Close()
-            os.startfile("updater.exe")
+            if value == wx.YES:
+                self.Close()
+                os.startfile("updater.exe")
 
     # Methods to handle client's events
     def handle_message(self, message):

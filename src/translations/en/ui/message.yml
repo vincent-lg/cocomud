@@ -14,6 +14,7 @@
         click on 'no' and then on 'ok'.  Are you sure you want to close
         this dialog without saving?
 error: Error
+information: Information
 sharp:
     missing: >
         Unable to find the selected line of action.
@@ -46,4 +47,5 @@ update:
     downloading: Downloading the new update...
     extracting: Extracting files...
     loading: Loading...
+    noupdate: No new update is currently available.
     title: Checking for updates

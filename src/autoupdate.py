@@ -66,10 +66,10 @@ class AutoUpdate(Thread):
     def run(self):
         """Run the thread."""
         build = self.check()
-        if build:
-            if self.object:
-                self.object.AvailableUpdate(build)
+        if self.object:
+            self.object.ResponseUpdate(build)
 
+        if build is not None:
             if not self.just_checking:
                 self.download()
                 self.update()

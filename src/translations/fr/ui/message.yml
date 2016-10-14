@@ -16,6 +16,7 @@
         cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
         cette boîte de dialogue sans sauvegarder ?
 error: Erreur
+information: Information
 sharp:
     missing: >
         Impossible de trouver la ligne d'action sélectionnée.
@@ -49,4 +50,5 @@ update:
     downloading: Téléchargement de la nouvelle mise à jour...
     extracting: Extraction de l'archive...
     loading: Chargement...
+    noupdate: Aucune mise à jour n'est disponible pour l'instant.
     title: Vérification des mises à jour
