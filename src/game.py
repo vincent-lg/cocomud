@@ -28,6 +28,8 @@
 
 """This file contains the GameEngine class."""
 
+import os
+
 from enum import Enum
 
 from client import GUIClient
@@ -91,3 +93,28 @@ class GameEngine:
         world.client = client
         world.sharp_engine = client.sharp_engine
         return client
+
+    def open_help(self, name):
+        """Open the selected help file in HTML format.
+
+        This method open the browser with the appropriate file.
+        The file is the one in the user's language, unless it cannot
+        be found.
+
+        """
+        lang = self.settings.get_language()
+        filename = name + ".html"
+        path = os.path.join("doc", lang, filename)
+        if os.path.exists(path):
+            os.startfile(path)
+            return
+
+        # Try English
+        path = os.path.join("doc", "en", filename)
+        if os.path.exists(path):
+            os.startfile(path)
+            return
+
+        # Neither worked
+        raise ValueError("the doc {} cannot be found, either in the " \
+                "user's language or English".format(repr(name)))

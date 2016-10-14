@@ -2,4 +2,5 @@
 add_action: Add action
 connect: Connect
 edit: Edit
+help: Help
 remove: Remove

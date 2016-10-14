@@ -69,6 +69,8 @@ class AliasDialog(wx.Dialog):
         add = wx.Button(self, label=t("ui.button.add"))
         buttons.Add(add)
         buttons.Add(confirm)
+        help = wx.Button(self, label=t("ui.button.help"))
+        buttons.Add(help)
 
         # Main sizer
         top.Add(aliases, proportion=2)
@@ -89,6 +91,7 @@ class AliasDialog(wx.Dialog):
         b_edit.Bind(wx.EVT_BUTTON, self.OnEdit)
         remove.Bind(wx.EVT_BUTTON, self.OnRemove)
         add.Bind(wx.EVT_BUTTON, self.OnAdd)
+        help.Bind(wx.EVT_BUTTON, self.OnHelp)
         self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
         self.Bind(wx.EVT_BUTTON, self.OnClose, id=wx.ID_CLOSE)
 
@@ -144,6 +147,10 @@ class AliasDialog(wx.Dialog):
                 self.alias_list.remove(alias)
                 self.populate_list(0)
                 self.aliases.SetFocus()
+
+    def OnHelp(self, e):
+        """The user clicked on 'help'."""
+        self.engine.open_help("Alias")
 
     def OnOK(self, e):
         """Save the aliases."""

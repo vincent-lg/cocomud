@@ -97,6 +97,11 @@ class ClientWindow(DummyUpdater):
         gameMenu.AppendItem(macro)
 
         ## Help menu
+        # Basics
+        basics = wx.MenuItem(helpMenu, -1, t("ui.menu.help_index"))
+        self.Bind(wx.EVT_MENU, self.OnBasics, basics)
+        helpMenu.AppendItem(basics)
+
         # Check for updates
         updates = wx.MenuItem(helpMenu, -1, t("ui.menu.updates"))
         self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
@@ -139,6 +144,10 @@ class ClientWindow(DummyUpdater):
         dialog = MacroDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnBasics(self, e):
+        """Open the Basics help file."""
+        self.engine.open_help("Basics")
 
     def OnCheckForUpdates(self, e):
         """Open the 'check for updates' dialog box."""
