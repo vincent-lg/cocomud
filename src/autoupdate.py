@@ -249,6 +249,12 @@ class AutoUpdate(Thread):
                 batch += "\nrmdir /Q /S " + name
                 batch += "\nmd " + name
                 batch += "\nxcopy /S " + path + " " + name
+            elif not os.path.exists(name):
+                if os.path.isfile(path):
+                    batch += "\ncopy /V " + path + " " + name
+                elif os.path.isdir(path):
+                    batch += "\nmd " + name
+                    batch += "\nxcopy /S " + path + " " + name
 
 
         # Add instructions to delete the clean update

@@ -41,6 +41,11 @@ updater = Executable(
     base="Win32GUI",
 )
 
+dbg_updater = Executable(
+    script="dbg_updater.py",
+    base="Win32GUI",
+)
+
 includefiles = [
     "translations",
     "worlds",
@@ -63,7 +68,7 @@ setup(
     version = "0.2",
     description = "The CocoMUD client.",
     options = {'build_exe': {'include_files': includefiles}},
-    executables = [client, updater]
+    executables = [client, updater, dbg_updater]
 )
 
 shutil.move("build/exe.win32-2.7", "build/CocoMUD")

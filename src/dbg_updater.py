@@ -26,39 +26,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""This file contains the debug updater.
+
+It's a console updater that plans on updating CocoMUD client.
+
+"""
+
 import os
-import shutil
 
-from cx_Freeze import setup, Executable
+from autoupdate import AutoUpdate
+from version import BUILD
 
-exe = Executable(
-    script="cocomud.py",
-    base="Win32GUI",
-)
+file = open("updating.log", "w")
+autoupdate = AutoUpdate(BUILD, None)
+file.write("Checking for updates...\n")
+build = autoupdate.check()
+if build is not None:
+    file.write("A new update is available: {}.\n".format(build))
+    file.close()
+    autoupdater.download()
+    autoupdater.update()
+else:
+    file.write("No update is available.\n")
+    file.close()
 
-includefiles = [
-    "translations",
-    "worlds",
-    "../doc",
-    "settings",
-
-    # UniversalSpeech DLLs
-    "../dolapi.dll",
-    "../jfwapi.dll",
-    "../nvdaControllerClient.dll",
-    "../SAAPI32.dll",
-    "../UniversalSpeech.dll",
-]
-
-if os.path.exists("build/CocoMUD"):
-    shutil.rmtree("build/CocoMUD")
-
-setup(
-    name = "CocoMUD client",
-    version = "0.2",
-    description = "The CocoMUD client.",
-    options = {'build_exe': {'include_files': includefiles}},
-    executables = [exe]
-)
-
-shutil.move("build/exe.win32-2.7", "build/CocoMUD")
+os.system("pause")
