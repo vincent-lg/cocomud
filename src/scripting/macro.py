@@ -77,4 +77,6 @@ class Macro:
 
     def execute(self, engine, client):
         """Execute the macro."""
-        client.write(self.action + "\r\n")
+        action = self.action.encode("latin-1", "replace")
+        for line in action.splitlines():
+            client.write(line)
