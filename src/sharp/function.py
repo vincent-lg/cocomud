@@ -28,6 +28,8 @@
 
 """Module containing the Function class."""
 
+from ytranslate import t
+
 class Function(object):
 
     """The function class, parent of all SharpScript functions."""
@@ -56,3 +58,21 @@ class Function(object):
     def complete(self, dialog, *args, **kwargs):
         """Complete the action."""
         return ()
+
+    def t(self, address, default):
+        """Translates the given address, returning a string.
+
+        If the translation isn't available in the catalog, return the
+        default value (presumably in English).  The address to be
+        given is relative to the function (the address
+        'sharp.function_name.{address}' will be sought).
+
+        """
+        address = "sharp.{name}.{address}".format(name=self.name,
+                address=address)
+        try:
+            translation = t(address)
+        except ValueError:
+            translation = default
+
+        return translation

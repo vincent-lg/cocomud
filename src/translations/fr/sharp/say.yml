@@ -1,3 +1,6 @@
-﻿description: Affiche un message et l'envoie au lecteur d'écran
+﻿braille: Affiche le message sur la plage tactile
+description: Affiche un message et l'envoie au lecteur d'écran
 empty_text: Le champ de texte est vide. Que dois-je dire ?
+screen: Affiche le message dans la zone de contenu
+speech: Envoie le message au lecteur d'écran
 text: Texte à afficher et envoyer au lecteur d'écran

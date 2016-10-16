@@ -51,32 +51,55 @@ class Say(Function):
             self.client.handle_message(text, screen=screen,
                     speech=speech, braille=braille)
 
-    def display(self, dialog, text=""):
+    def display(self, dialog, text="", screen=True, speech=True, braille=True):
         """Display the function's argument."""
-        try:
-            label = t("sharp.say.text")
-        except ValueError:
-            label = "Text to be displayed"
+        l_text = self.t("text", "Text to be displayed and sent")
+        l_screen = self.t("screen", "Display the message in the client")
+        l_speech = self.t("speech", "Speak the message aloud")
+        l_braille = self.t("braille", "Display the message on the Braille display")
 
-        l_text = wx.StaticText(dialog, label=label)
+        # Dialog
+        l_text = wx.StaticText(dialog, label=l_text)
         t_text = wx.TextCtrl(dialog, value=text,
                 style=wx.TE_MULTILINE)
         dialog.text = t_text
         dialog.top.Add(l_text)
         dialog.top.Add(t_text)
 
+        # Checkboxes
+        options = wx.BoxSizer(wx.HORIZONTAL)
+        dialog.cb_screen = wx.CheckBox(dialog, label=l_screen)
+        dialog.cb_screen.SetValue(screen)
+        dialog.cb_speech = wx.CheckBox(dialog, label=l_speech)
+        dialog.cb_speech.SetValue(speech)
+        dialog.cb_braille = wx.CheckBox(dialog, label=l_braille)
+        dialog.cb_braille.SetValue(braille)
+        options.Add(dialog.cb_screen)
+        options.Add(dialog.cb_speech)
+        options.Add(dialog.cb_braille)
+        dialog.top.Add(options)
+
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
         text = dialog.text.GetValue().encode("utf-8", "replace")
-        try:
-            empty_text = t("sharp.say.empty_text")
-        except ValueError:
-            empty_text = "The text field is empty.  What should I say?"
-
+        empty_text = self.t("empty_text",
+                "The text field is empty.  What should I say?")
         if not text:
             wx.MessageBox(empty_text, t("ui.message.error"),
                     wx.OK | wx.ICON_ERROR)
             dialog.text.SetFocus()
             return None
 
-        return (text, )
+        arguments = [text]
+        # Get the options
+        screen = dialog.cb_screen.GetValue()
+        speech = dialog.cb_speech.GetValue()
+        braille = dialog.cb_braille.GetValue()
+        if not screen:
+            arguments.append("-screen")
+        if not speech:
+            arguments.append("-speech")
+        if not braille:
+            arguments.append("-braille")
+
+        return tuple(arguments)

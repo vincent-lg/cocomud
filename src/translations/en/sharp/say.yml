@@ -1,3 +1,6 @@
-﻿description: Display a message and send it to the screen reader
+﻿braille: Display the message on the Braille display
+description: Display a message and send it to the screen reader
 empty_text: The text field is empty.  What should I say?
+screen: Display the message in the client
+speech: Speak the message aloud
 text: Text to be displayed and sent
