@@ -48,6 +48,7 @@ class ClientWindow(DummyUpdater):
 
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
+        self.panel = None
         self.engine = engine
         self.focus = True
         self.interrupt = False
@@ -119,6 +120,10 @@ class ClientWindow(DummyUpdater):
             dialog = ConnectionDialog(self.engine)
             dialog.ShowModal()
             world = self.engine.default_world
+
+        if world is None:
+            self.Destroy()
+            return
 
         self.panel = MUDPanel(self, self.engine, world)
         self.SetTitle("{} [CocoMUD]".format(world.name))
