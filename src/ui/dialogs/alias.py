@@ -252,6 +252,7 @@ class EditAliasDialog(wx.Dialog):
             alias = alias
             self.alias.alias = alias
             self.alias.action = action
+            self.alias.re_alias = self.alias.find_regex(self.alias.alias)
             if self.alias not in self.aliases:
                 self.aliases.append(self.alias)
             self.Destroy()
