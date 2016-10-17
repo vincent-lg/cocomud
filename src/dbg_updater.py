@@ -37,7 +37,7 @@ import os
 from autoupdate import AutoUpdate
 from version import BUILD
 
-file = open("updating.log", "w")
+file = open("update.log", "w")
 autoupdate = AutoUpdate(BUILD, None)
 file.write("Checking for updates...\n")
 build = autoupdate.check()

@@ -53,6 +53,7 @@ class ClientWindow(DummyUpdater):
         self.focus = True
         self.interrupt = False
         self.loading = None
+        self.connection = None
         self.CreateMenuBar()
         self.InitUI(world)
 
@@ -118,13 +119,15 @@ class ClientWindow(DummyUpdater):
         self.create_updater(just_checking=True)
         if world is None:
             dialog = ConnectionDialog(self.engine)
-            dialog.ShowModal()
+            self.connection = dialog
+            value = dialog.ShowModal()
+            if value == wx.ID_CANCEL:
+                self.Close()
+                return
+
             world = self.engine.default_world
 
-        if world is None:
-            self.Destroy()
-            return
-
+        self.connection = None
         self.panel = MUDPanel(self, self.engine, world)
         self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
@@ -190,7 +193,11 @@ class ClientWindow(DummyUpdater):
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                self.Close()
+                # If the connection dialog is still open, close it
+                if self.connection:
+                    self.connection.Close()
+                else:
+                    self.Close()
                 os.startfile("updater.exe")
 
     # Methods to handle client's events
