@@ -44,3 +44,4 @@ nl_end: Ajoute une nouvelle ligne à la fin du contenu
 world:
     add: Ajouter un univers
     edit: Éditer un univers existant
+choose_file: Sélectionner un fichier

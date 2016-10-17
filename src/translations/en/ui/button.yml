@@ -1,6 +1,8 @@
 ﻿add: Add
 add_action: Add action
+browse: Browse...
 connect: Connect
 edit: Edit
 help: Help
 remove: Remove
+test: Test

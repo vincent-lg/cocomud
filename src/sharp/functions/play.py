@@ -28,7 +28,11 @@
 
 """Module containing the Play function class."""
 
+import os
+
 from pygame import mixer
+import wx
+from ytranslate import t
 
 from sharp import Function
 
@@ -42,7 +46,67 @@ class Play(Function):
 
     """
 
+    description = "Play an audio file"
+
     def run(self, filename):
-        """Say the text."""
+        """Play the audio file."""
+        sound = mixer.Sound(filename)
+        sound.play()
+
+    def display(self, dialog, filename=""):
+        """Display the function's argument."""
+        self.dialog = dialog
+        directory = os.path.join(self.world.path, "sounds")
+        if not os.path.isdir(directory):
+            directory = self.world.path
+
+        dialog.default_directory = directory
+        dialog.default_file = filename
+        l_file = self.t("file", "Audio file to be played")
+
+        # Dialog
+        l_file = wx.StaticText(dialog, label=l_file)
+        t_file = wx.TextCtrl(dialog, value=filename)
+        browse = wx.Button(dialog, label=t("ui.button.browse"))
+        test = wx.Button(dialog, label=t("ui.button.test"))
+        dialog.file = t_file
+        dialog.top.Add(l_file)
+        dialog.top.Add(t_file)
+        dialog.top.Add(browse)
+        tialog.top.Add(test)
+
+        # event binding
+        browse.Bind(wx.EVT_BUTTON, self.browse_file)
+        test.Bind(wx.EVT_BUTTON, self.test_file)
+
+    def complete(self, dialog):
+        """The user pressed 'ok' in the dialog."""
+        file = dialog.default_file
+        empty_path = self.t("empty_path",
+                "The path hasn't been set.  What file should I play?")
+        if not file:
+            wx.MessageBox(empty_path, t("ui.message.error"),
+                    wx.OK | wx.ICON_ERROR)
+            dialog.file.SetFocus()
+            return None
+
+        return (file, )
+
+    def browse_file(self, e):
+        """Browse for a file."""
+        parent = self.dialog
+        extensions = "Audio file (*.wav)|*.wav"
+        dialog = wx.FileDialog(parent, t("ui.dialog.choose_file"),
+                parent.default_directory, "", extensions,
+                wx.OPEN)
+        result = dialog.ShowModal()
+        if result == wx.ID_OK:
+            parent.file.SetValue(dialog.GetPath())
+            parent.default_file = dialog.GetPath()
+
+    def test_file(self, e):
+        """Test the audio file."""
+        parent = self.dialog
+        filename = parent.default_file
         sound = mixer.Sound(filename)
         sound.play()

@@ -1,0 +1,5 @@
+﻿description: Joue un son
+empty_path: >
+    Vous n'avez pas sélectionné le fichier audio. Quel fichier dois-je
+    jouer ?
+file: Fichier audio à jouer

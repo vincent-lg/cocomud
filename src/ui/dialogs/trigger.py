@@ -250,11 +250,9 @@ class EditTriggerDialog(wx.Dialog):
             wx.MessageBox(t("ui.message.trigger.missing_action"),
                     t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
         else:
-            trigger = trigger
-            self.trigger.reaction = trigger
+            self.trigger.reaction = reaction
             self.trigger.action = action
-            self.trigger.re_reaction = self.trigger.find_regex(
-                    self.trigger.reaction)
+            self.trigger.re_reaction = self.trigger.find_regex(reaction)
             if self.trigger not in self.triggers:
                 self.triggers.append(self.trigger)
             self.Destroy()

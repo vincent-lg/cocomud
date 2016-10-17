@@ -43,3 +43,4 @@ nl_end: Add a new line at the end of the output
 world:
     add: Add a new world
     edit: Edit an existing world
+choose_file: Choose a file

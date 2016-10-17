@@ -40,8 +40,8 @@ class Function(object):
         self.engine = engine
         self.client = client
         self.sharp_engine = sharp
-        self.init()
         self.world = world
+        self.init()
 
     def init(self):
         """Another secondary constructor."""
