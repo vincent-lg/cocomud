@@ -8,3 +8,6 @@ function: Fonction
 hostname: Nom d'hôte
 name: Nom
 port: Port
+trigger:
+    1: Trigger
+    2+: Triggers

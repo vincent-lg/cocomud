@@ -40,6 +40,7 @@ from ui.dialogs.connection import ConnectionDialog
 from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
+from ui.dialogs.trigger import TriggerDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 from updater import *
 from version import BUILD
@@ -98,6 +99,11 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
         gameMenu.AppendItem(macro)
 
+        # Triggers
+        triggers = wx.MenuItem(gameMenu, -1, t("ui.menu.triggers"))
+        self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
+        gameMenu.AppendItem(triggers)
+
         ## Help menu
         # Basics
         basics = wx.MenuItem(helpMenu, -1, t("ui.menu.help_index"))
@@ -150,6 +156,12 @@ class ClientWindow(DummyUpdater):
     def OnMacro(self, e):
         """Open the macro dialog box."""
         dialog = MacroDialog(self.engine, self.world)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def OnTriggers(self, e):
+        """Open the triggers dialog box."""
+        dialog = TriggerDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
 

@@ -59,6 +59,14 @@ class Trigger:
         """Return the SharpScript code to create this trigger."""
         return self.sharp_engine.format((("#trigger", self.reaction,
                 self.action), ))
+
+    @property
+    def copied(self):
+        """Return a copied version of the trigger."""
+        copy = Trigger(self.sharp_engine, self.reaction, self.action)
+        copy.level = self.level
+        return copy
+
     def find_regex(self, reaction):
         """Find and compile the reaction given as argument.
 
