@@ -1,4 +1,5 @@
 ﻿# Copyright (c) 2016, LE GOFF Vincent
+# Copyright (c) 2016, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -67,6 +68,16 @@ class ClientWindow(DummyUpdater):
     def _set_client(self, client):
         self.panel.client = client
     client = property(_get_client, _set_client)
+
+    def CloseAll(self):
+        """Close ALL windows (counting dialogs)."""
+        windows = wx.GetTopLevelWindows()
+        for window in windows:
+            # The LoadingDialog needs to be destroyed to avoid confirmation
+            if isinstance(window, LoadingDialog):
+                window.Destroy()
+            else:
+                window.Close()
 
     def CreateMenuBar(self):
         """Create the GUI menu bar and hierarchy of menus."""
@@ -205,11 +216,7 @@ class ClientWindow(DummyUpdater):
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                # If the connection dialog is still open, close it
-                if self.connection:
-                    self.connection.Close()
-                else:
-                    self.Close()
+                self.CloseAll()
                 os.startfile("updater.exe")
 
     # Methods to handle client's events
