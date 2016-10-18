@@ -50,8 +50,31 @@ class Play(Function):
 
     def run(self, filename):
         """Play the audio file."""
+        filename = self.find_abs_filename(filename)
         sound = mixer.Sound(filename)
         sound.play()
+
+    def find_abs_filename(self, filename):
+        """Return the absolute path of the file.
+
+        The initial file name can be absolute, or relative to the
+        world's location.
+
+        """
+        if os.path.isabs(filename):
+            pass
+        elif os.path.normpath(filename).split(os.path.sep)[0] == "worlds":
+            filename = os.path.abspath(filename)
+        else:
+            path = os.path.join(self.world.path, filename)
+            filename = os.path.abspath(path)
+
+        return filename
+
+    def find_rel_filename(self, filename):
+        """Return the filename relative to the world's location."""
+        location = os.path.abspath(self.world.path)
+        return os.path.relpath(filename, location)
 
     def display(self, dialog, filename=""):
         """Display the function's argument."""
@@ -73,9 +96,9 @@ class Play(Function):
         dialog.top.Add(l_file)
         dialog.top.Add(t_file)
         dialog.top.Add(browse)
-        tialog.top.Add(test)
+        dialog.top.Add(test)
 
-        # event binding
+        # Event binding
         browse.Bind(wx.EVT_BUTTON, self.browse_file)
         test.Bind(wx.EVT_BUTTON, self.test_file)
 
@@ -101,12 +124,13 @@ class Play(Function):
                 wx.OPEN)
         result = dialog.ShowModal()
         if result == wx.ID_OK:
-            parent.file.SetValue(dialog.GetPath())
-            parent.default_file = dialog.GetPath()
+            filename = self.find_rel_filename(dialog.GetPath())
+            parent.file.SetValue(filename)
+            parent.default_file = filename
 
     def test_file(self, e):
         """Test the audio file."""
         parent = self.dialog
-        filename = parent.default_file
+        filename = self.find_abs_filename(parent.default_file)
         sound = mixer.Sound(filename)
         sound.play()
