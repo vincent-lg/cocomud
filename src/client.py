@@ -97,7 +97,6 @@ class Client(threading.Thread):
 
     def write(self, text, alias=True):
         """Write text to the client."""
-        print "1", repr(text)
         if text.startswith("#"):
             self.sharp_engine.execute(text)
         else:
@@ -107,10 +106,8 @@ class Client(threading.Thread):
                     if alias.test(text):
                         return
 
-            print "2", repr(text)
             if not text.endswith("\r\n"):
                 text += "\r\n"
-            print "3", repr(text)
             self.client.write(text)
 
 

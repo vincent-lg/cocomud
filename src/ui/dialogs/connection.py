@@ -256,6 +256,7 @@ class EditWorldDialog(wx.Dialog):
                     if t_world is self.world:
                         del self.worlds[name]
             self.worlds[self.world.name] = self.world
+            self.world.engine = self.engine
             self.world.save()
             self.Destroy()
 
