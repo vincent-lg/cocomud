@@ -41,7 +41,7 @@ import time
 try:
     from UniversalSpeech import say
     from UniversalSpeech import braille as display_braille
-except ImportError:
+except (ImportError, OSError):
     say = None
     display_braille = None
 
