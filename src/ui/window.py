@@ -31,6 +31,8 @@
 
 import os
 import sys
+
+from accesspanel import AccessPanel
 import wx
 from ytranslate.tools import t
 
@@ -222,20 +224,10 @@ class ClientWindow(DummyUpdater):
     # Methods to handle client's events
     def handle_message(self, message):
         """The client has just received a message."""
-        pos = self.panel.output.GetInsertionPoint()
         lines = message.splitlines()
         lines = [line for line in lines if line]
         message = "\n".join(lines)
-        output = self.panel.output.GetValue()
-        if output and not output.endswith("\n"):
-            message = "\n" + message
-
-        if self.engine.settings["options.accessibility.nl_end"]:
-            message += "\n"
-
-        self.panel.output.write(message)
-        self.panel.output.SetInsertionPoint(pos)
-        self.interrupt = False
+        self.panel.send(message)
 
     def handle_option(self, command):
         """Handle the specified option.
@@ -253,10 +245,10 @@ class ClientWindow(DummyUpdater):
             evt = FocusEvent(myEVT_FOCUS, -1, "input")
             wx.PostEvent(self.panel, evt)
 
-class MUDPanel(wx.Panel):
+class MUDPanel(AccessPanel):
 
     def __init__(self, parent, engine, world):
-        wx.Panel.__init__(self, parent)
+        AccessPanel.__init__(self, parent)
         self.parent = parent
         self.engine = engine
         self.client = None
@@ -264,73 +256,16 @@ class MUDPanel(wx.Panel):
         self.index = -1
         self.history = []
         self.focused = True
-        self.was_output = False
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.SetSizer(sizer)
 
-        # Input
-        s_input = wx.BoxSizer(wx.HORIZONTAL)
-        l_input = wx.StaticText(self, -1, t("ui.client.input"))
-        t_input = wx.TextCtrl(self, -1, "", size=(125, -1),
-                style=wx.TE_PROCESS_ENTER)
-        self.input = t_input
-
-        # Password
-        l_password = wx.StaticText(self, -1, t("ui.client.password"))
-        t_password = wx.TextCtrl(self, -1, "", size=(20, -1),
-                style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
-        self.password = t_password
-        t_password.Hide()
-
-        # Add the input field in the sizer
-        s_input.Add(l_input)
-        s_input.Add(t_input, proportion=4)
-        s_input.Add(l_password)
-        s_input.Add(t_password, proportion=2)
-
-        # Ouput
-        l_output = wx.StaticText(self, -1, t("ui.client.output"))
-        t_output = wx.TextCtrl(self, -1, "",
-                size=(600, 400), style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_PROCESS_TAB)
-        self.output = t_output
-
-        # Add the output fields in the sizer
-        sizer.Add(s_input)
-        sizer.Add(t_output, proportion=8)
-
-        # Event handler
-        t_input.Bind(wx.EVT_TEXT_ENTER, self.OnText)
-        t_password.Bind(wx.EVT_TEXT_ENTER, self.OnText)
+        # Event binding
         self.Bind(EVT_FOCUS, self.OnFocus)
-        t_input.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
-        t_input.Bind(wx.EVT_SET_FOCUS, self.OnInputFocused)
-        t_password.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
-        t_output.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 
-    def OnText(self, event):
-        """One of the input fields is sending text."""
-        self.input.Clear()
-        self.password.Clear()
+    def OnInput(self, message):
+        """Some text has been sent from the input."""
         encoding = self.engine.settings["options.general.encoding"]
-        msg = event.GetString().encode(encoding, "replace")
-        self.client.write(msg)
-
-        # SmartCursor
-        # If the client was in the output field, switch back there
-        if self.was_output and self.engine.settings[
-                "options.accessibility.smart_cursor"]:
-            if self.engine.settings["options.accessibility.tab_end"]:
-                self.output.SetInsertionPoint(-1)
-            self.output.SetFocus()
-            self.parent.interrupt = True
-
-        # Write in the history
-        if event.GetEventObject() == self.input:
-            if self.index == -1 and msg:
-                self.history.append(msg)
-
-        # Reset the 'was_output'
-        self.was_output = False
+        message = message.encode(encoding, "replace")
+        self.client.write(message)
+        self.history.append(message)
 
     def OnFocus(self, evt):
         """The GUIClient requires a change of focus.
@@ -339,55 +274,32 @@ class MUDPanel(wx.Panel):
         focus in the input field (hiding the password field) or in
         the password field (hiding the input field).
         """
-        val = evt.GetValue()
-        if val == "input":
-            self.input.Show()
-            self.input.SetFocus()
-            self.password.Hide()
-        elif val == "password":
-            self.password.Show()
-            self.password.SetFocus()
-            self.input.Hide()
-
-    def OnInputFocused(self, e):
-        """Input gains the focus."""
-        message = self.input.GetValue()
-        if message:
-            self.input.SetInsertionPoint(len(message) + 1)
-        e.Skip()
+        pass
+        #val = evt.GetValue()
+        #if val == "input":
+        #    self.input.Show()
+        #    self.input.SetFocus()
+        #    self.password.Hide()
+        #elif val == "password":
+        #    self.password.Show()
+        #    self.password.SetFocus()
+        #    self.input.Hide()
 
     def OnKeyDown(self, e):
         """A key is pressed in the window."""
-        skip = True
         modifiers = e.GetModifiers()
         key = e.GetUnicodeKey()
         if not key:
             key = e.GetKeyCode()
 
-        if e.GetEventObject() == self.input:
-            skip = self.HandleHistory(modifiers, key)
-
-        # Look for matching macros
         if self.world:
             for macro in self.world.macros:
                 code = (macro.key, macro.modifiers)
                 if code == (key, modifiers):
                     macro.execute(self.engine, self.client)
+                    return
 
-        if e.GetEventObject() is self.output:
-            shortcut = key_name(key, modifiers)
-            if shortcut:
-                if shortcut == "Backspace" or len(shortcut) == 1 or (
-                        shortcut.startswith("Shift +") and len(shortcut) == 9):
-                    self.was_output = True
-                    self.input.EmulateKeyPress(e)
-        elif e.GetEventObject() == self.input:
-            if key == wx.WXK_TAB:
-                if self.engine.settings["options.accessibility.tab_end"]:
-                    self.output.SetInsertionPoint(-1)
-
-        if skip:
-            e.Skip()
+        AccessPanel.OnKeyDown(self, e)
 
     def HandleHistory(self, modifiers, key):
         """Handle the history commands."""
