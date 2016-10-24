@@ -62,7 +62,10 @@ class World:
         self.aliases = []
         self.macros = []
         self.triggers = []
+
+        # Auto completion
         self.words = {}
+        self.ac_choices = []
 
     def __repr__(self):
         return "<World {} (hostname={}, port={})>".format(
@@ -141,6 +144,10 @@ class World:
         """Remove the world."""
         shutil.rmtree(self.path)
 
+    def reset_autocompletion(self):
+        """Erase the list of possible choices in for the auto completion."""
+        self.ac_choices[:] = []
+
     def feed_words(self, text):
         """Add new words using the provided text.
 
@@ -160,11 +167,13 @@ class World:
         word = word.lower()
         for potential, count in self.words.items():
             if potential.startswith(word):
-                matches[potential] = count
+                if potential not in self.ac_choices:
+                    matches[potential] = count
 
         # Sort through the most common
         for potential, count in sorted(matches.items(),
                 key=lambda tup: tup[1], reverse=True):
+            self.ac_choices.append(potential)
             return potential
 
         return None

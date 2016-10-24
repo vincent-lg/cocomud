@@ -263,6 +263,7 @@ class MUDPanel(AccessPanel):
         self.index = -1
         self.history = []
         self.focused = True
+        self.last_ac = None
 
         # Event binding
         self.Bind(EVT_FOCUS, self.OnFocus)
@@ -271,6 +272,9 @@ class MUDPanel(AccessPanel):
         """Some text has been sent from the input."""
         encoding = self.engine.settings["options.general.encoding"]
         message = message.encode(encoding, "replace")
+        if self.world:
+            self.world.reset_autocompletion()
+
         self.client.write(message)
         self.history.append(message)
 
@@ -313,6 +317,16 @@ class MUDPanel(AccessPanel):
                 last_word = LAST_WORD.search(input)
                 if last_word:
                     last_word = last_word.groups()[0]
+                    if self.last_ac and last_word.startswith(self.last_ac):
+                        # Remove the word to be modified
+                        self.output.Remove(
+                                self.output.GetLastPosition() + len(
+                                self.last_ac) - len(last_word),
+                                self.output.GetLastPosition())
+                        last_word = self.last_ac
+                    else:
+                        self.last_ac = last_word
+
                     complete = self.world.find_word(last_word)
                     if complete:
                         end = complete[len(last_word):]
