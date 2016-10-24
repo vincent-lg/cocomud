@@ -336,7 +336,7 @@ class MUDPanel(AccessPanel):
                     else:
                         self.last_ac = last_word
 
-                    complete = self.world.find_word(last_word)
+                    complete = self.world.find_word(last_word, TTS=True)
                     if complete:
                         end = complete[len(last_word):]
                         self.output.AppendText(end)

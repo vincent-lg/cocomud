@@ -38,13 +38,7 @@ from telnetlib import Telnet, WONT, WILL, ECHO
 import threading
 import time
 
-try:
-    from UniversalSpeech import say
-    from UniversalSpeech import braille as display_braille
-except (ImportError, OSError):
-    say = None
-    display_braille = None
-
+from screenreader import ScreenReader
 from sharp.engine import SharpScript
 
 # Constants
@@ -154,7 +148,6 @@ class GUIClient(Client):
         encoding = self.engine.settings["options.general.encoding"]
         msg = msg.decode(encoding, "replace")
         msg = ANSI_ESCAPE.sub('', msg)
-        interrupt = self.window and self.window.interrupt or False
         if self.window and screen:
             self.window.handle_message(msg)
 
@@ -167,10 +160,7 @@ class GUIClient(Client):
                 if not force_TTS:
                     return
 
-            if say and speech:
-                say(msg, interrupt=interrupt)
-            if braille and display_braille:
-                display_braille(msg)
+            ScreenReader.talk(msg, speech=speech, braille=braille)
 
     def handle_option(self, socket, command, option):
         """Handle a received option."""
