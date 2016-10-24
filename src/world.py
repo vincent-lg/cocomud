@@ -36,6 +36,8 @@ from textwrap import dedent
 
 from configobj import ConfigObj
 
+from screenreader import ScreenReader
+
 class World:
 
     """A class representing a World object.
@@ -161,7 +163,7 @@ class World:
             count += 1
             self.words[word] = count
 
-    def find_word(self, word):
+    def find_word(self, word, TTS=False):
         """Find the most likely word for auto-completion."""
         matches = {}
         word = word.lower()
@@ -174,6 +176,8 @@ class World:
         for potential, count in sorted(matches.items(),
                 key=lambda tup: tup[1], reverse=True):
             self.ac_choices.append(potential)
+            if TTS:
+                ScreenReader.talk(potential)
             return potential
 
         return None
