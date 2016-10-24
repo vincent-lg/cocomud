@@ -127,6 +127,11 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnBasics, basics)
         helpMenu.AppendItem(basics)
 
+        # News
+        new = wx.MenuItem(helpMenu, -1, t("ui.menu.new"))
+        self.Bind(wx.EVT_MENU, self.OnNew, new)
+        helpMenu.AppendItem(new)
+
         # Check for updates
         updates = wx.MenuItem(helpMenu, -1, t("ui.menu.updates"))
         self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
@@ -185,6 +190,10 @@ class ClientWindow(DummyUpdater):
     def OnBasics(self, e):
         """Open the Basics help file."""
         self.engine.open_help("Basics")
+
+    def OnNew(self, e):
+        """Open the Builds help file."""
+        self.engine.open_help("Builds")
 
     def OnCheckForUpdates(self, e):
         """Open the 'check for updates' dialog box."""
