@@ -30,6 +30,7 @@
 """This file contains the ClientWindow class."""
 
 import os
+import re
 import sys
 
 from accesspanel import AccessPanel
@@ -47,6 +48,9 @@ from ui.dialogs.trigger import TriggerDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 from updater import *
 from version import BUILD
+
+## Constants
+LAST_WORD = re.compile(r"^.*?(\w+)$", re.UNICODE | re.DOTALL)
 
 class ClientWindow(DummyUpdater):
 
@@ -227,6 +231,9 @@ class ClientWindow(DummyUpdater):
         lines = message.splitlines()
         lines = [line for line in lines if line]
         message = "\n".join(lines)
+        if self.panel.world:
+            self.panel.world.feed_words(message)
+
         self.panel.send(message)
 
     def handle_option(self, command):
@@ -293,11 +300,23 @@ class MUDPanel(AccessPanel):
             key = e.GetKeyCode()
 
         if self.world:
+            # Test the different macros
             for macro in self.world.macros:
                 code = (macro.key, macro.modifiers)
                 if code == (key, modifiers):
                     macro.execute(self.engine, self.client)
                     return
+
+            # Test auto-completion
+            if key == wx.WXK_TAB and modifiers == wx.MOD_NONE:
+                input = self.input
+                last_word = LAST_WORD.search(input)
+                if last_word:
+                    last_word = last_word.groups()[0]
+                    complete = self.world.find_word(last_word)
+                    if complete:
+                        end = complete[len(last_word):]
+                        self.output.AppendText(end)
 
         AccessPanel.OnKeyDown(self, e)
 

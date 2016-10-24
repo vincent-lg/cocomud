@@ -31,6 +31,7 @@
 from codecs import open
 import shutil
 import os
+import re
 from textwrap import dedent
 
 from configobj import ConfigObj
@@ -61,6 +62,7 @@ class World:
         self.aliases = []
         self.macros = []
         self.triggers = []
+        self.words = {}
 
     def __repr__(self):
         return "<World {} (hostname={}, port={})>".format(
@@ -138,3 +140,31 @@ class World:
     def remove(self):
         """Remove the world."""
         shutil.rmtree(self.path)
+
+    def feed_words(self, text):
+        """Add new words using the provided text.
+
+        Each word in this text will be added to the list of words for
+        a future auto-completion.
+
+        """
+        for word in re.findall(r"(\w+)", text, re.UNICODE):
+            word = word.lower()
+            count = self.words.get(word, 0)
+            count += 1
+            self.words[word] = count
+
+    def find_word(self, word):
+        """Find the most likely word for auto-completion."""
+        matches = {}
+        word = word.lower()
+        for potential, count in self.words.items():
+            if potential.startswith(word):
+                matches[potential] = count
+
+        # Sort through the most common
+        for potential, count in sorted(matches.items(),
+                key=lambda tup: tup[1], reverse=True):
+            return potential
+
+        return None
