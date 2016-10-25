@@ -276,6 +276,7 @@ class MUDPanel(AccessPanel):
 
         # Event binding
         self.Bind(EVT_FOCUS, self.OnFocus)
+        self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
 
     def OnInput(self, message):
         """Some text has been sent from the input."""
@@ -304,6 +305,24 @@ class MUDPanel(AccessPanel):
         #    self.password.Show()
         #    self.password.SetFocus()
         #    self.input.Hide()
+
+    def OnPaste(self, e):
+        """Paste several lines in the input field.
+
+        This event simply sends this text to be processed.
+
+        """
+        clipboard = wx.TextDataObject()
+        success = wx.TheClipboard.GetData(clipboard)
+        if success:
+            clipboard = clipboard.GetText()
+            input = clipboard
+            if input.endswith("\n"):
+                lines = input.splitlines()
+                for line in lines:
+                    self.OnInput(line)
+            else:
+                e.Skip()
 
     def OnKeyDown(self, e):
         """A key is pressed in the window."""
