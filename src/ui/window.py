@@ -243,7 +243,7 @@ class ClientWindow(DummyUpdater):
         if self.panel.world:
             self.panel.world.feed_words(message)
 
-        self.panel.send(message)
+        self.panel.Send(message)
 
     def handle_option(self, command):
         """Handle the specified option.
