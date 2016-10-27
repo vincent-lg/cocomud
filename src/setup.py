@@ -67,7 +67,10 @@ setup(
     name = "CocoMUD client",
     version = "0.2",
     description = "The CocoMUD client.",
-    options = {'build_exe': {'include_files': includefiles}},
+    options = {'build_exe': {
+            'include_files': includefiles,
+            "packages": ["accesspanel"],
+    }},
     executables = [client, updater, dbg_updater]
 )
 
