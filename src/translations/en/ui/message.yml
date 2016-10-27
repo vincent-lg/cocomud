@@ -66,3 +66,4 @@ update:
     loading: Loading...
     noupdate: No new update is currently available.
     title: Checking for updates
+    updating: Updating CocoMUD

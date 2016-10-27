@@ -125,6 +125,7 @@ class Updater(DummyUpdater):
         DummyUpdater.__init__(self, parent)
         self.create_updater(just_checking)
         self.InitUI()
+        self.SetTitle(t("ui.message.update.updating"))
         self.Show()
         self.Center()
 
@@ -133,7 +134,7 @@ class Updater(DummyUpdater):
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel.SetSizer(sizer)
         self.text = wx.TextCtrl(panel, value=self.default_text,
-                size=(200, 400), style=wx.TE_MULTILINE | wx.TE_READONLY)
+                size=(600, 100), style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.gauge = wx.Gauge(panel, range=100, size=(250, 25))
         self.cancel = wx.Button(panel, wx.ID_CANCEL)
 

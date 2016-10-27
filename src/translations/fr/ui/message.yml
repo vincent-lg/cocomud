@@ -71,3 +71,4 @@ update:
     loading: Chargement...
     noupdate: Aucune mise à jour n'est disponible pour l'instant.
     title: Vérification des mises à jour
+    updating: Mise à jour de CocoMUD
