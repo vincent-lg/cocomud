@@ -264,13 +264,11 @@ class ClientWindow(DummyUpdater):
 class MUDPanel(AccessPanel):
 
     def __init__(self, parent, engine, world):
-        AccessPanel.__init__(self, parent)
+        AccessPanel.__init__(self, parent, history=True)
         self.parent = parent
         self.engine = engine
         self.client = None
         self.world = world
-        self.index = -1
-        self.history = []
         self.focused = True
         self.last_ac = None
 
@@ -286,7 +284,6 @@ class MUDPanel(AccessPanel):
             self.world.reset_autocompletion()
 
         self.client.write(message)
-        self.history.append(message)
 
     def OnFocus(self, evt):
         """The GUIClient requires a change of focus.
@@ -361,48 +358,3 @@ class MUDPanel(AccessPanel):
                         self.output.AppendText(end)
 
         AccessPanel.OnKeyDown(self, e)
-
-    def HandleHistory(self, modifiers, key):
-        """Handle the history commands."""
-        if modifiers == 0:
-            if key == wx.WXK_UP:
-                self.HistoryGoUp()
-                return False
-            elif key == wx.WXK_DOWN:
-                self.HistoryGoDown()
-                return False
-
-        return True
-
-    def HistoryGoUp(self):
-        """Go up in the history."""
-        if self.index == -1:
-            self.index = len(self.history) - 1
-        elif self.index > 0:
-            self.index -= 1
-        else:
-            return
-
-        message = self.history[self.index]
-        encoding = self.engine.settings["options.general.encoding"]
-        message = message.decode(encoding, "replace")
-        self.input.Clear()
-        self.input.SetValue(message)
-        self.input.SetInsertionPoint(-1)
-
-    def HistoryGoDown(self):
-        """Go down in the history."""
-        if self.index == -1:
-            return
-        elif self.index >= len(self.history) - 1:
-            self.index = -1
-            message = ""
-        else:
-            self.index += 1
-            message = self.history[self.index]
-
-        encoding = self.engine.settings["options.general.encoding"]
-        message = message.decode(encoding, "replace")
-        self.input.Clear()
-        self.input.SetValue(message)
-        self.input.SetInsertionPoint(-1)
