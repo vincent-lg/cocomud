@@ -34,6 +34,7 @@ import os
 from configobj import ConfigObj
 from ytranslate import init, select, t
 import wx
+from wx.lib.pubsub import pub, setupkwargs
 
 from autoupdate import AutoUpdate
 from version import BUILD
@@ -66,45 +67,42 @@ class DummyUpdater(wx.Frame):
         self.progress = 0
 
         # Event binding
-        self.Bind(EVT_GAUGE, self.OnGauge)
-        self.Bind(EVT_TEXT, self.OnText)
-        self.Bind(EVT_FORCE_DESTROY, self.OnForceDestroy)
-        self.Bind(EVT_RESPONSE_UPDATE, self.OnResponseUpdate)
+        pub.subscribe(self.OnGauge, "gauge")
+        pub.subscribe(self.OnText, "text")
+        pub.subscribe(self.OnForceDestroy, "forceDestroy")
+        pub.subscribe(self.OnResponseUpdate, "responseUpdate")
 
     def create_updater(self, just_checking=False):
         """Create a new autoupdater instance."""
         self.autoupdate = AutoUpdate(BUILD, self, just_checking=just_checking)
         self.autoupdate.start()
 
-    def OnGauge(self, e):
+    def OnGauge(self, value=0):
         """The progress indicator changes."""
         pass
 
-    def OnText(self, e):
+    def OnText(self, text=""):
         """The text of the indicator changes."""
         pass
 
-    def OnForceDestroy(self, e):
+    def OnForceDestroy(self):
         """Ask for the window's destruction."""
         pass
 
-    def OnResponseUpdate(self, e):
+    def OnResponseUpdate(self, build=None):
         """The check for updates is complete."""
         pass
 
     def UpdateGauge(self, value):
         """Change the level indicator."""
-        evt = GaugeEvent(myEVT_GAUGE, -1, value)
-        wx.PostEvent(self, evt)
+        wx.CallAfter(pub.sendMessage, "gauge", value=value)
 
     def UpdateText(self, text):
         """Change the text."""
-        evt = TextEvent(myEVT_TEXT, -1, text)
-        wx.PostEvent(self, evt)
+        wx.CallAfter(pub.sendMessage, "text", text=text)
 
     def AskDestroy(self):
-        evt = ForceDestroyEvent(myEVT_FORCE_DESTROY, -1, None)
-        wx.PostEvent(self, evt)
+        wx.CallAfter(pub.sendMessage, "forceDestroy")
 
     def ResponseUpdate(self, build):
         """The check for updates has responded.
@@ -113,8 +111,7 @@ class DummyUpdater(wx.Frame):
         or a number (updates are available).
 
         """
-        evt = ResponseUpdateEvent(myEVT_RESPONSE_UPDATE, -1, build)
-        wx.PostEvent(self, evt)
+        wx.CallAfter(pub.sendMessage, "responseUpdate", build=build)
 
 
 class Updater(DummyUpdater):
@@ -146,17 +143,17 @@ class Updater(DummyUpdater):
         # Event binding
         self.Bind(wx.EVT_BUTTON, self.OnCancel, self.cancel)
 
-    def OnGauge(self, e):
-        self.gauge.SetValue(e.GetValue())
+    def OnGauge(self, value=0):
+        self.gauge.SetValue(value)
         text = self.default_text
-        text += " ({}%)".format(e.GetValue())
+        text += " ({}%)".format(value)
         self.text.SetValue(text)
 
-    def OnText(self, e):
-        self.default_text = t(e.GetValue())
-        self.text.SetValue(t(e.GetValue()))
+    def OnText(self, text):
+        self.default_text = t(text)
+        self.text.SetValue(self.default_text)
 
-    def OnForceDestroy(self, e):
+    def OnForceDestroy(self):
         self.Destroy()
 
     def OnCancel(self, e):
@@ -166,70 +163,6 @@ class Updater(DummyUpdater):
 
         if value == wx.YES:
             self.Destroy()
-
-
-# Events
-myEVT_GAUGE = wx.NewEventType()
-EVT_GAUGE = wx.PyEventBinder(myEVT_GAUGE, 1)
-
-class GaugeEvent(wx.PyCommandEvent):
-
-    """Change the value of the gaughe."""
-
-    def __init__(self, etype, eid, value=None):
-        wx.PyCommandEvent.__init__(self, etype, eid)
-        self._value = value
-
-    def GetValue(self):
-        """Return the event's value."""
-        return self._value
-
-myEVT_TEXT = wx.NewEventType()
-EVT_TEXT = wx.PyEventBinder(myEVT_TEXT, 1)
-
-class TextEvent(wx.PyCommandEvent):
-
-    """Change the value of the text field."""
-
-    def __init__(self, etype, eid, value=None):
-        wx.PyCommandEvent.__init__(self, etype, eid)
-        self._value = value
-
-    def GetValue(self):
-        """Return the event's value."""
-        return self._value
-
-
-myEVT_FORCE_DESTROY = wx.NewEventType()
-EVT_FORCE_DESTROY = wx.PyEventBinder(myEVT_FORCE_DESTROY, 1)
-
-class ForceDestroyEvent(wx.PyCommandEvent):
-
-    """Force the application to terminate."""
-
-    def __init__(self, etype, eid, value=None):
-        wx.PyCommandEvent.__init__(self, etype, eid)
-        self._value = value
-
-    def GetValue(self):
-        """Return the event's value."""
-        return self._value
-
-
-myEVT_RESPONSE_UPDATE = wx.NewEventType()
-EVT_RESPONSE_UPDATE = wx.PyEventBinder(myEVT_RESPONSE_UPDATE, 1)
-
-class ResponseUpdateEvent(wx.PyCommandEvent):
-
-    """Signal that the check for updates is complete."""
-
-    def __init__(self, etype, eid, value=None):
-        wx.PyCommandEvent.__init__(self, etype, eid)
-        self._value = value
-
-    def GetValue(self):
-        """Return the event's value."""
-        return self._value
 
 
 # AppMainLoop
