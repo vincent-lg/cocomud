@@ -215,9 +215,8 @@ class ClientWindow(DummyUpdater):
         self.focus = e.GetActive()
         e.Skip()
 
-    def OnResponseUpdate(self, e):
+    def OnResponseUpdate(self, build=None):
         """The check for updates has returned."""
-        build = e.GetValue()
         if self.loading:
             self.loading.Destroy()
             if build is None:
