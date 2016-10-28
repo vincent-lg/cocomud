@@ -312,11 +312,12 @@ class MUDPanel(AccessPanel):
         success = wx.TheClipboard.GetData(clipboard)
         if success:
             clipboard = clipboard.GetText()
-            input = clipboard
+            input = self.input + clipboard
             if input.endswith("\n"):
                 lines = input.splitlines()
                 for line in lines:
                     self.OnInput(line)
+                self.ClearInput()
             else:
                 e.Skip()
 
