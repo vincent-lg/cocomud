@@ -59,6 +59,7 @@ class ClientWindow(DummyUpdater):
         self.panel = None
         self.engine = engine
         self.focus = True
+        self.nb_unread = 0
         self.interrupt = False
         self.loading = None
         self.connection = None
@@ -211,8 +212,14 @@ class ClientWindow(DummyUpdater):
         self.Destroy()
 
     def OnActivate(self, e):
-        """The window gains focus."""
+        """The window gains or loses focus."""
         self.focus = e.GetActive()
+        if self.focus:
+            # Reset the window's title
+            world = self.world
+            self.nb_unread = 0
+            self.SetTitle("{} [CocoMUD]".format(world.name))
+
         e.Skip()
 
     def OnResponseUpdate(self, build=None):
@@ -243,6 +250,13 @@ class ClientWindow(DummyUpdater):
             self.panel.world.feed_words(message)
 
         self.panel.Send(message)
+
+        # Change the window title if not focused
+        if not self.focus:
+            world = self.world
+            self.nb_unread += 1
+            self.SetTitle("({}) {} [CocoMUD]".format(self.nb_unread,
+                    world.name))
 
     def handle_option(self, command):
         """Handle the specified option.
