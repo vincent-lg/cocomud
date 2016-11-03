@@ -53,18 +53,19 @@ class Client(threading.Thread):
         """Connects to the MUD."""
         threading.Thread.__init__(self)
         self.client = None
+        self.host = host
+        self.port = port
         self.timeout = timeout
         self.engine = engine
         self.world = world
         self.running = False
         self.sharp_engine = SharpScript(engine, self, world)
 
-        # Try to connect to the specified host and port
-        self.client = Telnet(host, port)
-        self.running = True
-
     def run(self):
         """Run the thread."""
+        # Try to connect to the specified host and port
+        self.client = Telnet(self.host, self.port)
+        self.running = True
         while self.running:
             time.sleep(self.timeout)
             msg = self.client.read_very_eager()
