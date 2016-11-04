@@ -56,7 +56,11 @@ class ClientWindow(DummyUpdater):
 
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
-        self.panel = None
+        sizer = wx.BoxSizer()
+        self.main_panel = wx.Panel(self)
+        self.tabs = wx.Notebook(self.main_panel)
+        sizer.Add(self.tabs, 1, wx.EXPAND)
+        self.main_panel.SetSizer(sizer)
         self.engine = engine
         self.focus = True
         self.nb_unread = 0
@@ -69,6 +73,11 @@ class ClientWindow(DummyUpdater):
     @property
     def world(self):
         return self.panel and self.panel.world or None
+
+    @property
+    def panel(self):
+        """Return the currently selected tab (a MUDPanel0."""
+        return self.tabs.GetCurrentPage()
 
     def _get_client(self):
         return self.panel.client
@@ -157,7 +166,8 @@ class ClientWindow(DummyUpdater):
             world = self.engine.default_world
 
         self.connection = None
-        self.panel = MUDPanel(self, self.engine, world)
+        self.tabs.AddPage(MUDPanel(self.tabs, self.engine, world),
+                world.name)
         self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
         self.Show()
@@ -277,16 +287,16 @@ class ClientWindow(DummyUpdater):
 class MUDPanel(AccessPanel):
 
     def __init__(self, parent, engine, world):
-        AccessPanel.__init__(self, parent, history=True)
+        AccessPanel.__init__(self, parent, history=True, lock_input=True)
         self.parent = parent
         self.engine = engine
         self.client = None
         self.world = world
         self.focused = True
         self.last_ac = None
+        self.SetFocus()
 
         # Event binding
-        self.Bind(EVT_FOCUS, self.OnFocus)
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
 
     def OnInput(self, message):
@@ -297,24 +307,6 @@ class MUDPanel(AccessPanel):
             self.world.reset_autocompletion()
 
         self.client.write(message)
-
-    def OnFocus(self, evt):
-        """The GUIClient requires a change of focus.
-
-        This event is triggered when the GUIClient asks a change of
-        focus in the input field (hiding the password field) or in
-        the password field (hiding the input field).
-        """
-        pass
-        #val = evt.GetValue()
-        #if val == "input":
-        #    self.input.Show()
-        #    self.input.SetFocus()
-        #    self.password.Hide()
-        #elif val == "password":
-        #    self.password.Show()
-        #    self.password.SetFocus()
-        #    self.input.Hide()
 
     def OnPaste(self, e):
         """Paste several lines in the input field.
