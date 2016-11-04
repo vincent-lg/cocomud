@@ -41,12 +41,13 @@ from autoupdate import AutoUpdate
 from scripting.key import key_name
 from session import Session
 from ui.dialogs.alias import AliasDialog
-from ui.dialogs.connection import ConnectionDialog
+from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
 from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.trigger import TriggerDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
+from world import World
 from updater import *
 from version import BUILD
 
@@ -105,6 +106,11 @@ class ClientWindow(DummyUpdater):
         helpMenu = wx.Menu()
 
         ## File menu
+        # New
+        create = wx.MenuItem(fileMenu, -1, t("ui.menu.create"))
+        self.Bind(wx.EVT_MENU, self.OnCreate, create)
+        fileMenu.AppendItem(create)
+
         # Open
         open = wx.MenuItem(fileMenu, -1, t("ui.menu.open"))
         self.Bind(wx.EVT_MENU, self.OnOpen, open)
@@ -180,6 +186,17 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
         self.tabs.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabChanged)
+
+    def OnCreate(self, e):
+        """Open the dialog to add a new world."""
+        session = Session(None, None)
+        world = World("")
+        dialog = EditWorldDialog(self.engine, world)
+        dialog.ShowModal()
+        panel = MUDPanel(self.tabs, self, self.engine, world, session)
+        panel.CreateClient()
+        self.tabs.AddPage(panel, world.name, select=True)
+        panel.SetFocus()
 
     def OnOpen(self, e):
         """Open the ConnectionDialog for an additional world."""
@@ -266,7 +283,6 @@ class ClientWindow(DummyUpdater):
 
         tab = self.tabs.GetCurrentPage()
         tab.focus = True
-        print "Focus only", tab.world
         e.Skip()
 
     def OnResponseUpdate(self, build=None):

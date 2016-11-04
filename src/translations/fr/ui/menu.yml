@@ -1,4 +1,5 @@
 file: "&Fichier"
+create: "Crér un &nouvel univers...\tCtrl+N"
 open: "&Ouvrir un univers dans un nouvel onglet...\tCtrl+O"
 preferences: "&Options\tAlt+Enter"
 quit: "&Quitter"
