@@ -156,14 +156,15 @@ class ClientWindow(DummyUpdater):
     def InitUI(self, world=None):
         self.create_updater(just_checking=True)
         if world is None:
-            dialog = ConnectionDialog(self.engine)
+            selection = []
+            dialog = ConnectionDialog(self.engine, selection)
             self.connection = dialog
             value = dialog.ShowModal()
             if value == wx.ID_CANCEL:
                 self.Close()
                 return
 
-            world = self.engine.default_world
+            world = selection[0]
 
         self.connection = None
         self.tabs.AddPage(MUDPanel(self.tabs, self.engine, world),
