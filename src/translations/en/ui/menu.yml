@@ -1,6 +1,7 @@
 ﻿file: "&File"
 create: "Create a &new world...\tCtrl+N"
 open: "&Open a world in a new tab...\tCtrl+O"
+close_tab: "&Close the current tab\tCtrl+w"
 preferences: "&Preferences\tAlt+Enter"
 quit: "&Quit"
 game: "&Game"

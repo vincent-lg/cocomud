@@ -116,6 +116,11 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnOpen, open)
         fileMenu.AppendItem(open)
 
+        # Close
+        close_tab = wx.MenuItem(fileMenu, -1, t("ui.menu.close_tab"))
+        self.Bind(wx.EVT_MENU, self.OnCloseTab, close_tab)
+        fileMenu.AppendItem(close_tab)
+
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
@@ -211,6 +216,18 @@ class ClientWindow(DummyUpdater):
         panel.CreateClient()
         self.tabs.AddPage(panel, world.name, select=True)
         panel.SetFocus()
+
+    def OnCloseTab(self, e):
+        """Close the current tab."""
+        panel = self.panel
+        if panel:
+            if panel.client and panel.client.client.get_socket():
+                panel.client.client.close()
+
+            for i, tab in enumerate(self.tabs.GetChildren()):
+                if tab is panel:
+                    self.tabs.DeletePage(i)
+                    break
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""

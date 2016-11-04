@@ -1,6 +1,7 @@
 file: "&Fichier"
 create: "Crér un &nouvel univers...\tCtrl+N"
 open: "&Ouvrir un univers dans un nouvel onglet...\tCtrl+O"
+close_tab: "&Fermer l'onglet actuel\tCtrl+w"
 preferences: "&Options\tAlt+Enter"
 quit: "&Quitter"
 game: "&Jeu"
