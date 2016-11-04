@@ -39,6 +39,7 @@ from ytranslate.tools import t
 
 from autoupdate import AutoUpdate
 from scripting.key import key_name
+from session import Session
 from ui.dialogs.alias import AliasDialog
 from ui.dialogs.connection import ConnectionDialog
 from ui.dialogs.loading import LoadingDialog
@@ -156,18 +157,18 @@ class ClientWindow(DummyUpdater):
     def InitUI(self, world=None):
         self.create_updater(just_checking=True)
         if world is None:
-            selection = []
-            dialog = ConnectionDialog(self.engine, selection)
+            session = Session(None, None)
+            dialog = ConnectionDialog(self.engine, session)
             self.connection = dialog
             value = dialog.ShowModal()
             if value == wx.ID_CANCEL:
                 self.Close()
                 return
 
-            world = selection[0]
+            world = session.world
 
         self.connection = None
-        self.tabs.AddPage(MUDPanel(self.tabs, self.engine, world),
+        self.tabs.AddPage(MUDPanel(self.tabs, self.engine, world, session),
                 world.name)
         self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
@@ -251,23 +252,53 @@ class ClientWindow(DummyUpdater):
                 self.CloseAll()
                 os.startfile("updater.exe")
 
+
+class MUDPanel(AccessPanel):
+
+    def __init__(self, parent, engine, world, session):
+        AccessPanel.__init__(self, parent, history=True, lock_input=True)
+        self.parent = parent
+        self.engine = engine
+        self.client = None
+        self.world = world
+        self.session = session
+        self.focus = True
+        self.last_ac = None
+        self.SetFocus()
+
+        # Event binding
+        self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
+
+    def CreateClient(self):
+        """Connect the MUDPanel."""
+        engine = self.engine
+        world = self.world
+        hostname = world.hostname
+        port = world.port
+        client = engine.open(hostname, port, world)
+        client.link_window(self)
+        world.load()
+        client.start()
+        self.session.client = client
+        return client
+
     # Methods to handle client's events
     def handle_message(self, message):
         """The client has just received a message."""
         lines = message.splitlines()
         lines = [line for line in lines if line]
         message = "\n".join(lines)
-        if self.panel.world:
-            self.panel.world.feed_words(message)
+        world = self.world
+        if world:
+            world.feed_words(message)
 
-        self.panel.Send(message)
+        self.Send(message)
 
         # Change the window title if not focused
         if not self.focus:
-            world = self.world
             self.nb_unread += 1
-            self.SetTitle("({}) {} [CocoMUD]".format(self.nb_unread,
-                    world.name))
+            self.parent.SetTitle("({}) {} [CocoMUD]".format(
+                    self.nb_unread, world.name))
 
     def handle_option(self, command):
         """Handle the specified option.
@@ -284,21 +315,6 @@ class ClientWindow(DummyUpdater):
         elif command == "show":
             evt = FocusEvent(myEVT_FOCUS, -1, "input")
             wx.PostEvent(self.panel, evt)
-
-class MUDPanel(AccessPanel):
-
-    def __init__(self, parent, engine, world):
-        AccessPanel.__init__(self, parent, history=True, lock_input=True)
-        self.parent = parent
-        self.engine = engine
-        self.client = None
-        self.world = world
-        self.focused = True
-        self.last_ac = None
-        self.SetFocus()
-
-        # Event binding
-        self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
 
     def OnInput(self, message):
         """Some text has been sent from the input."""

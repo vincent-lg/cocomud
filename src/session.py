@@ -26,29 +26,24 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""This demo file creates a simple client with TTS support."""
+"""This file contains the Session class."""
 
-import wx
+class Session:
 
-from ytranslate import init, select
+    """A class representing a session.
 
-init(root_dir="translations")
+    A session is an object linking together a world, a client and the
+    GUI tab behind it.  Several sessions can be connected to the same
+    world, using various clients.
 
-from game import GameEngine
-from ui.window import ClientWindow
+    """
 
-app = wx.App()
-# Load the user configuration
-engine = GameEngine()
-engine.load()
+    def __init__(self, client, world):
+        self.client = client
+        self.world = world
+        self.engine = None
+        self.sharp_engine = None
 
-# Select the configured language
-lang = engine.settings.get_language()
-select(lang)
-
-# Create the client and ClientWindow
-window = ClientWindow(engine)
-world = window.world
-if world is not None:
-    window.panel.CreateClient()
-    app.MainLoop()
+    def __repr__(self):
+        return "<Session to the world {}>".format(
+                self.world and self.world.name or "unknown")

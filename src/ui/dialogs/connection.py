@@ -38,10 +38,10 @@ class ConnectionDialog(wx.Dialog):
 
     """Connection dialog to choose a server and character."""
 
-    def __init__(self, engine, selectionned):
+    def __init__(self, engine, session):
         super(ConnectionDialog, self).__init__(None, title=t("common.connection"))
         self.engine = engine
-        self.selectionned = selectionned
+        self.session = session
 
         self.InitUI()
         self.Center()
@@ -100,7 +100,7 @@ class ConnectionDialog(wx.Dialog):
             except IndexError:
                 pass
             else:
-                self.selectionned[:] = [world]
+                self.session.world = world
 
     def OnKeyDown(self, e):
         """If Enter is pressed, connect to the selected world."""
@@ -164,7 +164,7 @@ class ConnectionDialog(wx.Dialog):
         worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         index = self.worlds.GetFirstSelected()
         world = worlds[index]
-        self.selectionned[:] = [world]
+        self.session.world = world
         self.Destroy()
 
 

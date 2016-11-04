@@ -37,6 +37,7 @@ from textwrap import dedent
 from configobj import ConfigObj
 
 from screenreader import ScreenReader
+from session import Session
 
 class World:
 
@@ -56,7 +57,6 @@ class World:
         self.settings = None
 
         # World's access to general data
-        self.client = None
         self.engine = None
         self.sharp_engine = None
 
@@ -181,3 +181,10 @@ class World:
             return potential
 
         return None
+
+    def create_session(self, client):
+        """Create a session attached to this world."""
+        session = Session(client, self)
+        session.engine = self.engine
+        session.sharp_engine = self.sharp_engine
+        return session
