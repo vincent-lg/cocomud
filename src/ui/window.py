@@ -106,6 +106,11 @@ class ClientWindow(DummyUpdater):
         helpMenu = wx.Menu()
 
         ## File menu
+        # Open
+        open = wx.MenuItem(fileMenu, -1, t("ui.menu.open"))
+        self.Bind(wx.EVT_MENU, self.OnOpen, open)
+        fileMenu.AppendItem(open)
+
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
@@ -175,6 +180,20 @@ class ClientWindow(DummyUpdater):
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+
+    def OnOpen(self, e):
+        """Open the ConnectionDialog for an additional world."""
+        session = Session(None, None)
+        dialog = ConnectionDialog(self.engine, session)
+        value = dialog.ShowModal()
+        if value == wx.ID_CANCEL:
+            return
+
+        world = session.world
+        panel = MUDPanel(self.tabs, self.engine, world, session)
+        panel.CreateClient()
+        self.tabs.AddPage(panel, world.name)
+        print dir(self.tabs)
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
