@@ -54,7 +54,7 @@ class ScreenReader:
     """
 
     @staticmethod
-    def talk(message, speech=True, braille=True):
+    def talk(message, speech=True, braille=True, interrupt=True):
         """Send the message to the screen reader to be spoken or displayed.
 
         Parameters:
@@ -64,7 +64,7 @@ class ScreenReader:
 
         """
         if say and speech:
-            say(message)
+            say(message, interrupt=interrupt)
 
         if braille and display_braille:
             display_braille(message)

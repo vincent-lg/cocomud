@@ -38,6 +38,7 @@ import wx
 from ytranslate.tools import t
 
 from autoupdate import AutoUpdate
+from screenreader import ScreenReader
 from scripting.key import key_name
 from session import Session
 from ui.dialogs.alias import AliasDialog
@@ -103,6 +104,7 @@ class ClientWindow(DummyUpdater):
         # Differemtn menus
         fileMenu = wx.Menu()
         gameMenu = wx.Menu()
+        connectionMenu = wx.Menu()
         helpMenu = wx.Menu()
 
         ## File menu
@@ -147,6 +149,17 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
         gameMenu.AppendItem(triggers)
 
+        ## Connection menu
+        # Disconnect
+        disconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.disconnect"))
+        self.Bind(wx.EVT_MENU, self.OnDisconnect, disconnect)
+        connectionMenu.AppendItem(disconnect)
+
+        # Reconnect
+        reconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.reconnect"))
+        self.Bind(wx.EVT_MENU, self.OnReconnect, reconnect)
+        connectionMenu.AppendItem(reconnect)
+
         ## Help menu
         # Basics
         basics = wx.MenuItem(helpMenu, -1, t("ui.menu.help_index"))
@@ -165,6 +178,7 @@ class ClientWindow(DummyUpdater):
 
         menubar.Append(fileMenu, t("ui.menu.file"))
         menubar.Append(gameMenu, t("ui.menu.game"))
+        menubar.Append(connectionMenu, t("ui.menu.connection"))
         menubar.Append(helpMenu, t("ui.menu.help"))
 
         self.SetMenuBar(menubar)
@@ -221,8 +235,8 @@ class ClientWindow(DummyUpdater):
         """Close the current tab."""
         panel = self.panel
         if panel:
-            if panel.client and panel.client.client.get_socket():
-                panel.client.client.close()
+            if panel.client:
+                panel.client.disconnect()
 
             for i, tab in enumerate(self.tabs.GetChildren()):
                 if tab is panel:
@@ -253,6 +267,18 @@ class ClientWindow(DummyUpdater):
         dialog.ShowModal()
         dialog.Destroy()
 
+    def OnDisconnect(self, e):
+        """Disconnect the current client."""
+        panel = self.panel
+        if panel and panel.client:
+            panel.client.disconnect()
+
+    def OnReconnect(self, e):
+        """Reconnect the current client."""
+        panel = self.panel
+        if panel:
+            panel.CreateClient()
+
     def OnBasics(self, e):
         """Open the Basics help file."""
         self.engine.open_help("Basics")
@@ -275,9 +301,8 @@ class ClientWindow(DummyUpdater):
         """Properly close the interface."""
         # Close all clients
         for page in self.tabs.GetChildren():
-            if page.client.running:
-                page.client.running = False
-                page.client.client.close()
+            if page.client:
+                page.client.disconnect()
 
         self.Destroy()
 
@@ -340,8 +365,8 @@ class MUDPanel(AccessPanel):
 
     def CreateClient(self):
         """Connect the MUDPanel."""
-        if self.client and self.client.running:
-            self.client.client.close()
+        if self.client:
+            self.client.disconnect()
 
         engine = self.engine
         world = self.world
@@ -357,7 +382,9 @@ class MUDPanel(AccessPanel):
     # Methods to handle client's events
     def handle_disconnection(self):
         """The client has been disconnected for any reason."""
-        self.Send("--- {} ---".format(t("ui.client.disconnected")))
+        message = u"--- {} ---".format(t("ui.client.disconnected"))
+        self.Send(message)
+        ScreenReader.talk(message, interrupt=False)
 
     def handle_message(self, message):
         """The client has just received a message."""

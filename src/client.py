@@ -61,6 +61,13 @@ class Client(threading.Thread):
         self.running = False
         self.sharp_engine = SharpScript(engine, self, world)
 
+    def disconnect(self):
+        """Disconnect, close the client."""
+        if self.client and self.client.get_socket():
+            self.client.close()
+
+        self.running = False
+
     def run(self):
         """Run the thread."""
         # Try to connect to the specified host and port
