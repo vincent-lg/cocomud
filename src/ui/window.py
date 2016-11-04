@@ -307,6 +307,9 @@ class MUDPanel(AccessPanel):
 
     def CreateClient(self):
         """Connect the MUDPanel."""
+        if self.client and self.client.running:
+            self.client.client.close()
+
         engine = self.engine
         world = self.world
         hostname = world.hostname
@@ -319,6 +322,10 @@ class MUDPanel(AccessPanel):
         return client
 
     # Methods to handle client's events
+    def handle_disconnection(self):
+        """The client has been disconnected for any reason."""
+        self.Send("--- {} ---".format(t("ui.client.disconnected")))
+
     def handle_message(self, message):
         """The client has just received a message."""
         lines = message.splitlines()

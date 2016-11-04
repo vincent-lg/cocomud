@@ -68,13 +68,27 @@ class Client(threading.Thread):
         self.running = True
         while self.running:
             time.sleep(self.timeout)
-            msg = self.client.read_very_eager()
+            if not self.client.get_socket():
+                break
+
+            try:
+                msg = self.client.read_very_eager()
+            except EOFError:
+                break
+
             if msg:
                 for line in msg.splitlines():
                     for trigger in self.world.triggers:
                         trigger.feed(line)
 
                 self.handle_message(msg)
+
+        # Consider the thread as stopped
+        self.running = False
+
+        # If there's still an open window
+        if self.window:
+            self.window.handle_disconnection()
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True):
