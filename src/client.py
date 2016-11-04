@@ -155,13 +155,20 @@ class GUIClient(Client):
         # In any case, tries to find the TTS
         if self.engine.TTS_on or force_TTS:
             # If outside of the window
-            window = self.window
-            focus = window.focus if window else True
-            if not focus and not self.engine.settings["options.TTS.outside"]:
-                if not force_TTS:
-                    return
+            tts = False
+            panel = self.window
+            window = getattr(panel, "window", None)
+            focus = (window.focus and panel.focus) if panel else False
+            outside = (not window.focus and panel.focus) if panel else False
+            if force_TTS:
+                tts = True
+            elif focus:
+                tts = True
+            elif outside and self.engine.settings["options.TTS.outside"]:
+                tts = True
 
-            ScreenReader.talk(msg, speech=speech, braille=braille)
+            if tts:
+                ScreenReader.talk(msg, speech=speech, braille=braille)
 
     def handle_option(self, socket, command, option):
         """Handle a received option."""

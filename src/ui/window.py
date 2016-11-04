@@ -64,7 +64,6 @@ class ClientWindow(DummyUpdater):
         self.main_panel.SetSizer(sizer)
         self.engine = engine
         self.focus = True
-        self.nb_unread = 0
         self.interrupt = False
         self.loading = None
         self.connection = None
@@ -173,13 +172,14 @@ class ClientWindow(DummyUpdater):
             world = session.world
 
         self.connection = None
-        self.tabs.AddPage(MUDPanel(self.tabs, self.engine, world, session),
-                world.name)
+        self.tabs.AddPage(MUDPanel(self.tabs, self, self.engine, world,
+                session), world.name)
         self.SetTitle("{} [CocoMUD]".format(world.name))
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+        self.tabs.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabChanged)
 
     def OnOpen(self, e):
         """Open the ConnectionDialog for an additional world."""
@@ -190,10 +190,10 @@ class ClientWindow(DummyUpdater):
             return
 
         world = session.world
-        panel = MUDPanel(self.tabs, self.engine, world, session)
+        panel = MUDPanel(self.tabs, self, self.engine, world, session)
         panel.CreateClient()
-        self.tabs.AddPage(panel, world.name)
-        print dir(self.tabs)
+        self.tabs.AddPage(panel, world.name, select=True)
+        panel.SetFocus()
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
@@ -238,8 +238,13 @@ class ClientWindow(DummyUpdater):
         self.OnClose(e)
 
     def OnClose(self, e):
-        if self.panel.client:
-            self.panel.client.running = False
+        """Properly close the interface."""
+        # Close all clients
+        for page in self.tabs.GetChildren():
+            if page.client.running:
+                page.client.running = False
+                page.client.client.close()
+
         self.Destroy()
 
     def OnActivate(self, e):
@@ -247,10 +252,21 @@ class ClientWindow(DummyUpdater):
         self.focus = e.GetActive()
         if self.focus:
             # Reset the window's title
+            panel = self.panel
             world = self.world
-            self.nb_unread = 0
+            panel.nb_unread = 0
             self.SetTitle("{} [CocoMUD]".format(world.name))
 
+        e.Skip()
+
+    def OnTabChanged(self, e):
+        """The current tab has changed."""
+        for page in self.tabs.GetChildren():
+            page.focus = False
+
+        tab = self.tabs.GetCurrentPage()
+        tab.focus = True
+        print "Focus only", tab.world
         e.Skip()
 
     def OnResponseUpdate(self, build=None):
@@ -274,9 +290,9 @@ class ClientWindow(DummyUpdater):
 
 class MUDPanel(AccessPanel):
 
-    def __init__(self, parent, engine, world, session):
+    def __init__(self, parent, window, engine, world, session):
         AccessPanel.__init__(self, parent, history=True, lock_input=True)
-        self.parent = parent
+        self.window = window
         self.engine = engine
         self.client = None
         self.world = world
@@ -284,6 +300,7 @@ class MUDPanel(AccessPanel):
         self.focus = True
         self.last_ac = None
         self.SetFocus()
+        self.nb_unread = 0
 
         # Event binding
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
@@ -314,9 +331,9 @@ class MUDPanel(AccessPanel):
         self.Send(message)
 
         # Change the window title if not focused
-        if not self.focus:
+        if self.focus and not self.window.focus:
             self.nb_unread += 1
-            self.parent.SetTitle("({}) {} [CocoMUD]".format(
+            self.window.SetTitle("({}) {} [CocoMUD]".format(
                     self.nb_unread, world.name))
 
     def handle_option(self, command):
