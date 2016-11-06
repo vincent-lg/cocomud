@@ -222,6 +222,33 @@ class DisplayTab(wx.Panel):
         return supported[index]
 
 
+class InputTab(wx.Panel):
+
+    """Input tab."""
+
+    def __init__(self, parent, engine):
+        super(InputTab, self).__init__(parent)
+        self.engine = engine
+
+        self.InitUI()
+        self.Fit()
+
+    def InitUI(self):
+        settings = self.engine.settings
+        sizer = wx.GridBagSizer(15, 15)
+        self.SetSizer(sizer)
+
+        # Command stacking
+        l_stacking = wx.StaticText(self, label=t("ui.dialog.command_stacking"))
+        t_stacking = wx.TextCtrl(self,
+                value=settings["options.input.command_stacking"])
+        self.command_stacking = t_stacking
+
+        # Append to the sizer
+        sizer.Add(l_stacking, pos=(0, 0))
+        sizer.Add(t_stacking, pos=(1, 0))
+
+
 class AccessibilityTab(wx.Panel):
 
     """Accessibility tab."""
@@ -258,12 +285,15 @@ class PreferencesTabs(wx.Notebook):
 
         general_tab = GeneralTab(self, engine)
         display_tab = DisplayTab(self, engine)
+        input_tab = InputTab(self, engine)
         accessibility_tab = AccessibilityTab(self, engine)
         self.AddPage(general_tab, t("ui.dialog.general"))
         self.AddPage(display_tab, t("ui.dialog.display"))
+        self.AddPage(input_tab, t("ui.dialog.input"))
         self.AddPage(accessibility_tab, t("ui.dialog.accessibility"))
         self.general = general_tab
         self.display = display_tab
+        self.input = input_tab
         self.accessibility = accessibility_tab
 
 class PreferencesDialog(wx.Dialog):
@@ -301,12 +331,15 @@ class PreferencesDialog(wx.Dialog):
         settings = self.engine.settings
         general = self.tabs.general
         display = self.tabs.display
+        input = self.tabs.input
         accessibility = self.tabs.accessibility
         new_language = general.get_selected_language()
         encoding = display.get_selected_encoding()
+        command_stacking = input.command_stacking.GetValue()
         old_language = settings["options.general.language"]
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
+        settings["options.input.command_stacking"] = command_stacking
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options"].write()

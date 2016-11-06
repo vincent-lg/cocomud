@@ -1,10 +1,12 @@
 ﻿general: General
 display: Display
+input: Input
 accessibility: Accessibility
 macros: Macros
 encodings: Encodings
 shortcut: Shortcut
 action: Action
+command_stacking: Command stacking
 smart_cursor: Enable the smart cursor
 alias:
     add: Add a new alias

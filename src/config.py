@@ -240,6 +240,9 @@ class Settings(Configuration):
                 language = option('en', 'fr', default='{lang}')
                 encoding = string(default="iso8859_15")
 
+            [input]
+                command_stacking = string(default=";")
+
             [TTS]
                 on = boolean(default=True)
                 outside = boolean(default=True)
