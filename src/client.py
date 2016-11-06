@@ -116,15 +116,32 @@ class Client(threading.Thread):
         if text.startswith("#"):
             self.sharp_engine.execute(text)
         else:
-            # Test the aliases
-            if alias:
-                for alias in self.world.aliases:
-                    if alias.test(text):
-                        return
+            # Break in chunks based on the command stacking, if active
+            settings = self.engine.settings
+            command_stacking = settings["options.input.command_stacking"]
+            encoding = settings["options.general.encoding"]
+            if command_stacking:
+                delimiter = re.escape(command_stacking)
+                re_del = re.compile("(?<!{s}){s}(?!{s})".format(s=delimiter), re.UNICODE)
+                chunks = re_del.split(text)
+                # Reset ;; as ; (or other command stacking character)
+                for i, chunk in enumerate(chunks):
+                    chunks[i] = chunk.replace(2 * command_stacking,
+                            command_stacking).encode(encoding, "replace")
+            else:
+                chunks = [text.encode(encoding, "replace")]
 
-            if not text.endswith("\r\n"):
-                text += "\r\n"
-            self.client.write(text)
+            for text in chunks:
+                # Test the aliases
+                if alias:
+                    for alias in self.world.aliases:
+                        if alias.test(text):
+                            return
+
+                if not text.endswith("\r\n"):
+                    text += "\r\n"
+
+                self.client.write(text)
 
 
 class GUIClient(Client):

@@ -421,8 +421,6 @@ class MUDPanel(AccessPanel):
 
     def OnInput(self, message):
         """Some text has been sent from the input."""
-        encoding = self.engine.settings["options.general.encoding"]
-        message = message.encode(encoding, "replace")
         if self.world:
             self.world.reset_autocompletion()
 
