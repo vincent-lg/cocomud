@@ -244,9 +244,21 @@ class InputTab(wx.Panel):
                 value=settings["options.input.command_stacking"])
         self.command_stacking = t_stacking
 
+        # Help on command stacking
+        h_stacking = wx.Button(self,
+                label=t("ui.button.what.command_stacking"))
+
         # Append to the sizer
         sizer.Add(l_stacking, pos=(0, 0))
         sizer.Add(t_stacking, pos=(1, 0))
+        sizer.Add(h_stacking, pos=(0, 1))
+
+        # Event binding
+        h_stacking.Bind(wx.EVT_BUTTON, self.OnHelpStacking)
+
+    def OnHelpStacking(self, e):
+        """Open the help for command stacking."""
+        self.engine.open_help("CommandStacking")
 
 
 class AccessibilityTab(wx.Panel):

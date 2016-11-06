@@ -6,3 +6,5 @@ edit: Éditer
 help: Aide
 remove: Supprimer
 test: Test
+what:
+    command_stacking: Que sont les commandes multiples ?

@@ -6,3 +6,5 @@ edit: Edit
 help: Help
 remove: Remove
 test: Test
+what:
+    command_stacking: What is command stacking?
