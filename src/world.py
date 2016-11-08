@@ -82,6 +82,12 @@ class World:
         from game import Level
         level = self.engine.level
         self.engine.level = Level.world
+
+        # Reset some of the world's configuration
+        self.aliases = []
+        self.macros = []
+        self.triggers = []
+
         path = self.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):

@@ -39,7 +39,6 @@ import threading
 import time
 
 from screenreader import ScreenReader
-from sharp.engine import SharpScript
 
 # Constants
 ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
@@ -59,7 +58,7 @@ class Client(threading.Thread):
         self.engine = engine
         self.world = world
         self.running = False
-        self.sharp_engine = SharpScript(engine, self, world)
+        self.sharp_engine = None
 
     def disconnect(self):
         """Disconnect, close the client."""

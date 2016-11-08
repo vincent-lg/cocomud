@@ -46,7 +46,7 @@ class SharpScript(object):
         self.engine = engine
         self.client = client
         self.world = world
-        self.globals = globals()
+        self.globals = dict(globals())
         self.locals = {}
         self.functions = {}
 

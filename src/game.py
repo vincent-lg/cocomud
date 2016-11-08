@@ -34,6 +34,7 @@ from enum import Enum
 
 from client import GUIClient
 from config import Settings
+from sharp.engine import SharpScript
 
 class Level(Enum):
 
@@ -90,8 +91,10 @@ class GameEngine:
 
         """
         client = GUIClient(host, port, engine=self, world=world)
+        sharp_engine = SharpScript(self, client, world)
         world.client = client
-        world.sharp_engine = client.sharp_engine
+        client.sharp_engine = sharp_engine
+        world.sharp_engine = sharp_engine
         return client
 
     def open_help(self, name):
