@@ -50,13 +50,18 @@ class Play(Function):
 
     def run(self, filename):
         """Play the audio file."""
-        logger = self.engine.loggers["cocomud.sharp"]
-        logger.debug("#play {}".format(filename))
+        logger = None
+        if self.engine:
+            logger = self.engine.loggers["cocomud.sharp"]
+            logger.debug("#play {}".format(filename))
+
         filename = self.find_abs_filename(filename)
         if os.path.exists(filename):
-            logger.debug("#play playing {}".format(filename))
+            if logger:
+                logger.debug("#play playing {}".format(filename))
         else:
-            logger.warning("#play cannot find the file at {}".format(
+            if logger:
+                logger.warning("#play cannot find the file at {}".format(
                     filename))
 
         sound = mixer.Sound(filename)

@@ -52,8 +52,11 @@ class SharpScript(object):
         self.globals = dict(globals())
         self.locals = {}
         self.functions = {}
-        self.logger = engine.create_logger("sharp")
-        self.logger.debug("Creating SharpScript #{}".format(self.id))
+        if engine:
+            self.logger = engine.create_logger("sharp")
+            self.logger.debug("Creating SharpScript #{}".format(self.id))
+        else:
+            self.logger = None
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
