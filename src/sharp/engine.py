@@ -42,13 +42,18 @@ class SharpScript(object):
 
     """
 
+    id = 0
     def __init__(self, engine, client, world):
+        self.id = type(self).id + 1
+        type(self).id += 1
         self.engine = engine
         self.client = client
         self.world = world
         self.globals = dict(globals())
         self.locals = {}
         self.functions = {}
+        self.logger = engine.create_logger("sharp")
+        self.logger.debug("Creating SharpScript #{}".format(self.id))
 
         # Adding the functions
         for name, function in FUNCTIONS.items():
