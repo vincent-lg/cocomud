@@ -92,6 +92,13 @@ def logger(name):
         handler.setLevel(logging.INFO)
         logger.addHandler(handler)
 
+        # Set a FileHandler for error messages
+        handler = logging.FileHandler(os.path.join("logs", "error.log"),
+                encoding="utf-8")
+        handler.setLevel(logging.ERROR)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
     # Create the file handler
     handler = logging.FileHandler(filename, encoding="utf-8")
     handler.setLevel(logging.DEBUG)
