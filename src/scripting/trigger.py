@@ -30,6 +30,8 @@
 
 import re
 
+from log import logger
+
 class Trigger:
 
     """A trigger object.
@@ -46,6 +48,7 @@ class Trigger:
         self.reaction = reaction
         self.re_reaction = self.find_regex(reaction)
         self.action = action
+        self.logger = logger("sharp")
 
         # Set the trigger's level
         self.level = sharp.engine.level
@@ -66,6 +69,11 @@ class Trigger:
         copy = Trigger(self.sharp_engine, self.reaction, self.action)
         copy.level = self.level
         return copy
+
+    @property
+    def world(self):
+        """Return the world bound to the SharpEngine."""
+        return self.sharp_engine and self.sharp_engine.world or None
 
     def find_regex(self, reaction):
         """Find and compile the reaction given as argument.
@@ -89,6 +97,11 @@ class Trigger:
     def feed(self, line):
         """Should the trigger be triggered by the text?"""
         if self.re_reaction.search(line):
+            world = self.world
+            world = world and world.name or "unknown"
+            self.logger.debug("Trigger {}.{} fired.".format(
+                    world, self.reaction))
+
             self.execute()
 
     def execute(self):
