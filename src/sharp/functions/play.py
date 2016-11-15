@@ -34,6 +34,7 @@ from pygame import mixer
 import wx
 from ytranslate import t
 
+from log import logger
 from sharp import Function
 
 mixer.init(buffer=1024)
@@ -50,13 +51,13 @@ class Play(Function):
 
     def run(self, filename):
         """Play the audio file."""
-        logger = self.engine.loggers["cocomud.sharp"]
-        logger.debug("#play {}".format(filename))
+        log = logger("sharp")
+        log.debug("#play {}".format(filename))
         filename = self.find_abs_filename(filename)
         if os.path.exists(filename):
-            logger.debug("#play playing {}".format(filename))
+            log.debug("#play playing {}".format(filename))
         else:
-            logger.warning("#play cannot find the file at {}".format(
+            log.warning("#play cannot find the file at {}".format(
                     filename))
 
         sound = mixer.Sound(filename)

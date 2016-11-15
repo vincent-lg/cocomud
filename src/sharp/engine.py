@@ -30,6 +30,7 @@
 
 from textwrap import dedent
 
+from log import logger
 from sharp import FUNCTIONS
 
 class SharpScript(object):
@@ -52,7 +53,7 @@ class SharpScript(object):
         self.globals = dict(globals())
         self.locals = {}
         self.functions = {}
-        self.logger = engine.create_logger("sharp")
+        self.logger = logger("sharp")
         self.logger.debug("Creating SharpScript #{}".format(self.id))
 
         # Adding the functions

@@ -28,14 +28,13 @@
 
 """This file contains the GameEngine class."""
 
-from datetime import datetime
-import logging
 import os
 
 from enum import Enum
 
 from client import GUIClient
 from config import Settings
+from log import logger, begin
 from sharp.engine import SharpScript
 
 class Level(Enum):
@@ -57,18 +56,6 @@ class Level(Enum):
     category = 4
 
 
-class CustomFormatter(logging.Formatter):
-
-    """Special formatter to add hour and minute."""
-
-    def format(self, record):
-        """Add special placeholders for shorter messages."""
-        now = datetime.now()
-        record.hour = now.hour
-        record.minute = now.minute
-        return logging.Formatter.format(self, record)
-
-
 class GameEngine:
 
     """A class representing the game engine.
@@ -82,53 +69,13 @@ class GameEngine:
     """
 
     def __init__(self):
-        if not os.path.exists("logs"):
-            os.mkdir("logs")
-
-        self.loggers = {}
-        self.logger = self.create_logger("")
+        self.logger = logger("")
+        begin()
         self.settings = Settings(self)
         self.worlds = {}
         self.default_world = None
         self.level = Level.engine
         self.logger.info("CocoMUD engine started")
-
-    def create_logger(self, name, filename=None):
-        """Create and return a new logger.
-
-        The name should be a string like 'sharp' to create the child
-        logger 'cocomud.sharp'.  If no filename is specified, the
-        handler for the file 'logs/{name}.log" will be created.
-
-        """
-        if not name:
-            filename = os.path.join("logs", "main.log")
-            name = "cocomud"
-        else:
-            filename = filename or os.path.join("logs", name + ".log")
-            name = "cocomud." + name
-
-        if name in self.loggers:
-            return self.loggers[name]
-
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.DEBUG)
-        formatter = CustomFormatter(
-                "%(hour)02d:%(minute)02d [%(levelname)s] %(message)s")
-
-        # If it's the main logger, create a stream handler
-        if name == "cocomud":
-            handler = logging.StreamHandler()
-            handler.setLevel(logging.INFO)
-            logger.addHandler(handler)
-
-        # Create the file handler
-        handler = logging.FileHandler(filename, encoding="utf-8")
-        handler.setLevel(logging.DEBUG)
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        self.loggers[name] = logger
-        return logger
 
     def load(self):
         """Load the configuration."""
