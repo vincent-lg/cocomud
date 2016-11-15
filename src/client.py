@@ -38,6 +38,7 @@ from telnetlib import Telnet, WONT, WILL, ECHO
 import threading
 import time
 
+from log import logger
 from screenreader import ScreenReader
 
 # Constants
@@ -85,9 +86,20 @@ class Client(threading.Thread):
             if msg:
                 for line in msg.splitlines():
                     for trigger in self.world.triggers:
-                        trigger.feed(line)
+                        try:
+                            trigger.feed(line)
+                        except Exception:
+                            log = logger("client")
+                            log.exception("The trigger {} failed".format(
+                                    repr(trigger.readction)))
 
-                self.handle_message(msg)
+
+                try:
+                    self.handle_message(msg)
+                except Exception:
+                    log = logger("client")
+                    log.exception(
+                            "An error occurred when handling a message")
 
         # Consider the thread as stopped
         self.running = False

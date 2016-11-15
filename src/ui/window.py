@@ -38,6 +38,7 @@ import wx
 from ytranslate.tools import t
 
 from autoupdate import AutoUpdate
+from log import logger
 from screenreader import ScreenReader
 from scripting.key import key_name
 from session import Session
@@ -306,6 +307,9 @@ class ClientWindow(DummyUpdater):
 
         self.Destroy()
 
+        if self.engine:
+            self.engine.stop()
+
     def OnActivate(self, e):
         """The window gains or loses focus."""
         self.focus = e.GetActive()
@@ -424,7 +428,11 @@ class MUDPanel(AccessPanel):
         if self.world:
             self.world.reset_autocompletion()
 
-        self.client.write(message)
+        try:
+            self.client.write(message)
+        except Exception:
+            log = logger("client")
+            log.exception("An error occurred when sending a message")
 
     def OnPaste(self, e):
         """Paste several lines in the input field.

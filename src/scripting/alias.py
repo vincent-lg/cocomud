@@ -31,6 +31,8 @@
 import re
 from textwrap import dedent
 
+from log import logger
+
 class Alias:
 
     """An alias object.
@@ -89,6 +91,9 @@ class Alias:
     def test(self, command):
         """Should the alias be triggered by the text?"""
         if self.re_alias.search(command):
+            log = logger("client")
+            log.debug("Executing the alias {}".format(
+                    repr(self.alias)))
             self.execute()
             return True
 
@@ -96,4 +101,9 @@ class Alias:
 
     def execute(self):
         """Execute the alias."""
-        self.sharp_engine.execute(self.action)
+        try:
+            self.sharp_engine.execute(self.action)
+        except Exception:
+            log = logger("client")
+            log.exception("An error occurred while executing the alias " \
+                    "{}".format(repr(self.alias)))

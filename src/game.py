@@ -34,7 +34,7 @@ from enum import Enum
 
 from client import GUIClient
 from config import Settings
-from log import logger, begin
+from log import logger, begin, end
 from sharp.engine import SharpScript
 
 class Level(Enum):
@@ -134,3 +134,7 @@ class GameEngine:
         self.logger.debug("The documentation for the {} help file " \
                 "cannot be found, either using lang={} or lang=en".format(
                 name, lang))
+
+    def stop(self):
+        """Stop the game engine and close the sessions."""
+        end()

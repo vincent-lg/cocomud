@@ -125,9 +125,8 @@ WEEKDAYS = [
     "Sunday",
 ]
 
-def begin():
-    """Log the beginning of the session to every logger."""
-    # Prepare the message with the current date
+def get_date_formats():
+    """Return the date formats in a dictionary."""
     now = datetime.now()
     formats = {
         "year": now.year,
@@ -138,9 +137,27 @@ def begin():
         "minute": now.minute,
         "second": now.second,
     }
+    return formats
+
+def begin():
+    """Log the beginning of the session to every logger."""
+    formats = get_date_formats()
 
     # Message to be sent
     message = "CocoMUD started on {weekday}, {month} {day}, {year}"
+    message += " at {hour:>02}:{minute:>02}:{second:>02}"
+    message = message.format(**formats)
+    for logger in loggers.values():
+        logger.propagate = False
+        logger.info(message)
+        logger.propagate = True
+
+def end():
+    """Log the end of the session to every logger."""
+    formats = get_date_formats()
+
+    # Message to be sent
+    message = "CocoMUD stopped on {weekday}, {month} {day}, {year}"
     message += " at {hour:>02}:{minute:>02}:{second:>02}"
     message = message.format(**formats)
     for logger in loggers.values():
@@ -153,4 +170,6 @@ if not os.path.exists("logs"):
     os.mkdir("logs")
 
 logger("")  # Main logger
+logger("client")  # Client logger
 logger("sharp")  # SharpEngine logger
+logger("ui")  # User Interface logger
