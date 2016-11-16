@@ -6,8 +6,12 @@ connection: Connection
 description: Description
 function: Function
 hostname: Hostname
+macro:
+    1: Macro
+    2+: Macros
 name: Name
 port: Port
+shortcut: Shortcut
 trigger:
     1: Trigger
     2+: Triggers
