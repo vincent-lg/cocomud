@@ -131,7 +131,7 @@ class ConnectionDialog(wx.Dialog):
             world = worlds[index]
         except IndexError:
             wx.MessageBox(t("ui.message.world.unknown"),
-                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             dialog = EditWorldDialog(self.engine, world)
             dialog.ShowModal()
@@ -146,10 +146,10 @@ class ConnectionDialog(wx.Dialog):
             world = worlds[index]
         except IndexError:
             wx.MessageBox(t("ui.message.world.unknown"),
-                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.world.remove"),
-                    t("ui.dialog.confirm"),
+                    t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -235,19 +235,19 @@ class EditWorldDialog(wx.Dialog):
         port = self.port.GetValue()
         if not name:
             wx.MessageBox(t("ui.message.world.missing"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.name.SetFocus()
         elif not hostname:
             wx.MessageBox(t("ui.message.world.hostname"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.hostname.SetFocus()
         elif not port:
             wx.MessageBox(t("ui.message.world.port"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.port.SetFocus()
         elif not port.isdigit() or int(port) < 0 or int(port) > 65535:
             wx.MessageBox(t("ui.message.world.invalid_port"),
-                    t("ui.dialog.message.invalid"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.invalid"), wx.OK | wx.ICON_ERROR)
             self.port.SetFocus()
         else:
             name = name.encode("utf-8", "replace")
