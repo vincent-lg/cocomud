@@ -123,7 +123,7 @@ class TriggerDialog(wx.Dialog):
             trigger = self.trigger_list[index]
         except IndexError:
             wx.MessageBox(t("ui.message.trigger.unknown"),
-                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             dialog = EditTriggerDialog(self.engine, self.world,
                     self.trigger_list, trigger)
@@ -138,10 +138,10 @@ class TriggerDialog(wx.Dialog):
             trigger = self.trigger_list[index]
         except IndexError:
             wx.MessageBox(t("ui.message.trigger.unknown"),
-                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.trigger.remove",
-                    trigger=trigger.reaction), t("ui.dialog.confirm"),
+                    trigger=trigger.reaction), t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -180,7 +180,7 @@ class TriggerDialog(wx.Dialog):
             self.Destroy()
         else:
             value = wx.MessageBox(t("ui.message.trigger.unsaved"),
-                    t("ui.dialog.confirm"),
+                    t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -244,11 +244,11 @@ class EditTriggerDialog(wx.Dialog):
         action = self.trigger.action
         if not reaction:
             wx.MessageBox(t("ui.message.trigger.missing_reaction"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.t_trigger.SetFocus()
         elif not action:
             wx.MessageBox(t("ui.message.trigger.missing_action"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
         else:
             self.trigger.reaction = reaction
             self.trigger.action = action
