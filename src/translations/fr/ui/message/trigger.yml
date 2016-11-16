@@ -1,0 +1,18 @@
+﻿add: Ajouter un trigger
+edit: Editer un trigger
+missing_action: >
+    Le champ de texte contenant l'action est vide. Veuillez préciser
+    l'action à associer à ce trigger.
+missing_reaction: >
+    Le champ de texte contenant le nom du trigger est vide.
+    Vous devez préciser une réaction pour ce trigger.
+remove: >
+    Êtes-vous sûr de vouloir retirer le trigger {trigger} ?
+unknown: >
+    Impossible de trouver ce trigger.
+unsaved: >
+    Il se trouve plusieurs triggers non sauvegardés dans la
+    configuration. Si vous fermez cette boîte de dialogue sans
+    sauvegarde, ces modifications seront perdues. Pour sauvegarder,
+    cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
+    cette boîte de dialogue sans sauvegarder ?

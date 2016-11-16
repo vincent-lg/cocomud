@@ -1,0 +1,16 @@
+﻿hostname: >
+    Vous devez préciser un nom d'hôte valide pour cet univers.  Ce
+    peut être une adresse IP (comme 10.35.1.128) ou un nom d'hôte (comme
+    exemple.com).
+invalid_port: >
+    Vous devez préciser un numéro de port valide. Ce doit être un
+    nombre entre 0 et 65535.
+missing: >
+    Vous devez préciser un nom pour cet univers.
+port: >
+    Vous devez préciser un numéro de port pour se connecter à cet
+    univers.
+remove: >
+    êtes-vous sûr de vouloir supprimer cet univers ?
+unknown: >
+    L'univers sélectionné n'a pas pu être trouvé.

@@ -137,10 +137,10 @@ class AliasDialog(wx.Dialog):
             alias = self.alias_list[index]
         except IndexError:
             wx.MessageBox(t("ui.message.alias.unknown"),
-                    t("ui.dialog.error"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.alias.remove",
-                    alias=alias.alias), t("ui.dialog.confirm"),
+                    alias=alias.alias), t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -179,7 +179,7 @@ class AliasDialog(wx.Dialog):
             self.Destroy()
         else:
             value = wx.MessageBox(t("ui.message.alias.unsaved"),
-                    t("ui.dialog.confirm"),
+                    t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
@@ -243,11 +243,11 @@ class EditAliasDialog(wx.Dialog):
         action = self.alias.action
         if not alias:
             wx.MessageBox(t("ui.message.alias.missing_alias"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.t_alias.SetFocus()
         elif not action:
             wx.MessageBox(t("ui.message.alias.missing_action"),
-                    t("ui.dialog.message.missing"), wx.OK | wx.ICON_ERROR)
+                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
         else:
             alias = alias
             self.alias.alias = alias

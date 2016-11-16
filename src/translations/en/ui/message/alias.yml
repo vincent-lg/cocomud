@@ -1,0 +1,14 @@
+﻿missing_action: >
+    The action field is empty.  Please specify the actions
+    associated with this alias.
+missing_alias: >
+    The alias field is empty.  Please specify the alias' name.
+remove: >
+    Are you sure you want to remove the alias {alias}?
+unknown: >
+    Unable to find this alias.
+unsaved: >
+    There are unsaved aliases in this configuration.  If you
+    close this dialog without saving, they will be lost.  To save,
+    click on 'no' and then on 'ok'.  Are you sure you want to close
+    this dialog without saving?

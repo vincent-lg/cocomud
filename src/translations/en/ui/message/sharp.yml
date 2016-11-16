@@ -1,0 +1,4 @@
+﻿missing: >
+    Unable to find the selected line of action.
+remove: >
+    Are you sure you want to remove this action? {line}

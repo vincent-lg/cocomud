@@ -1,0 +1,13 @@
+﻿available: >
+    Une nouvelle mise à jour (build numéro {build}) est disponible.
+    Souhaitez-vous la télécharger et l'installer maintenant ? Si
+    vous choisisssez 'oui', le client sera fermé pendant l'installation
+    et ré-ouvert après celle-ci.
+checking: Vérification des mises à jour disponibles...
+confirm_cancel: Êtes-vous sûr de vouloir interrompre l'installation de cette mise à jour ?
+downloading: Téléchargement de la nouvelle mise à jour...
+extracting: Extraction de l'archive...
+loading: Chargement...
+noupdate: Aucune mise à jour n'est disponible pour l'instant.
+title: Vérification des mises à jour
+updating: Mise à jour de CocoMUD

@@ -1,0 +1,16 @@
+﻿add: Add a trigger
+edit: Edit a trigger
+missing_action: >
+    The action field is empty.  Please specify the actions
+    associated with this trigger.
+missing_reaction: >
+    The trigger field is empty.  Please specify the trigger's reaction.
+remove: >
+    Are you sure you want to remove the trigger {trigger}?
+unknown: >
+    Unable to find this trigger.
+unsaved: >
+    There are unsaved triggers in this configuration.  If you
+    close this dialog without saving, they will be lost.  To save,
+    click on 'no' and then on 'ok'.  Are you sure you want to close
+    this dialog without saving?
