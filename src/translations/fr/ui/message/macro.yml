@@ -1,0 +1,20 @@
+﻿add: Ajouter un nouveau macro
+edit: Éditer un macro existant
+missing_action: >
+    Le champ de texte contenant l'action est vide. Veuillez préciser
+    l'action à associer à ce macro.
+missing_macro: >
+    Le champ de texte contenant le raccourci est vide. Une fois
+    dans le champ de texte, pressez les touches raccourci à associer
+    à ce macro.
+remove: >
+    Voulez-vous réellement supprimer ce macro ? {action} via {shortcut}.
+unknown: >
+    Impossible de trouver le macro sélectionné.
+unsaved: >
+    Un macro ou plusieurs ont été modifiés dans cette boîte de
+    dialogue, mais ces modifications seront perdues si vous la
+    quittez. Si vous désirez enregistrer ces modifications,
+    sélectionnez 'non', puis 'ok' pour quitter la boîte de dialogue.
+    Voulez-vous réellement quitter cette boîte de dialogue sans
+    sauvegarder ?

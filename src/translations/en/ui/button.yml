@@ -1,10 +1,12 @@
 ﻿add: Add
 add_action: Add action
 browse: Browse...
+choose_file: Choose a file
 connect: Connect
 edit: Edit
 help: Help
 remove: Remove
+restart: Restart
 test: Test
 what:
     command_stacking: What is command stacking?

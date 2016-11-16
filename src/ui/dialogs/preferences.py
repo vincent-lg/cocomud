@@ -48,7 +48,8 @@ class GeneralTab(wx.Panel):
         self.SetSizer(sizer)
 
         # Language selection
-        l_languages = wx.StaticText(self, label=t("ui.dialog.general"))
+        l_languages = wx.StaticText(self,
+                label=t("ui.dialog.preferences.general"))
         languages = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         languages.InsertColumn(0, "Name")
         self.languages = languages
@@ -190,7 +191,7 @@ class DisplayTab(wx.Panel):
         self.SetSizer(sizer)
 
         # Encoding selection
-        l_encodings = wx.StaticText(self, label=t("ui.dialog.encodings"))
+        l_encodings = wx.StaticText(self, label=t("ui.dialog.preferences.encodings"))
         encodings = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         encodings.InsertColumn(0, "Name")
         self.encodings = encodings
@@ -239,7 +240,8 @@ class InputTab(wx.Panel):
         self.SetSizer(sizer)
 
         # Command stacking
-        l_stacking = wx.StaticText(self, label=t("ui.dialog.command_stacking"))
+        l_stacking = wx.StaticText(self,
+                label=t("ui.dialog.preferences.command_stacking"))
         t_stacking = wx.TextCtrl(self,
                 value=settings["options.input.command_stacking"])
         self.command_stacking = t_stacking
@@ -278,9 +280,11 @@ class AccessibilityTab(wx.Panel):
         self.SetSizer(sizer)
 
         # TTS preferendces
-        self.TTS_on = wx.CheckBox(self, label=t("ui.dialog.TTS.on"))
+        self.TTS_on = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.TTS.on"))
         self.TTS_on.SetValue(settings["options.TTS.on"])
-        self.TTS_outside = wx.CheckBox(self, label=t("ui.dialog.TTS.outside"))
+        self.TTS_outside = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.TTS.outside"))
         self.TTS_outside.SetValue(settings["options.TTS.outside"])
 
         # Append to the sizer
@@ -299,10 +303,10 @@ class PreferencesTabs(wx.Notebook):
         display_tab = DisplayTab(self, engine)
         input_tab = InputTab(self, engine)
         accessibility_tab = AccessibilityTab(self, engine)
-        self.AddPage(general_tab, t("ui.dialog.general"))
-        self.AddPage(display_tab, t("ui.dialog.display"))
-        self.AddPage(input_tab, t("ui.dialog.input"))
-        self.AddPage(accessibility_tab, t("ui.dialog.accessibility"))
+        self.AddPage(general_tab, t("ui.dialog.preferences.general"))
+        self.AddPage(display_tab, t("ui.dialog.preferences.display"))
+        self.AddPage(input_tab, t("ui.dialog.preferences.input"))
+        self.AddPage(accessibility_tab, t("ui.dialog.preferences.accessibility"))
         self.general = general_tab
         self.display = display_tab
         self.input = input_tab
@@ -356,8 +360,8 @@ class PreferencesDialog(wx.Dialog):
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options"].write()
         if old_language != new_language:
-            wx.MessageBox(t("ui.dialog.message.update_language"),
-                    t("ui.dialog.restart"), wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(t("ui.dialog.preferences.update_language"),
+                    t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
         self.Destroy()
 
     def OnCancel(self, e):

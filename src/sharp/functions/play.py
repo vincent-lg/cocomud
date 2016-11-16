@@ -126,9 +126,10 @@ class Play(Function):
 
     def browse_file(self, e):
         """Browse for a file."""
+        choose_file = t("ui.buttons.choose_file")
         parent = self.dialog
         extensions = "Audio file (*.wav)|*.wav"
-        dialog = wx.FileDialog(parent, t("ui.dialog.choose_file"),
+        dialog = wx.FileDialog(parent, choose_file,
                 parent.default_directory, "", extensions,
                 wx.OPEN)
         result = dialog.ShowModal()

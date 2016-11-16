@@ -1,0 +1,12 @@
+general: Général
+display: Affichage
+encodings: Encodages
+input: Commandes
+command_stacking: Multiple commandes
+accessibility: Accessibilité
+TTS:
+    "on": Activer le TTS (Text-To-Speech)
+    outside: Activer le TTS hors de la fenêtre
+update_language: >
+    Vous avez modifié la langue du client CocoMUD. Vous devez
+    redémarrer le programme pour voir ces modifications.

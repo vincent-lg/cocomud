@@ -1,10 +1,12 @@
 add: Ajouter
 add_action: Ajouter l'action
 browse: Parcourir...
+choose_file: Sélectionner un fichier
 connect: Connecter
 edit: Éditer
 help: Aide
 remove: Supprimer
+restart: Redémarrage
 test: Test
 what:
     command_stacking: Que sont les commandes multiples ?
