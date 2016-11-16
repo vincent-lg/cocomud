@@ -41,6 +41,8 @@ Example:
 from datetime import datetime
 import logging
 import os
+import sys
+import traceback
 
 class CustomFormatter(logging.Formatter):
 
@@ -176,7 +178,15 @@ def end():
 if not os.path.exists("logs"):
     os.mkdir("logs")
 
-logger("")  # Main logger
-logger("client")  # Client logger
-logger("sharp")  # SharpEngine logger
-logger("ui")  # User Interface logger
+main = logger("")  # Main logger
+client = logger("client")  # Client logger
+sharp = logger("sharp")  # SharpEngine logger
+ui = logger("ui")  # User Interface logger
+
+# Write a special exceptionhook
+def excepthook(type, value, tb):
+    message = 'Uncaught exception:\n'
+    message += "".join(traceback.format_exception(type, value, tb))
+    main.error(message)
+
+sys.excepthook = excepthook
