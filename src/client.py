@@ -129,16 +129,20 @@ class Client(threading.Thread):
         else:
             # Break in chunks based on the command stacking, if active
             settings = self.engine.settings
-            command_stacking = settings["options.input.command_stacking"]
+            stacking = settings["options.input.command_stacking"]
             encoding = settings["options.general.encoding"]
-            if command_stacking:
-                delimiter = re.escape(command_stacking)
+            if stacking:
+                delimiter = re.escape(stacking)
                 re_del = re.compile("(?<!{s}){s}(?!{s})".format(s=delimiter), re.UNICODE)
                 chunks = re_del.split(text)
+
                 # Reset ;; as ; (or other command stacking character)
+                def reset_del(match):
+                    return match.group(0)[1:]
+
                 for i, chunk in enumerate(chunks):
-                    chunks[i] = chunk.replace(2 * command_stacking,
-                            command_stacking).encode(encoding, "replace")
+                    chunks[i] = re.sub(delimiter + "{2,}", reset_del, chunk)
+                    chunks[i] = chunks[i].encode(encoding, errors="replace")
             else:
                 chunks = [text.encode(encoding, "replace")]
 
