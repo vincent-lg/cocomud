@@ -96,12 +96,30 @@ class Trigger:
 
     def feed(self, line):
         """Should the trigger be triggered by the text?"""
-        if self.re_reaction.search(line):
+        match = self.re_reaction.search(line)
+        if match:
             world = self.world
             world = world and world.name or "unknown"
             self.logger.debug("Trigger {}.{} fired.".format(
                     world, self.reaction))
 
+            engine = self.sharp_engine
+            if "args" not in engine.locals:
+                engine.locals["args"] = {}
+
+            args = engine.locals["args"]
+
+            # Copy the groups of this match
+            i = 0
+            for group in match.groups():
+                i += 1
+                args[str(i)] = group
+
+            # Copy the named groups
+            for name, group in match.groupdict().items():
+                engine.locals[name] = group
+
+            # Execute the trigger
             self.execute()
 
     def execute(self):
