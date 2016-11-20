@@ -192,9 +192,9 @@ class EditAliasDialog(wx.Dialog):
 
     def __init__(self, engine, world, aliases, alias=None):
         if alias.alias:
-            title = t("ui.dialog.alias.edit")
+            title = t("ui.message.alias.edit")
         else:
-            title = t("ui.dialog.alias.add")
+            title = t("ui.message.alias.add")
 
         super(EditAliasDialog, self).__init__(None, title=title)
         self.engine = engine

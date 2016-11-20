@@ -1,4 +1,6 @@
-﻿missing_action: >
+﻿add: Add a new alias
+edit: Edit an existing alias
+missing_action: >
     The action field is empty.  Please specify the actions
     associated with this alias.
 missing_alias: >

@@ -1,4 +1,6 @@
-﻿missing_action: >
+﻿add: Ajouter un nouvel alias
+edit: Éditer un alias existant
+missing_action: >
     Le champ de texte contenant l'action est vide. Veuillez préciser
     l'action à associer à cet alias.
 missing_alias: >

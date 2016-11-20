@@ -90,10 +90,29 @@ class Alias:
 
     def test(self, command):
         """Should the alias be triggered by the text?"""
-        if self.re_alias.search(command):
+        match = self.re_alias.search(command)
+        if match:
             log = logger("client")
             log.debug("Executing the alias {}".format(
                     repr(self.alias)))
+
+            engine = self.sharp_engine
+            if "args" not in engine.locals:
+                engine.locals["args"] = {}
+
+            args = engine.locals["args"]
+
+            # Copy the groups of this match
+            i = 0
+            for group in match.groups():
+                i += 1
+                args[str(i)] = group
+
+            # Copy the named groups
+            for name, group in match.groupdict().items():
+                engine.locals[name] = group
+
+            # Execute the alias
             self.execute()
             return True
 
