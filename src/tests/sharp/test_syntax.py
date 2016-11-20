@@ -114,6 +114,38 @@ class TestSyntax(unittest.TestCase):
                 "trigger('ok', '#play new.wav\n#stop')",
         ])
 
+    def test_simple_variables(self):
+        """Test simple variables."""
+        self.engine.locals["a"] = 30
+        self.engine.locals["b"] = -80
+        self.engine.locals["art"] = "magnificient"
+
+        # Try to display the variables
+        statements = self.engine.feed("#send {Display a: $a.}")
+        self.assertEqual(statements, ["send('Display a: 30.')"])
+        statements = self.engine.feed("#send {Display b: $b.}")
+        self.assertEqual(statements, ["send('Display b: -80.')"])
+        statements = self.engine.feed("#send {Display art: $art.}")
+        self.assertEqual(statements, ["send('Display art: magnificient.')"])
+        statements = self.engine.feed("#send {a=$a, b=$b, art=$art.}")
+        self.assertEqual(statements, ["send('a=30, b=-80, art=magnificient.')"])
+
+    def test_escape_variables(self):
+        """Test a more complex syntax for variables."""
+        self.engine.locals["sum"] = 500
+        self.engine.locals["HP"] = 20
+        self.engine.locals["s"] = "calc"
+
+        # Try to display the variables
+        statements = self.engine.feed("#send {sum=$sum}")
+        self.assertEqual(statements, ["send('sum=500')"])
+        statements = self.engine.feed("#send {You have \\$$sum.}")
+        self.assertEqual(statements, ["send('You have $500.')"])
+        statements = self.engine.feed("#send {You have ${HP}HP left.}")
+        self.assertEqual(statements, ["send('You have 20HP left.')"])
+        statements = self.engine.feed("#send {You have ${H}HP left.}")
+        self.assertEqual(statements, ["send('You have HP left.')"])
+
     def test_escape_sharp(self):
         """Test the escaped sharp symbol."""
         # A sharp escaping with plain text

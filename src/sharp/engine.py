@@ -28,22 +28,27 @@
 
 """Module containing the SharpEngine class."""
 
+import re
 from textwrap import dedent
 
 from log import logger
 from sharp import FUNCTIONS
 
+# Constants
+RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?")
+
 class SharpScript(object):
 
     """Class representing a SharpScript engine.
 
-    An SharpScript engine is often linked with the game's main engine
+    A SharpScript engine is often linked with the game's main engine
     and an individual client, which is itself optionally linked to
     the ui application.
 
     """
 
     id = 0
+
     def __init__(self, engine, client, world):
         self.id = type(self).id + 1
         type(self).id += 1
@@ -125,12 +130,14 @@ class SharpScript(object):
             elif argument.startswith("{"):
                 argument = repr(argument[1:-1])
                 argument = self.replace_semicolons(argument)
+                argument = self.replace_variables(argument)
             elif argument[0] in "-+":
                 kwargs[argument[1:]] = True if argument[0] == "+" else False
                 continue
             else:
                 argument = repr(argument)
                 argument = self.replace_semicolons(argument)
+                argument = self.replace_variables(argument)
 
             arguments.append(argument)
 
@@ -255,6 +262,39 @@ class SharpScript(object):
             i += 1
 
         return text.replace(";;", ";")
+
+    def replace_variables(self, line):
+        """Replace the variables in the line (str) and return the new line.
+
+        Variables can be written in two ways:
+            $variable (when surrounded by special characters)
+            ${variable} (if not).
+
+        The dollar sign can be espaced with \$.
+
+        For instance:
+            "You see your heal point is now $pv."
+            "You have ${pv}PV left."
+            "You can earn ${sum}USD if you move quickly."
+            "You can earn \$$sum if you move quickly."
+
+        """
+        def spot(match):
+            """A variable has been found and should be replaced."""
+            variable = match.group(1)
+            value = self.locals.get(variable, "")
+            self.logger.debug("#{} requests variable '{}', value={}".format(
+                    self.id, variable, value))
+
+            return str(value)
+
+        # Replace the variables
+        line = RE_VAR.sub(spot, line)
+
+        # Escape the double $ sign
+        line = line.replace("\\\\$", "$")
+
+        return line
 
     def format(self, content, return_str=True):
         """Write SharpScript and return a string.
