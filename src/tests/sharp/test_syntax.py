@@ -130,6 +130,13 @@ class TestSyntax(unittest.TestCase):
         statements = self.engine.feed("#send {a=$a, b=$b, art=$art.}")
         self.assertEqual(statements, ["send('a=30, b=-80, art=magnificient.')"])
 
+    def test_variables_args(self):
+        """Test variables in arguments."""
+        args = {"1": 800}
+        self.engine.locals["args"] = args
+        statements = self.engine.feed("#send $1")
+        self.assertEqual(statements, ["send('800')"])
+
     def test_escape_variables(self):
         """Test a more complex syntax for variables."""
         self.engine.locals["sum"] = 500

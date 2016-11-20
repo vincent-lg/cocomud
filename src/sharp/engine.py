@@ -35,7 +35,7 @@ from log import logger
 from sharp import FUNCTIONS
 
 # Constants
-RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?")
+RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
 
 class SharpScript(object):
 
@@ -282,7 +282,13 @@ class SharpScript(object):
         def spot(match):
             """A variable has been found and should be replaced."""
             variable = match.group(1)
-            value = self.locals.get(variable, "")
+            if variable.isdigit():
+                # Get from the 'args' variable
+                args = self.locals.get("args", {})
+                value = args.get(variable, "")
+            else:
+                value = self.locals.get(variable, "")
+
             self.logger.debug("#{} requests variable '{}', value={}".format(
                     self.id, variable, value))
 
