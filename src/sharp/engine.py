@@ -35,7 +35,7 @@ from log import logger
 from sharp import FUNCTIONS
 
 # Constants
-RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
+RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?", re.UNICODE)
 
 class SharpScript(object):
 

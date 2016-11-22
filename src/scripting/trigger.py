@@ -139,4 +139,4 @@ class Trigger:
 
     def execute(self):
         """Execute the trigger."""
-        self.sharp_engine.execute(self.action)
+        self.sharp_engine.execute(self.action, variables=True)
