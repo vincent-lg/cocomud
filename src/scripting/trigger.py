@@ -48,6 +48,7 @@ class Trigger:
         self.reaction = reaction
         self.re_reaction = self.find_regex(reaction)
         self.action = action
+        self.mute = False
         self.logger = logger("sharp")
 
         # Set the trigger's level
@@ -60,13 +61,15 @@ class Trigger:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this trigger."""
+        mute = "+mute" if self.mute else ""
         return self.sharp_engine.format((("#trigger", self.reaction,
-                self.action), ))
+                self.action, mute), ))
 
     @property
     def copied(self):
         """Return a copied version of the trigger."""
         copy = Trigger(self.sharp_engine, self.reaction, self.action)
+        copy.mute = self.mute
         copy.level = self.level
         return copy
 
@@ -94,12 +97,21 @@ class Trigger:
 
         return re.compile(reaction, re.IGNORECASE)
 
-    def feed(self, line):
-        """Should the trigger be triggered by the text?"""
+    def test(self, line, execute=False):
+        """Should the trigger be triggered by the text?
+
+        This function return either True or False.  If the 'execute'
+        argument is set to True, and the trigger should be fired, then
+        call the 'execute' method.
+
+        """
         match = self.re_reaction.search(line)
         if match:
             world = self.world
             world = world and world.name or "unknown"
+            if not execute:
+                return True
+
             self.logger.debug("Trigger {}.{} fired.".format(
                     world, self.reaction))
 
@@ -121,6 +133,9 @@ class Trigger:
 
             # Execute the trigger
             self.execute()
+            return True
+
+        return False
 
     def execute(self):
         """Execute the trigger."""

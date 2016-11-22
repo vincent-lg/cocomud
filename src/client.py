@@ -84,22 +84,7 @@ class Client(threading.Thread):
                 break
 
             if msg:
-                for line in msg.splitlines():
-                    for trigger in self.world.triggers:
-                        try:
-                            trigger.feed(line)
-                        except Exception:
-                            log = logger("client")
-                            log.exception("The trigger {} failed".format(
-                                    repr(trigger.readction)))
-
-
-                try:
-                    self.handle_message(msg)
-                except Exception:
-                    log = logger("client")
-                    log.exception(
-                            "An error occurred when handling a message")
+                self.handle_lines(msg)
 
         # Consider the thread as stopped
         self.running = False
@@ -107,6 +92,40 @@ class Client(threading.Thread):
         # If there's still an open window
         if self.window:
             self.window.handle_disconnection()
+
+    def handle_lines(self, msg):
+        """Handle multiple lines of text."""
+        lines = []
+        triggers = []
+        for line in msg.splitlines():
+            display = True
+            for trigger in self.world.triggers:
+                try:
+                    test = trigger.test(line)
+                except Exception:
+                    log = logger("client")
+                    log.exception("The trigger {} failed".format(
+                            repr(trigger.readction)))
+                else:
+                    if test:
+                        triggers.append((trigger, line))
+                        if trigger.mute:
+                            display = False
+
+            if display:
+                lines.append(line)
+
+        # Handle the remaining text
+        try:
+            self.handle_message("\r\n".join(lines))
+        except Exception:
+            log = logger("client")
+            log.exception(
+                    "An error occurred when handling a message")
+
+        # Execute the triggers
+        for trigger, line in triggers:
+            trigger.test(line, execute=True)
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True):

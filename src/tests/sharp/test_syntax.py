@@ -121,20 +121,24 @@ class TestSyntax(unittest.TestCase):
         self.engine.locals["art"] = "magnificient"
 
         # Try to display the variables
-        statements = self.engine.feed("#send {Display a: $a.}")
+        statements = self.engine.feed("#send {Display a: $a.}",
+                variables=True)
         self.assertEqual(statements, ["send('Display a: 30.')"])
-        statements = self.engine.feed("#send {Display b: $b.}")
+        statements = self.engine.feed("#send {Display b: $b.}",
+                variables=True)
         self.assertEqual(statements, ["send('Display b: -80.')"])
-        statements = self.engine.feed("#send {Display art: $art.}")
+        statements = self.engine.feed("#send {Display art: $art.}",
+                variables=True)
         self.assertEqual(statements, ["send('Display art: magnificient.')"])
-        statements = self.engine.feed("#send {a=$a, b=$b, art=$art.}")
+        statements = self.engine.feed("#send {a=$a, b=$b, art=$art.}",
+                variables=True)
         self.assertEqual(statements, ["send('a=30, b=-80, art=magnificient.')"])
 
     def test_variables_args(self):
         """Test variables in arguments."""
         args = {"1": 800}
         self.engine.locals["args"] = args
-        statements = self.engine.feed("#send $1")
+        statements = self.engine.feed("#send $1", variables=True)
         self.assertEqual(statements, ["send('800')"])
 
     def test_escape_variables(self):
@@ -144,13 +148,17 @@ class TestSyntax(unittest.TestCase):
         self.engine.locals["s"] = "calc"
 
         # Try to display the variables
-        statements = self.engine.feed("#send {sum=$sum}")
+        statements = self.engine.feed("#send {sum=$sum}",
+                variables=True)
         self.assertEqual(statements, ["send('sum=500')"])
-        statements = self.engine.feed("#send {You have \\$$sum.}")
+        statements = self.engine.feed("#send {You have \\$$sum.}",
+                variables=True)
         self.assertEqual(statements, ["send('You have $500.')"])
-        statements = self.engine.feed("#send {You have ${HP}HP left.}")
+        statements = self.engine.feed("#send {You have ${HP}HP left.}",
+                variables=True)
         self.assertEqual(statements, ["send('You have 20HP left.')"])
-        statements = self.engine.feed("#send {You have ${H}HP left.}")
+        statements = self.engine.feed("#send {You have ${H}HP left.}",
+                variables=True)
         self.assertEqual(statements, ["send('You have HP left.')"])
 
     def test_escape_sharp(self):

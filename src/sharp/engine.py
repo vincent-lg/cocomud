@@ -68,10 +68,10 @@ class SharpScript(object):
             self.functions[name] = function
             self.globals[name] = function.run
 
-    def execute(self, code, debug=False):
+    def execute(self, code, debug=False, variables=False):
         """Execute the SharpScript code given as an argument."""
         if isinstance(code, basestring):
-            instructions = self.feed(code)
+            instructions = self.feed(code, variables=variables)
         else:
             instructions = [code]
 
@@ -83,7 +83,7 @@ class SharpScript(object):
         for instruction in instructions:
             exec(instruction, globals, locals)
 
-    def feed(self, content):
+    def feed(self, content, variables=False):
         """Feed the SharpScript engine with a string content.
 
         The content is probably a file with several statements in
@@ -105,12 +105,12 @@ class SharpScript(object):
         # The remaining must be SharpScript, splits into statements
         statements = self.split_statements(content)
         for statement in statements:
-            pycode = self.convert_to_python(statement)
+            pycode = self.convert_to_python(statement, variables=variables)
             codes.append(pycode)
 
         return codes
 
-    def convert_to_python(self, statement):
+    def convert_to_python(self, statement, variables=False):
         """Convert the statement to Python and return the str code.
 
         The statement given in argument should be a tuple:  The first
@@ -128,16 +128,21 @@ class SharpScript(object):
                 argument = repr(dedent(argument)).replace("\\n", "\n")
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
-                argument = repr(argument[1:-1])
+                argument = argument[1:-1]
                 argument = self.replace_semicolons(argument)
-                argument = self.replace_variables(argument)
+                if variables:
+                    argument = self.replace_variables(argument)
+
+                argument = repr(argument).replace("\\n", "\n")
             elif argument[0] in "-+":
                 kwargs[argument[1:]] = True if argument[0] == "+" else False
                 continue
             else:
-                argument = repr(argument)
                 argument = self.replace_semicolons(argument)
-                argument = self.replace_variables(argument)
+                if variables:
+                    argument = self.replace_variables(argument)
+
+                argument = repr(argument).replace("\\n", "\n")
 
             arguments.append(argument)
 
@@ -298,7 +303,7 @@ class SharpScript(object):
         line = RE_VAR.sub(spot, line)
 
         # Escape the double $ sign
-        line = line.replace("\\\\$", "$")
+        line = line.replace("\\$", "$")
 
         return line
 
