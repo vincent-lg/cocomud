@@ -5,6 +5,7 @@ missing_action: >
     associated with this trigger.
 missing_reaction: >
     The trigger field is empty.  Please specify the trigger's reaction.
+mute: Mute trigger
 remove: >
     Are you sure you want to remove the trigger {trigger}?
 unknown: >

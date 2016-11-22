@@ -229,6 +229,11 @@ class EditTriggerDialog(wx.Dialog):
         self.editor = SharpEditor(self, self.engine, self.world.sharp_engine,
                 self.trigger, "action")
         sizer.Add(self.editor)
+
+        # Mute option
+        self.mute = wx.CheckBox(self, label=t("ui.message.trigger.mute"))
+        self.mute.SetValue(self.trigger.mute)
+        sizer.Add(self.mute)
         sizer.Add(buttons)
         sizer.Fit(self)
 
@@ -242,6 +247,7 @@ class EditTriggerDialog(wx.Dialog):
         """Save the trigger."""
         reaction = self.t_trigger.GetValue()
         action = self.trigger.action
+        mute = self.mute.GetValue()
         if not reaction:
             wx.MessageBox(t("ui.message.trigger.missing_reaction"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
@@ -253,6 +259,7 @@ class EditTriggerDialog(wx.Dialog):
             self.trigger.reaction = reaction
             self.trigger.action = action
             self.trigger.re_reaction = self.trigger.find_regex(reaction)
+            self.trigger.mute = mute
             if self.trigger not in self.triggers:
                 self.triggers.append(self.trigger)
             self.Destroy()
