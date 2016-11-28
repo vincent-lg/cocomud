@@ -125,7 +125,8 @@ class SharpScript(object):
         for argument in statement[1:]:
             if argument.startswith("{+"):
                 argument = argument[2:-1].lstrip("\n").rstrip("\n ")
-                argument = repr(dedent(argument)).replace("\\n", "\n")
+                argument = repr(dedent(argument))
+                #.replace("\\n", "\n")
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = argument[1:-1]

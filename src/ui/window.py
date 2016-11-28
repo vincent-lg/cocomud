@@ -213,6 +213,7 @@ class ClientWindow(DummyUpdater):
         world = World("")
         dialog = EditWorldDialog(self.engine, world)
         dialog.ShowModal()
+        self.SetTitle("{} [CocoMUD]".format(world.name))
         panel = MUDPanel(self.tabs, self, self.engine, world, session)
         panel.CreateClient()
         self.tabs.AddPage(panel, world.name, select=True)
@@ -227,6 +228,7 @@ class ClientWindow(DummyUpdater):
             return
 
         world = session.world
+        self.SetTitle("{} [CocoMUD]".format(world.name))
         panel = MUDPanel(self.tabs, self, self.engine, world, session)
         panel.CreateClient()
         self.tabs.AddPage(panel, world.name, select=True)
@@ -329,6 +331,8 @@ class ClientWindow(DummyUpdater):
 
         tab = self.tabs.GetCurrentPage()
         tab.focus = True
+        world = tab.world
+        self.SetTitle("{} [CocoMUD]".format(world.name))
         e.Skip()
 
     def OnResponseUpdate(self, build=None):

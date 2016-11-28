@@ -81,7 +81,7 @@ class TestSyntax(unittest.TestCase):
             print var
         }""")
         self.assertEqual(statements, [
-            "trigger('Should it work?', compile('var = 2 + 3\nprint var', " \
+            "trigger('Should it work?', compile('var = 2 + 3\\nprint var', " \
             "'SharpScript', 'exec'))"
         ])
 
