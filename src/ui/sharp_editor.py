@@ -82,7 +82,7 @@ class SharpEditor(wx.Panel):
         if text:
             s_text = wx.BoxSizer(wx.VERTICAL)
             l_text = wx.StaticText(self, label=t("common.script"))
-            t_text = wx.TextCtrl(self, value=script)
+            t_text = wx.TextCtrl(self, value=script, style=wx.TE_MULTILINE)
             self.text = t_text
             s_text.Add(l_text)
             s_text.Add(t_text)
@@ -135,6 +135,9 @@ class SharpEditor(wx.Panel):
         """Populate the list with existing functions."""
         self.existing.DeleteAllItems()
         script = getattr(self.object, self.attribute)
+        if self.text:
+            self.text.SetValue(script)
+
         lines = self.sharp_engine.format(script, return_str=False)
         for line in lines:
             self.existing.Append((line, ))
