@@ -37,17 +37,15 @@ class SharpEditor(wx.Panel):
     """SharpScript editor panel.
 
     This panel can be added into dialogs that have to support SharpScript
-    editing.  On the top, at the left of the panel, is a list of
-    SharpScript functions which could be added to the edited SharpScript.
-    On the right of this list is a button to add the selected function
-    to the action field.
-
-    At the bottom of this panel is the list of functions currently
-    used in the selected attribute.
+    editing.  On the top, at the left of the panel, is an optional
+    text field to edit SharpScript directly.  To the right is a list
+    of functions already associated with this entry.  After buttons
+    to edit and remove is a second list with new functions to be added.
 
     """
 
-    def __init__(self, dialog, engine, sharp, object, attribute):
+    def __init__(self, dialog, engine, sharp, object, attribute,
+            text=False):
         """Creates the frame.
 
         Arguments:
@@ -56,6 +54,7 @@ class SharpEditor(wx.Panel):
             sharp: the SharpScript engine.
             object: the object containing the field to be edited.
             attribute: the attribute's name of the object to edit.
+            text (default to False): should a text field be added?
 
         If the SharpEditor is to modify a trigger, for instance,
         particularly its "action" attribute, the trigger is the object
@@ -67,45 +66,55 @@ class SharpEditor(wx.Panel):
         self.sharp_engine = sharp
         self.object = object
         self.attribute = attribute
-
-        # Shape
+        self.text = None
+        script = getattr(self.object, self.attribute)
         self.functions = sorted(sharp.functions.values(),
                 key=lambda function: function.name)
         self.functions = [f for f in self.functions if f.description]
+
+        # Shape
         sizer = wx.BoxSizer(wx.VERTICAL)
         top = wx.BoxSizer(wx.HORIZONTAL)
         bottom = wx.BoxSizer(wx.HORIZONTAL)
-        self.options = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
-        # List of functions
-        self.choices = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.choices.InsertColumn(0, t("common.description"))
-        self.populate_list()
-        top.Add(self.choices)
-        top.Add(self.options, proportion=3)
-
-        # Bottom
-        add = wx.Button(self, label=t("ui.button.add_action"))
-        bottom.Add(add)
+        # Insert a text field
+        if text:
+            s_text = wx.BoxSizer(wx.VERTICAL)
+            l_text = wx.StaticText(self, label=t("common.script"))
+            t_text = wx.TextCtrl(self, value=script)
+            self.text = t_text
+            s_text.Add(l_text)
+            s_text.Add(t_text)
+            top.Add(s_text)
 
         # List of current functions
         self.existing = wx.ListCtrl(self,
                 style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
         self.existing.InsertColumn(0, t("common.action"))
-        self.populate_existing()
 
         # Buttons
-        edit = wx.Button(self, label=t("ui.button.edit"))
-        remove = wx.Button(self, label=t("ui.button.remove"))
-        bottom.Add(self.existing)
-        bottom.Add(edit)
-        bottom.Add(remove)
+        self.edit = wx.Button(self, label=t("ui.button.edit"))
+        self.remove = wx.Button(self, label=t("ui.button.remove"))
+        top.Add(self.existing)
+        top.Add(self.edit)
+        top.Add(self.remove)
+        self.populate_existing()
+
+        # List of functions
+        self.choices = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.choices.InsertColumn(0, t("common.description"))
+        self.populate_list()
+        bottom.Add(self.choices)
+
+        # Add button
+        self.add = wx.Button(self, label=t("ui.button.add_action"))
+        bottom.Add(self.add)
 
         # Event binding
-        add.Bind(wx.EVT_BUTTON, self.OnAdd)
-        edit.Bind(wx.EVT_BUTTON, self.OnEdit)
-        remove.Bind(wx.EVT_BUTTON, self.OnRemove)
+        self.add.Bind(wx.EVT_BUTTON, self.OnAdd)
+        self.edit.Bind(wx.EVT_BUTTON, self.OnEdit)
+        self.remove.Bind(wx.EVT_BUTTON, self.OnRemove)
 
     def populate_list(self):
         """Populate the list with function names."""
@@ -132,6 +141,15 @@ class SharpEditor(wx.Panel):
 
         self.existing.Select(0)
         self.existing.Focus(0)
+
+        if lines:
+            self.existing.Enable()
+            self.edit.Enable()
+            self.remove.Enable()
+        else:
+            self.existing.Disable()
+            self.edit.Disable()
+            self.remove.Disable()
 
     def OnAdd(self, e):
         """The 'add' button is pressed."""
@@ -178,7 +196,7 @@ class SharpEditor(wx.Panel):
                     t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
             value = wx.MessageBox(t("ui.message.sharp.remove",
-                    line=line), t("ui.dialog.confirm"),
+                    line=line), t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:

@@ -77,6 +77,4 @@ class Macro:
 
     def execute(self, engine, client):
         """Execute the macro."""
-        action = self.action.encode("latin-1", "replace")
-        for line in action.splitlines():
-            client.write(line)
+        self.sharp_engine.execute(self.action, variables=True)

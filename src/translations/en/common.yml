@@ -11,6 +11,7 @@ macro:
     2+: Macros
 name: Name
 port: Port
+script: Script
 shortcut: Shortcut
 trigger:
     1: Trigger

@@ -34,6 +34,7 @@ from ytranslate import t
 
 from scripting.key import key_code, key_name
 from scripting.macro import Macro
+from ui.sharp_editor import SharpEditor
 
 class MacroDialog(wx.Dialog):
 
@@ -166,7 +167,7 @@ class MacroDialog(wx.Dialog):
     def OnAdd(self, e):
         """The 'add' button is pressed."""
         dialog = EditMacroDialog(self.engine, self.macro_list,
-                Macro(0, 0, ""))
+                Macro(0, 0, ""), self.world)
         dialog.ShowModal()
         self.populate_list(len(self.macro_list) - 1)
         self.macros.SetFocus()
@@ -180,7 +181,8 @@ class MacroDialog(wx.Dialog):
             wx.MessageBox("Unable to find the selected macro.",
                     wx.OK | wx.ICON_ERROR)
         else:
-            dialog = EditMacroDialog(self.engine, self.macro_list, macro)
+            dialog = EditMacroDialog(self.engine, self.macro_list,
+                    macro, self.world)
             dialog.ShowModal()
             self.populate_list(index)
             self.macros.SetFocus()
@@ -242,7 +244,7 @@ class EditMacroDialog(wx.Dialog):
 
     """Dialog to add/edit a macro."""
 
-    def __init__(self, engine, macros, macro=None):
+    def __init__(self, engine, macros, macro, world):
         if macro.shortcut:
             title = t("ui.message.macro.edit")
         else:
@@ -252,6 +254,7 @@ class EditMacroDialog(wx.Dialog):
         self.engine = engine
         self.macros = macros
         self.macro = macro
+        self.world = world
 
         self.InitUI()
         self.Center()
@@ -271,20 +274,14 @@ class EditMacroDialog(wx.Dialog):
         s_shortcut.Add(l_shortcut)
         s_shortcut.Add(t_shortcut)
         top.Add(s_shortcut)
-        top.Add((15, -1))
 
-        # Create the action field
-        s_action = wx.BoxSizer(wx.VERTICAL)
-        l_action = wx.StaticText(self, label=t("common.action"))
-        t_action = wx.TextCtrl(self, value=self.macro.action,
-                style=wx.TE_MULTILINE)
-        self.action = t_action
-        s_action.Add(l_action)
-        s_action.Add(t_action)
-        top.Add(s_action)
+        # SharpScript editor
+        self.editor = SharpEditor(self, self.engine, self.world.sharp_engine,
+                self.macro, "action", text=True)
 
         # Main sizer
         sizer.Add(top, proportion=4)
+        sizer.Add(self.editor)
         sizer.Add(buttons)
         sizer.Fit(self)
 
@@ -313,7 +310,10 @@ class EditMacroDialog(wx.Dialog):
     def OnOK(self, e):
         """Save the macro."""
         shortcut = self.shortcut.GetValue()
-        action = self.action.GetValue()
+        action = self.macro.action
+        if not action:
+            action = self.editor.text.GetValue()
+
         if not shortcut:
             wx.MessageBox(t("ui.message.macro.missing_macro"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
@@ -321,7 +321,7 @@ class EditMacroDialog(wx.Dialog):
         elif not action:
             wx.MessageBox(t("ui.message.macro.missing_action"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
-            self.action.SetFocus()
+            self.editor.SetFocus()
         else:
             shortcut = shortcut.encode("utf-8", "replace")
             action = action.encode("utf-8", "replace")
