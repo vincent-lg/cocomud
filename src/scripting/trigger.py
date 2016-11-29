@@ -29,6 +29,7 @@
 """Class containing the Trigger class."""
 
 import re
+from textwrap import dedent
 
 from log import logger
 
@@ -47,7 +48,7 @@ class Trigger:
         self.sharp_engine = sharp
         self.reaction = reaction
         self.re_reaction = self.find_regex(reaction)
-        self.action = action
+        self.action = dedent(action.strip("\n"))
         self.mute = False
         self.logger = logger("sharp")
 

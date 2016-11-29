@@ -111,7 +111,7 @@ class TestSyntax(unittest.TestCase):
         # A test with SharpScript
         statements = self.engine.feed("#trigger ok {#play new.wav;#stop}")
         self.assertEqual(statements, [
-                "trigger('ok', '#play new.wav\n#stop')",
+                "trigger('ok', '#play new.wav\\n#stop')",
         ])
 
     def test_simple_variables(self):
@@ -170,3 +170,10 @@ class TestSyntax(unittest.TestCase):
         # A sharp escaping with SharpScript
         statements = self.engine.feed("#macro ##ok")
         self.assertEqual(statements, ["macro('#ok')"])
+
+    def test_multiline(self):
+        """Test the SharpScript editor with multiple lines."""
+        statements = self.engine.feed("#action {ok} {\n    1\n    2\n}")
+        self.assertEqual(statements, [
+                "action('ok', '\\n    1\\n    2\\n')",
+        ])

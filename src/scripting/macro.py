@@ -28,6 +28,8 @@
 
 """Class containing the Macro class."""
 
+from textwrap import dedent
+
 from scripting.key import key_name
 
 class Macro:
@@ -43,7 +45,7 @@ class Macro:
     def __init__(self, key, modifiers, action, sharp=None):
         self.key = key
         self.modifiers = modifiers
-        self.action = action
+        self.action = dedent(action.strip("\n"))
         self.sharp_engine = sharp
 
         # Set the trigger's level

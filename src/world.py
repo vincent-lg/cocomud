@@ -96,7 +96,7 @@ class World:
             file.close()
 
             # Execute the script
-            self.sharp_engine.execute(content, variables=False)
+            self.sharp_engine.execute(content, debug=True, variables=False)
 
         # Put the engine level back
         self.engine.level = level

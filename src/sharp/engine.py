@@ -77,10 +77,11 @@ class SharpScript(object):
 
         globals = self.globals
         locals = self.locals
-        if debug:
-            print "exec", instructions
 
         for instruction in instructions:
+            if debug:
+                self.logger.debug("Executing SharpScript\n{}".format(
+                        instruction))
             exec(instruction, globals, locals)
 
     def feed(self, content, variables=False):
@@ -126,7 +127,6 @@ class SharpScript(object):
             if argument.startswith("{+"):
                 argument = argument[2:-1].lstrip("\n").rstrip("\n ")
                 argument = repr(dedent(argument))
-                #.replace("\\n", "\n")
                 argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = argument[1:-1]
@@ -134,7 +134,8 @@ class SharpScript(object):
                 if variables:
                     argument = self.replace_variables(argument)
 
-                argument = repr(argument).replace("\\n", "\n")
+                argument = repr(argument)
+                #.replace("\\n", "\n")
             elif argument[0] in "-+":
                 kwargs[argument[1:]] = True if argument[0] == "+" else False
                 continue
