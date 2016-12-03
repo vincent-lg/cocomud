@@ -98,8 +98,7 @@ class SharpScript(object):
         while content.startswith("{+"):
             end = self.find_right_brace(content)
             code = content[2:end - 1].lstrip("\n").rstrip("\n ")
-            code = repr(dedent(code)).replace("\\n", "\n")
-            code = "compile(" + code + ", 'SharpScript', 'exec')"
+            code = dedent(code)
             codes.append(code)
             content = content[end + 1:]
 
@@ -125,9 +124,7 @@ class SharpScript(object):
         kwargs = {}
         for argument in statement[1:]:
             if argument.startswith("{+"):
-                argument = argument[2:-1].lstrip("\n").rstrip("\n ")
                 argument = repr(dedent(argument))
-                argument = "compile(" + argument + ", 'SharpScript', 'exec')"
             elif argument.startswith("{"):
                 argument = argument[1:-1]
                 argument = self.replace_semicolons(argument)
@@ -135,7 +132,6 @@ class SharpScript(object):
                     argument = self.replace_variables(argument)
 
                 argument = repr(argument)
-                #.replace("\\n", "\n")
             elif argument[0] in "-+":
                 kwargs[argument[1:]] = True if argument[0] == "+" else False
                 continue
@@ -289,9 +285,9 @@ class SharpScript(object):
         def spot(match):
             """A variable has been found and should be replaced."""
             variable = match.group(1)
+            args = self.locals.get("args", {})
             if variable.isdigit():
                 # Get from the 'args' variable
-                args = self.locals.get("args", {})
                 value = args.get(variable, "")
             else:
                 value = self.locals.get(variable, "")

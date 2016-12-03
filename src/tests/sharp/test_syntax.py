@@ -81,8 +81,9 @@ class TestSyntax(unittest.TestCase):
             print var
         }""")
         self.assertEqual(statements, [
-            "trigger('Should it work?', compile('var = 2 + 3\\nprint var', " \
-            "'SharpScript', 'exec'))"
+            "trigger('Should it work?', '{+\\n" \
+            "            var = 2 + 3\\n" \
+            "            print var\\n        }')"""
         ])
 
     def test_flag(self):
@@ -99,7 +100,7 @@ class TestSyntax(unittest.TestCase):
             print 3
         }""")
         self.assertEqual(statements, [
-            "compile('print 1\nprint 3', 'SharpScript', 'exec')",
+            'print 1\nprint 3',
         ])
 
     def test_semicolons(self):
