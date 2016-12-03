@@ -26,6 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from textwrap import dedent
 import unittest
 
 from sharp.engine import SharpScript
@@ -178,3 +179,27 @@ class TestSyntax(unittest.TestCase):
         self.assertEqual(statements, [
                 "action('ok', '\\n    1\\n    2\\n')",
         ])
+
+    def test_python_variables(self):
+        """Test with Python variables."""
+        code = dedent("""
+            {+
+            try:
+                i
+            except NameError:
+                i = 0
+
+            i += 1
+            }
+        """.strip("\n"))
+
+        self.engine.execute(code)
+        self.assertEqual(self.engine.locals["i"], 1)
+        self.engine.execute(code)
+        self.assertEqual(self.engine.locals["i"], 2)
+
+        # Try to get the 'i' variable
+        self.engine.execute(code)
+        statements = self.engine.feed("#say {i=$i}",
+                variables=True)
+        self.assertEqual(statements, ["say('i=3')"])
