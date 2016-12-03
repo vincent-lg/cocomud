@@ -68,7 +68,10 @@ setup(
     version = "0.2",
     description = "The CocoMUD client.",
     options = {'build_exe': {
-            'include_files': includefiles,
+            "include_files": includefiles,
+            "excludes": ["_gtkagg", "_tkagg", "bsddb", "curses",
+                    "pywin.debugger", "pywin.debugger.dbgcon",
+                    "pywin.dialogs", "tcl", "Tkconstants", "Tkinter"],
             "packages": ["accesspanel"],
     }},
     executables = [client, updater, dbg_updater]

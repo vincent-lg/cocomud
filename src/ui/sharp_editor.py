@@ -45,7 +45,7 @@ class SharpEditor(wx.Panel):
     """
 
     def __init__(self, dialog, engine, sharp, object, attribute,
-            text=False):
+            text=False, escape=False):
         """Creates the frame.
 
         Arguments:
@@ -55,6 +55,7 @@ class SharpEditor(wx.Panel):
             object: the object containing the field to be edited.
             attribute: the attribute's name of the object to edit.
             text (default to False): should a text field be added?
+            escape (default to false): the #send calls are removed.
 
         If the SharpEditor is to modify a trigger, for instance,
         particularly its "action" attribute, the trigger is the object
@@ -67,6 +68,8 @@ class SharpEditor(wx.Panel):
         self.object = object
         self.attribute = attribute
         self.text = None
+        self.escape = escape
+
         script = getattr(self.object, self.attribute)
         self.functions = sorted(sharp.functions.values(),
                 key=lambda function: function.name)
@@ -81,7 +84,7 @@ class SharpEditor(wx.Panel):
         # Insert a text field
         if text:
             s_text = wx.BoxSizer(wx.VERTICAL)
-            l_text = wx.StaticText(self, label=t("common.script"))
+            l_text = wx.StaticText(self, label=t("common.action"))
             t_text = wx.TextCtrl(self, value=script, style=wx.TE_MULTILINE)
             self.text = t_text
             s_text.Add(l_text)
@@ -163,7 +166,8 @@ class SharpEditor(wx.Panel):
             wx.MessageBox(t("ui.message.sharp.missing"),
                     t("ui.message.error"), wx.OK | wx.ICON_ERROR)
         else:
-            dialog = AddEditFunctionDialog(self.engine, self.sharp_engine, function, self.object, self.attribute)
+            dialog = AddEditFunctionDialog(self.engine, self.sharp_engine,
+                    function, self.object, self.attribute, escape=self.escape)
             dialog.ShowModal()
             self.populate_existing()
             self.existing.SetFocus()
@@ -182,7 +186,8 @@ class SharpEditor(wx.Panel):
             name, arguments, flags = self.sharp_engine.extract_arguments(line)
             function = self.sharp_engine.functions[name[1:]]
             dialog = AddEditFunctionDialog(self.engine, self.sharp_engine,
-                    function, self.object, self.attribute, index)
+                    function, self.object, self.attribute, index,
+                    escape=self.escape)
             dialog.ShowModal()
             self.populate_existing()
             self.existing.SetFocus()
@@ -215,7 +220,7 @@ class AddEditFunctionDialog(wx.Dialog):
     """Add or edit a function."""
 
     def __init__(self, engine, sharp_engine, function, object, attribute,
-            index=-1):
+            index=-1, escape=False):
         super(AddEditFunctionDialog, self).__init__(None,
                 title=t("common.action"))
         self.engine = engine
@@ -225,6 +230,7 @@ class AddEditFunctionDialog(wx.Dialog):
         self.object = object
         self.attribute = attribute
         self.index = index
+        self.escape = escape
         arguments = []
         flags = {}
         if index >= 0:
@@ -261,13 +267,19 @@ class AddEditFunctionDialog(wx.Dialog):
                     self.attribute), return_str=False)
             if self.index >= 0:
                 lines[self.index] = line
-                content = "\n".join(lines)
             else:
-                content = "\n".join(lines)
-                if content:
-                    content += "\n"
+                lines.append(line)
 
-                content += line
+            if self.escape:
+                print "escaping lines"
+                for i, line in enumerate(lines):
+                    if line.startswith("#send "):
+                        line = line[6:]
+                        if line.startswith("{"):
+                            line = line[1:-1]
+                        lines[i] = line
+
+            content = "\n".join(lines)
             setattr(self.object, self.attribute, content)
             self.Destroy()
 

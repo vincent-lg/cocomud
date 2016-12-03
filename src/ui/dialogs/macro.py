@@ -277,7 +277,7 @@ class EditMacroDialog(wx.Dialog):
 
         # SharpScript editor
         self.editor = SharpEditor(self, self.engine, self.world.sharp_engine,
-                self.macro, "action", text=True)
+                self.macro, "action", text=True, escape=True)
 
         # Main sizer
         sizer.Add(top, proportion=4)
@@ -310,10 +310,7 @@ class EditMacroDialog(wx.Dialog):
     def OnOK(self, e):
         """Save the macro."""
         shortcut = self.shortcut.GetValue()
-        action = self.macro.action
-        if not action:
-            action = self.editor.text.GetValue()
-
+        action = self.editor.text.GetValue()
         if not shortcut:
             wx.MessageBox(t("ui.message.macro.missing_macro"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
