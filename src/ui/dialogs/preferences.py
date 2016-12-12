@@ -365,6 +365,8 @@ class PreferencesDialog(wx.Dialog):
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options.TTS.interrupt"] = interrupt
         settings["options"].write()
+        self.engine.TTS_on = accessibility.TTS_on.GetValue()
+        self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
         if old_language != new_language:
             wx.MessageBox(t("ui.dialog.preferences.update_language"),
                     t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
