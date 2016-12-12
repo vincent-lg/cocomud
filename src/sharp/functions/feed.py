@@ -28,6 +28,8 @@
 
 """Module containing the Feed function class."""
 
+import wx
+
 from sharp import Function
 
 class Feed(Function):

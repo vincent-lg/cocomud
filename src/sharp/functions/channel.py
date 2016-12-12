@@ -28,6 +28,8 @@
 
 """Module containing the Channel function class."""
 
+import wx
+
 from scripting.channel import Channel as ObjChannel
 from sharp import Function
 from ui.dialogs.channel import ChannelsDialog

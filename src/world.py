@@ -134,6 +134,10 @@ class World:
         for alias in self.aliases:
             lines.append(alias.sharp_script)
 
+        # Channels
+        for channel in self.channels:
+            lines.append("#channel {{{}}}".format(channel.name))
+
         # Macros
         for macro in self.macros:
             lines.append(macro.sharp_script)
