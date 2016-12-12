@@ -240,7 +240,9 @@ class GUIClient(Client):
                 tts = True
 
             if tts:
-                ScreenReader.talk(msg, speech=speech, braille=braille)
+                interrupt = self.engine.settings["options.TTS.interrupt"]
+                ScreenReader.talk(msg, speech=speech, braille=braille,
+                        interrupt=interrupt)
 
     def handle_option(self, socket, command, option):
         """Handle a received option."""

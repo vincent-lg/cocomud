@@ -246,6 +246,7 @@ class Settings(Configuration):
             [TTS]
                 on = boolean(default=True)
                 outside = boolean(default=True)
+                interrupt = boolean(default=True)
         """.format(lang=lang).strip("\n"))
         self.load_config_file("options", spec)
 

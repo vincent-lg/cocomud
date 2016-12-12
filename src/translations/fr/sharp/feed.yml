@@ -1,0 +1,6 @@
+﻿channel: Nom du canal dans lequel envoyer le message
+description: Envoie un message dans un canal
+empty_channel: >
+        Le nom du canal est vide. Dans quel canal envoyer ce message ?
+empty_message: Le message est vide. Que doit-on envoyer à ce canal ?
+message: Message à envoyer au canal

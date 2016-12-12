@@ -7,6 +7,7 @@ accessibility: Accessibility
 TTS:
     "on": Enable TTS (Text-To Speech)
     outside: Enable TTS when on a different window
+    interrupt: Interrupt TTS when a new message is received
 update_language: >
     You have changed the CocoMUD anguage.  You have to restart the
     application to see these changes.

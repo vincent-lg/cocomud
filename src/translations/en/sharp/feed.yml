@@ -1,0 +1,5 @@
+﻿channel: Name of the channel to be fed
+description: Feed a channel with a message
+empty_channel: The channel name is empty.  Where to send the message?
+empty_message: The message is empty.  What to send to the channel?
+message: Message to feed to the channel")

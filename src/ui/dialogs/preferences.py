@@ -286,10 +286,14 @@ class AccessibilityTab(wx.Panel):
         self.TTS_outside = wx.CheckBox(self,
                 label=t("ui.dialog.preferences.TTS.outside"))
         self.TTS_outside.SetValue(settings["options.TTS.outside"])
+        self.TTS_interrupt = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.TTS.interrupt"))
+        self.TTS_interrupt.SetValue(settings["options.TTS.interrupt"])
 
         # Append to the sizer
         sizer.Add(self.TTS_on, pos=(0, 0))
         sizer.Add(self.TTS_outside, pos=(0, 1))
+        sizer.Add(self.TTS_interrupt, pos=(1, 1))
 
 
 class PreferencesTabs(wx.Notebook):
@@ -353,11 +357,13 @@ class PreferencesDialog(wx.Dialog):
         encoding = display.get_selected_encoding()
         command_stacking = input.command_stacking.GetValue()
         old_language = settings["options.general.language"]
+        interrupt = accessibility.TTS_interrupt.GetValue()
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
         settings["options.input.command_stacking"] = command_stacking
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
+        settings["options.TTS.interrupt"] = interrupt
         settings["options"].write()
         if old_language != new_language:
             wx.MessageBox(t("ui.dialog.preferences.update_language"),
