@@ -2,6 +2,9 @@
 alias:
     1: Alias
     2+: Alias
+channel:
+    1: Canal
+    2+: Canaux
 connection: Connexion
 description: Description
 function: Fonction
@@ -9,6 +12,7 @@ hostname: Nom d'hôte
 macro:
     1: Macro
     2+: Macros
+message: Message
 name: Nom
 port: Port
 script: Script

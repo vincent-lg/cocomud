@@ -62,6 +62,7 @@ class World:
 
         # World's configuration
         self.aliases = []
+        self.channels = []
         self.macros = []
         self.triggers = []
 
@@ -85,6 +86,7 @@ class World:
 
         # Reset some of the world's configuration
         self.aliases = []
+        self.channels = []
         self.macros = []
         self.triggers = []
 
