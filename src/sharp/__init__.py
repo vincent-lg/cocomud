@@ -3,6 +3,7 @@
 from sharp.function import Function
 from sharp.functions.alias import Alias
 from sharp.functions.channel import Channel
+from sharp.functions.feed import Feed
 from sharp.functions.macro import Macro
 from sharp.functions.play import Play
 from sharp.functions.say import Say
@@ -13,6 +14,7 @@ from sharp.functions.tts import TTS
 FUNCTIONS = {
     "alias": Alias,
     "channel": Channel,
+    "feed": Feed,
     "macro": Macro,
     "play": Play,
     "say": Say,

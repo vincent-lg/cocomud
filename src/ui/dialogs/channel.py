@@ -54,7 +54,7 @@ class ChannelsDialog(wx.Dialog):
             messages = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
             messages.InsertColumn(0, t("common.message"))
             i = 0
-            for message in channel.messages[:-50]:
+            for message in channel.messages[-50:]:
                 messages.Append((message, ))
                 i += 1
 
