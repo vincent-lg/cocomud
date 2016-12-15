@@ -32,11 +32,45 @@ A task is an operation run in an independent thread.  It can be bond
 to a dialog box with a progress bar.  This can be useful to report
 progress in a foreground task.
 
-See the other modules in this package for examples.
+Here's a very short example:
+
+import time
+
+from task.base import BaseTask
+from ui.dialogs.task import TaskDialog
+
+class Wait(BaseTask):
+
+    "Task to wait a few seconds."
+
+    def __init__(self):
+        BaseTask.__init__(self)
+        self.dialog = TaskDialog(self, "Wait for...")
+
+    def execute(self):
+        "Wait for several seconds."
+        self.update(title="Waiting...")
+        time.sleep(2)
+        i = 0
+        while i < 100:
+            self.update(text="i = {}".format(i), progress=i)
+            time.sleep(1)
+            i += 1
+
+And to use this class:
+
+wait = Wait()
+wait.start()
+# That will pause the program and display the dialog with the progress
+# bar.  The dialog will be destroyed when the task is complete or if
+# the user clicks on the Cancel button.
+print "After the task is finished or cancelled."
 
 """
 
 from threading import Thread
+
+from log import task as logger
 
 class BaseTask(Thread):
 
@@ -44,7 +78,7 @@ class BaseTask(Thread):
 
     def __init__(self):
         Thread.__init__(self)
-        self.window = None
+        self.dialog = None
         self.cancelled = False
 
     def check_active(self):
@@ -55,6 +89,13 @@ class BaseTask(Thread):
         """
         if self.cancelled:
             raise InterruptTask
+
+    def start(self):
+        """Start the thread and display the dialog."""
+        logger.debug("Starting the task {}".format(self))
+        Thread.start(self)
+        if self.dialog:
+            self.dialog.ShowModal()
 
     def run(self):
         """Run in a separate thread.
@@ -68,13 +109,34 @@ class BaseTask(Thread):
             self.execute()
         except InterruptTask:
             self.cancel()
+        else:
+            logger.debug("Completed the task {} successfully".format(self))
         finally:
-            if self.window:
-                self.window.Destroy()
+            if self.dialog:
+                self.dialog.Destroy()
 
     def cancel(self):
         """Should a specific action be performed when cancelled?"""
-        print "Task", self, "interrupted"
+        logger.debug("Cancelled the task {}".format(self))
+
+    def update(self, title=None, text=None, progress=None):
+        """Update the dialog, if any.
+
+        Update the dialog with the specified information.  The
+        information (title, text and progress) do not have to all
+        be specified.  It is recommended to use this method with the
+        keyword arguments:
+            task.update(text="Almost done", progress=95)
+
+        """
+        self.check_active()
+        if self.dialog:
+            if title is not None:
+                self.dialog.UpdateTitle(title)
+            if text is not None:
+                self.dialog.UpdateText(text)
+            if progress is not None:
+                self.dialog.UpdateProgress(progress)
 
     def execute(self):
         """Execute the task.

@@ -181,6 +181,7 @@ if not os.path.exists("logs"):
 main = logger("")  # Main logger
 client = logger("client")  # Client logger
 sharp = logger("sharp")  # SharpEngine logger
+task = logger("task")  # Task logger
 ui = logger("ui")  # User Interface logger
 
 # Write a special exceptionhook

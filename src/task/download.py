@@ -57,10 +57,10 @@ class Download(BaseTask):
         self.title = title
         self.downloading = downloading
         if background:
-            self.window = None
+            self.dialog = None
         else:
-            self.window = TaskDialog(self, title.format(url=url, progress=0))
-            self.window.confirmation = confirmation
+            self.dialog = TaskDialog(self, title.format(url=url, progress=0))
+            self.dialog.confirmation = confirmation
 
     def __repr__(self):
         return "<{} (url={})>".format(type(self), self.url)
@@ -81,24 +81,21 @@ class Download(BaseTask):
             keep = True
             progress = 0.0
             percent = 0
-            if self.window:
-                self.window.UpdateTitle(self.title.format(
-                        url=self.url, progress=0))
-                self.window.UpdateProgress(0)
-                self.window.UpdateText(self.downloading.format(
+            self.update(title=self.title.format(
+                        url=self.url, progress=0),
+                        text=self.downloading.format(
                         url=self.url, percent=0))
 
             while keep:
-                self.check_active()
                 old_percent = percent
                 progress += chunk_size
                 percent = round((progress / size) * 100, 1)
-                if self.window and int(percent) != int(old_percent):
-                    self.window.UpdateTitle(self.title.format(
-                            url=self.url, percent=int(percent)))
-                    self.window.UpdateText(self.downloading.format(
-                            url=self.url, percent=int(percent)))
-                    self.window.UpdateProgress(int(percent))
+                if int(percent) != int(old_percent):
+                    self.update(title=self.title.format(
+                            url=self.url, percent=int(percent)),
+                            text=self.downloading.format(
+                            url=self.url, percent=int(percent)),
+                            progress=int(percent))
 
                 chunk = response.read(chunk_size)
                 if not chunk:
