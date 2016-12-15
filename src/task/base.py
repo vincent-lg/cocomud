@@ -69,6 +69,7 @@ print "After the task is finished or cancelled."
 """
 
 from threading import Thread
+import traceback
 
 from log import task as logger
 
@@ -124,6 +125,8 @@ class BaseTask(Thread):
             self.execute()
         except InterruptTask:
             self.cancel()
+        except Exception:
+            logger.exception("Exception in task {}:".format(self))
         else:
             logger.debug("Completed the task {} successfully".format(self))
         finally:

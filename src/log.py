@@ -42,6 +42,7 @@ from datetime import datetime
 import logging
 import os
 import sys
+import threading
 import traceback
 
 class CustomFormatter(logging.Formatter):
@@ -186,8 +187,37 @@ ui = logger("ui")  # User Interface logger
 
 # Write a special exceptionhook
 def excepthook(type, value, tb):
+    """New except hook, the exception is logged."""
     message = 'Uncaught exception:\n'
     message += "".join(traceback.format_exception(type, value, tb))
-    main.error(message)
+    main.error(message.strip())
 
 sys.excepthook = excepthook
+
+# Install the hook for other threads
+def setup_thread_excepthook():
+    """Install the sys.excepthook on all threads.
+
+    Workaround for `sys.excepthook` thread bug from:
+    http://bugs.python.org/issue1230540
+
+    Call once from the main thread before creating any threads.
+
+    """
+    init_original = threading.Thread.__init__
+
+    def init(self, *args, **kwargs):
+        init_original(self, *args, **kwargs)
+        run_original = self.run
+
+        def run_with_except_hook(*args2, **kwargs2):
+            try:
+                run_original(*args2, **kwargs2)
+            except Exception:
+                sys.excepthook(*sys.exc_info())
+
+        self.run = run_with_except_hook
+
+    threading.Thread.__init__ = init
+
+setup_thread_excepthook()

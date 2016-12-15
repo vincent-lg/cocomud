@@ -33,7 +33,7 @@ from cx_Freeze import setup, Executable
 
 client = Executable(
     script="cocomud.py",
-    base="Win32GUI",
+    #base="Win32GUI",
 )
 
 updater = Executable(
@@ -51,6 +51,9 @@ includefiles = [
     "worlds",
     "../doc",
     "../settings",
+
+    # Requests
+    "cacert.pem",
 
     # UniversalSpeech DLLs
     "../dolapi.dll",
@@ -72,7 +75,7 @@ setup(
             "excludes": ["_gtkagg", "_tkagg", "bsddb", "curses",
                     "pywin.debugger", "pywin.debugger.dbgcon",
                     "pywin.dialogs", "tcl", "Tkconstants", "Tkinter"],
-            "packages": ["accesspanel"],
+            "packages": ["accesspanel", "redmine.resources"],
     }},
     executables = [client, updater, dbg_updater]
 )

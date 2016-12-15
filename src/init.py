@@ -1,4 +1,4 @@
-# Copyright (c) 2016, LE GOFF Vincent
+﻿# Copyright (c) 2016, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -26,27 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""This demo file creates a simple client with TTS support."""
+"""this module is just to initialize environment variables for CocoMUD."""
 
-import wx
-from ytranslate import init, select
+import os
 
-from game import GameEngine
-import init
-from ui.window import ClientWindow
+from ytranslate import init
 
-app = wx.App()
-# Load the user configuration
-engine = GameEngine()
-engine.load()
+init(root_dir="translations")
 
-# Select the configured language
-lang = engine.settings.get_language()
-select(lang)
-
-# Create the client and ClientWindow
-window = ClientWindow(engine)
-world = window.world
-if world is not None:
-    window.panel.CreateClient()
-    app.MainLoop()
+os.environ["REQUESTS_CA_BUNDLE"] = "cacert.pem"

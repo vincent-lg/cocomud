@@ -257,7 +257,6 @@ class ClientWindow(DummyUpdater):
         """Import a world."""
         task = ImportWorlds()
         task.start()
-        print task.worlds
         dialog = WorldsDialog(self.engine, task.worlds)
         dialog.ShowModal()
 

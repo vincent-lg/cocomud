@@ -60,6 +60,7 @@ docs/_build/
 target/
 
 # Libraries
+cacert.pem
 *.dll
 
 # User settings
