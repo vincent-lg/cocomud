@@ -34,7 +34,8 @@ from redmine import Redmine
 from task.base import BaseTask
 from ui.dialogs.task import TaskDialog
 
-World = namedtuple("World", ["name", "author", "updated_on", "description"])
+World = namedtuple("World", ["name", "author", "updated_on",
+        "description", "attachments"])
 
 class ImportWorlds(BaseTask):
 
@@ -79,7 +80,7 @@ class ImportWorlds(BaseTask):
         self.update(text=message.format(10), progress=10)
         size = len(pages) - 1
         self.update(text=message.format(15), progress=15)
-        progress_per_task = 85.0 / size / 3
+        progress_per_task = 85.0 / size / 4
         progress = 15
         for page in pages:
             if page.title == "Wiki":
@@ -98,7 +99,11 @@ class ImportWorlds(BaseTask):
             progress += progress_per_task
             self.update(text=message.format(int(progress)),
                     progress=int(progress))
-            world = World(title, author, updated_on, description)
+            attachments = page.attachments
+            progress += progress_per_task
+            self.update(text=message.format(int(progress)),
+                    progress=int(progress))
+            world = World(title, author, updated_on, description, attachments)
             self.worlds.append(world)
 
         self.update(text=message.format(100), progress=100)

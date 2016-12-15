@@ -28,9 +28,11 @@
 
 """Module containing the Worlds dialog."""
 
-from redmine import Redmine
+from __future__ import absolute_import
 import wx
 from ytranslate import t
+
+from task.download import Download
 
 class WorldsDialog(wx.Dialog):
 
@@ -60,21 +62,28 @@ class WorldsDialog(wx.Dialog):
         self.description = wx.TextCtrl(self, size=(600, 400),
                 style=wx.TE_MULTILINE | wx.TE_READONLY)
 
+        # Buttons
+        install = wx.Button(self, label="Install this world...")
+
         # Main sizer
         sizer.Add(worlds, proportion=4)
         sizer.Add(l_description)
         sizer.Add(self.description, proportion=2)
+        sizer.Add(install)
         sizer.Fit(self)
 
         # Populate the list
         self.populate_list()
         self.worlds.SetFocus()
 
+        # Event binding
+        install.Bind(wx.EVT_BUTTON, self.OnInstall)
+
     def populate_list(self, selection=0):
         """Populate the list with worlds."""
         self.worlds.DeleteAllItems()
 
-        for name, author, updated_on, description in self.online:
+        for name, author, updated_on, description, a in self.online:
             updated_on = "{}-{:>02}-{:>02}".format(updated_on.year,
                     updated_on.month, updated_on.day)
             self.worlds.Append((name, author, updated_on))
@@ -88,3 +97,17 @@ class WorldsDialog(wx.Dialog):
                 self.description.SetValue(world.description)
                 self.worlds.Select(selection)
                 self.worlds.Focus(selection)
+
+    def OnInstall(self, e):
+        """The user clicked on 'install'>"""
+        index = self.worlds.GetFirstSelected()
+        try:
+            world = self.online[index]
+        except IndexError:
+            wx.MessageBox("Cannot find this world",
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+        else:
+            attachment = world.attachments[0]
+            url = attachment.content_url
+            download = Download("world.zip", url)
+            download.start()

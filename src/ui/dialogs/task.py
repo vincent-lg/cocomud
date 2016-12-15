@@ -82,17 +82,20 @@ class TaskDialog(wx.Dialog):
 
     def OnUpdateProgress(self, value=0):
         """Update the progress level."""
-        text = self.text.GetValue()
-        ScreenReader.talk(u"{}% {}".format(value, text), speech=False)
-        self.gauge.SetValue(value)
+        if self:
+            text = self.text.GetValue()
+            ScreenReader.talk(u"{}% {}".format(value, text), speech=False)
+            self.gauge.SetValue(value)
 
     def OnUpdateText(self, text):
         """Update thetext."""
-        self.text.SetValue(text)
+        if self:
+            self.text.SetValue(text)
 
     def OnUpdateTitle(self, title):
         """Update the title."""
-        self.SetTitle(title)
+        if self:
+            self.SetTitle(title)
 
     def OnCancel(self, e):
         """The user clicks on 'cancel'."""

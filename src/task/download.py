@@ -27,8 +27,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import time
 from urllib2 import urlopen
 
+from log import task as logger
 from task.base import BaseTask
 from ui.dialogs.task import TaskDialog
 
@@ -73,9 +75,12 @@ class Download(BaseTask):
 
     def execute(self):
         """Download the file at the URL."""
+        logger.debug("Task {}: preparing to download {}".format(self,
+                self.url))
         response = urlopen(self.url)
         meta = response.info()
         size = int(meta.getheaders("Content-Length")[0])
+        logger.debug("Task {}: size={}".format(self, size))
         chunk_size = 4096
         with open(self.filename, "wb") as file:
             keep = True
@@ -87,6 +92,7 @@ class Download(BaseTask):
                         url=self.url, percent=0))
 
             while keep:
+                time.sleep(0.1)
                 old_percent = percent
                 progress += chunk_size
                 percent = round((progress / size) * 100, 1)

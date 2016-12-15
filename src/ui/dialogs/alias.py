@@ -121,8 +121,8 @@ class AliasDialog(wx.Dialog):
         try:
             alias = self.alias_list[index]
         except IndexError:
-            wx.MessageBox("Unable to find the selected alias.",
-                    wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(t("ui.message.alias.unknown"),
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             dialog = EditAliasDialog(self.engine, self.world,
                     self.alias_list, alias)
