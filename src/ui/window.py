@@ -42,12 +42,14 @@ from log import logger
 from screenreader import ScreenReader
 from scripting.key import key_name
 from session import Session
+from task.import_worlds import ImportWorlds
 from ui.dialogs.alias import AliasDialog
 from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
 from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.trigger import TriggerDialog
+from ui.dialogs.worlds import WorldsDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 from world import World
 from updater import *
@@ -123,6 +125,11 @@ class ClientWindow(DummyUpdater):
         close_tab = wx.MenuItem(fileMenu, -1, t("ui.menu.close_tab"))
         self.Bind(wx.EVT_MENU, self.OnCloseTab, close_tab)
         fileMenu.AppendItem(close_tab)
+
+        # Import
+        import_worlds = wx.MenuItem(fileMenu, -1, "Import a world...")
+        self.Bind(wx.EVT_MENU, self.OnImportWorlds, import_worlds)
+        fileMenu.AppendItem(import_worlds)
 
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
@@ -245,6 +252,14 @@ class ClientWindow(DummyUpdater):
                 if tab is panel:
                     self.tabs.DeletePage(i)
                     break
+
+    def OnImportWorlds(self, e):
+        """Import a world."""
+        task = ImportWorlds()
+        task.start()
+        print task.worlds
+        dialog = WorldsDialog(self.engine, task.worlds)
+        dialog.ShowModal()
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""

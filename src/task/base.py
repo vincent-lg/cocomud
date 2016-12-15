@@ -76,10 +76,25 @@ class BaseTask(Thread):
 
     """Base class for asynchronous tasks."""
 
+    current_id = 1
+
     def __init__(self):
         Thread.__init__(self)
+        self._id = type(self).current_id
+        type(self).current_id += 1
         self.dialog = None
         self.cancelled = False
+
+    def __repr__(self):
+        return "<Task {}>".format(self.task_id)
+
+    def __str__(self):
+        return self.task_id
+
+    @property
+    def task_id(self):
+        """Return a str identifying the task."""
+        return "{}[{}]".format(type(self).__name__, self._id)
 
     def check_active(self):
         """Check if active.

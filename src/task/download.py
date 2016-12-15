@@ -62,8 +62,8 @@ class Download(BaseTask):
             self.dialog = TaskDialog(self, title.format(url=url, progress=0))
             self.dialog.confirmation = confirmation
 
-    def __repr__(self):
-        return "<{} (url={})>".format(type(self), self.url)
+    def __str__(self):
+        return "{} (url={})".format(self.task_id, self.url)
 
     def cancel(self):
         """If the task is cancelled, delete the file."""
