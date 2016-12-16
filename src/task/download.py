@@ -26,8 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from StringIO import StringIO
 import os
-import time
 from urllib2 import urlopen
 
 from log import task as logger
@@ -45,16 +45,20 @@ class Download(BaseTask):
         """Initialize the task.
 
         Parameters:
-            filename: the name of file to be created.
+            filename: the name of file to be created (or None).
             url: the url of the file to be downloaded.
             background (default False): should the task run in the background?
             title: the title of the window to be displayed.
             downloading: the message to be displayed while downloading.
             confirmation: message displayed if the user clicks on cancel.
 
+        If the filename is None, then download in memory.  The file
+        attribute will contain a StringIO pointing to this object.
+
         """
         BaseTask.__init__(self)
         self.filename = filename
+        self.file = StringIO() if filename is None else None
         self.url = url
         self.title = title
         self.downloading = downloading
@@ -64,13 +68,13 @@ class Download(BaseTask):
             self.dialog = TaskDialog(self, title.format(url=url, progress=0))
             self.dialog.confirmation = confirmation
 
-    def __str__(self):
-        return "{} (url={})".format(self.task_id, self.url)
-
     def cancel(self):
         """If the task is cancelled, delete the file."""
         BaseTask.cancel(self)
-        if os.path.exists(self.filename):
+        if self.file:
+            self.file = None
+
+        if self.filename and os.path.exists(self.filename):
             os.remove(self.filename)
 
     def execute(self):
@@ -79,10 +83,17 @@ class Download(BaseTask):
                 self.url))
         response = urlopen(self.url)
         meta = response.info()
+        encoding = response.headers['content-type'].split('charset=')[-1]
         size = int(meta.getheaders("Content-Length")[0])
-        logger.debug("Task {}: size={}".format(self, size))
+        logger.debug("Task {}: size={}, encoding={}".format(self,
+                size, encoding))
         chunk_size = 4096
-        with open(self.filename, "wb") as file:
+        if self.filename is None:
+            file = self.file
+        else:
+            file = open(self.filename, "wb")
+
+        try:
             keep = True
             progress = 0.0
             percent = 0
@@ -92,7 +103,6 @@ class Download(BaseTask):
                         url=self.url, percent=0))
 
             while keep:
-                time.sleep(0.1)
                 old_percent = percent
                 progress += chunk_size
                 percent = round((progress / size) * 100, 1)
@@ -108,3 +118,7 @@ class Download(BaseTask):
                     keep = False
 
                 file.write(chunk)
+            file.seek(0)
+        finally:
+            if self.filename is not None:
+                file.close()

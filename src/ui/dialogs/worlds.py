@@ -29,10 +29,13 @@
 """Module containing the Worlds dialog."""
 
 from __future__ import absolute_import
+from zipfile import ZipFile
+
 import wx
 from ytranslate import t
 
 from task.download import Download
+from wizard.install_world import InstallWorld
 
 class WorldsDialog(wx.Dialog):
 
@@ -109,5 +112,11 @@ class WorldsDialog(wx.Dialog):
         else:
             attachment = world.attachments[0]
             url = attachment.content_url
-            download = Download("world.zip", url)
+            download = Download(None, url)
             download.start()
+
+            # Extract the world in memory
+            archive = ZipFile("world.zip")
+            files = {name: archive.read(name) for name in archive.namelist()}
+            wizard = InstallWorld(self.engine, world.name, files)
+            wizard.start()

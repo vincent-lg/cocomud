@@ -82,7 +82,7 @@ class BaseTask(Thread):
     def __init__(self):
         Thread.__init__(self)
         self._id = type(self).current_id
-        type(self).current_id += 1
+        BaseTask.current_id += 1
         self.dialog = None
         self.cancelled = False
 
