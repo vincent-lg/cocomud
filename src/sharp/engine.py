@@ -292,8 +292,8 @@ class SharpScript(object):
             else:
                 value = self.locals.get(variable, "")
 
-            self.logger.debug("#{} requests variable '{}', value={}".format(
-                    self.id, variable, value))
+            self.logger.debug("#{} requests variable {}, value={}".format(
+                    self.id, repr(variable), repr(value)))
 
             return str(value)
 
@@ -333,7 +333,13 @@ class SharpScript(object):
             line = function + " " + " ".join(arguments)
             lines.append(line.rstrip(" "))
 
-        return "\n".join(lines) if return_str else lines
+        if return_str:
+            content = "\n".join(lines)
+            if isinstance(content, unicode):
+                content = content.encode("latin-1")
+            return content
+        else:
+            return lines
 
     @staticmethod
     def escape_argument(argument):

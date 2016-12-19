@@ -161,7 +161,9 @@ class Client(threading.Thread):
 
                 for i, chunk in enumerate(chunks):
                     chunks[i] = re.sub(delimiter + "{2,}", reset_del, chunk)
-                    chunks[i] = chunks[i].encode(encoding, errors="replace")
+                    if isinstance(chunks[i], unicode):
+                        chunks[i] = chunks[i].encode(encoding,
+                                errors="replace")
             else:
                 chunks = [text.encode(encoding, "replace")]
 

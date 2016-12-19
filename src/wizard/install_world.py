@@ -30,7 +30,9 @@
 
 from collections import OrderedDict
 import json
+import os
 
+from log import wizard as logger
 from ui.wizard.install_world import PreInstallDialog
 from ui.wizard.install_world import InstallWorld as UI
 from world import World
@@ -66,6 +68,9 @@ class InstallWorld:
         3. The installation dialog is displayed.
 
         """
+        logger.info("Starting the wizard 'install_world' for '{}'".format(
+                self.name))
+
         # 1. Look for the world, if any
         best = self.engine.get_world(self.name)
         worlds = []
@@ -85,6 +90,7 @@ class InstallWorld:
 
         # 2. Create the dialog to select merging options
         if self.ui:
+            logger.debug("Opening the PreInstallDialog")
             dialog = PreInstallDialog(self.engine, self.name, worlds,
                     merging)
             results = dialog.results
@@ -92,6 +98,7 @@ class InstallWorld:
             destination = results.get("world")
             merge = results.get("merge")
             name = results.get("name")
+            logger.debug("Obtained the settings: {}".format(results))
             if destination is None or merge is None:
                 return
 
@@ -109,9 +116,11 @@ class InstallWorld:
 
         # 3. Show the installation dialog
         if self.ui:
+            logger.debug("Opening the installation dialog")
             self.dialog = UI(self.engine, self)
             data = self.dialog.data
             self.dialog.ShowModal()
+            logger.debug("Obtained data={}".format(data))
         else:
             data = {}
             install = self.files.get("world/install.json")
@@ -123,8 +132,6 @@ class InstallWorld:
                     default = value.get("default")
                     data[key] = default
 
-        # Look for an existing world into which to merge config
-        print "Found the world", self.name, destination
         self.engine.prepare_world(destination, merge)
         sharp = destination.sharp_engine
 
@@ -140,12 +147,50 @@ class InstallWorld:
 
         # Install the world
         if "world/install.py" in self.files:
-            print "Found the installation file"
+            logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
+            install = install.decode("utf-8").encode("latin-1")
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
             exec(install, globals, locals)
-            destination.save()
+
+        # Execute the 'config.set' file as is
+        config = self.files.get("world/config.set")
+        if config:
+            logger.debug("Executing the config.set script")
+            config = config.replace("\r", "")
+            destination.sharp_engine.execute(config, variables=False)
+
+        # Just saves the world
+        destination.save()
 
         # Copy all the other files
+        to_skip = ("config.set", "install.py", "install.json", "options.conf")
+        for path, content in self.files.items():
+            if path.endswith("/"):
+                # It's a folder, we skip it
+                continue
+
+            relpath = os.path.relpath(path, "world")
+            if relpath in to_skip:
+                # We skip all these files
+                continue
+
+            abspath = os.path.join(destination.path, relpath)
+            dirname = os.path.dirname(abspath)
+
+            # If the parent directory doesn't exist, create it
+            if not os.path.exists(dirname):
+                logger.debug("Create the directory {}".format(dirname))
+                os.makedirs(dirname)
+
+            # Create the file itself
+            logger.debug("Copy the file {}".format(abspath))
+            with open(abspath, "wb") as file:
+                file.write(content)
+
+        # End of the wizard
+        logger.info("The world {} has been installed successfully".format(
+                destination.name))
+

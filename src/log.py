@@ -184,6 +184,7 @@ client = logger("client")  # Client logger
 sharp = logger("sharp")  # SharpEngine logger
 task = logger("task")  # Task logger
 ui = logger("ui")  # User Interface logger
+wizard = logger("wizard")  # Wizard logger
 
 # Write a special exceptionhook
 def excepthook(type, value, tb):

@@ -320,8 +320,8 @@ class EditMacroDialog(wx.Dialog):
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.editor.SetFocus()
         else:
-            shortcut = shortcut.encode("utf-8", "replace")
-            action = action.encode("utf-8", "replace")
+            #shortcut = shortcut.encode("utf-8", "replace")
+            #action = action.encode("utf-8", "replace")
             key, modifiers = key_code(shortcut)
             self.macro.key = key
             self.macro.modifiers = modifiers

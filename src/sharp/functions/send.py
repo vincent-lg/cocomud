@@ -51,7 +51,6 @@ class Send(Function):
         text = dedent(text.strip("\n"))
         if self.client:
             for line in text.splitlines():
-                line = line.encode("latin-1")
                 self.client.write(line)
 
     def display(self, dialog, commands=""):

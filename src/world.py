@@ -28,7 +28,6 @@
 
 """This file contains the World class."""
 
-from codecs import open
 from enum import Enum
 import shutil
 import os
@@ -38,6 +37,7 @@ from textwrap import dedent
 
 from configobj import ConfigObj
 
+from log import sharp as logger
 from screenreader import ScreenReader
 from session import Session
 
@@ -104,12 +104,12 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
-            file = open(path, "r", encoding="latin-1", errors="replace")
+            file = open(path, "r")
             content = file.read().replace("\r", "")
             file.close()
 
             # Execute the script
-            self.sharp_engine.execute(content, debug=True, variables=False)
+            self.sharp_engine.execute(content, variables=False)
 
         # Put the engine level back
         self.engine.level = level
@@ -158,10 +158,10 @@ class World:
             lines.append(trigger.sharp_script)
 
         content = "\n".join(lines) + "\n"
-        content = content.replace("\n", "\r\n")
         path = self.path
         path = os.path.join(path, "config.set")
-        file = open(path, "w", encoding="latin-1", errors="replace")
+        file = open(path, "w")
+        logger.debug(repr(content))
         file.write(content)
         file.close()
 
