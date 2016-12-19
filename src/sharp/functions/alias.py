@@ -39,4 +39,4 @@ class Alias(Function):
         """Create an alias."""
         alias = ObjAlias(self.sharp_engine, alias, action)
         if self.world:
-            self.world.aliases.append(alias)
+            self.world.add_alias(alias)

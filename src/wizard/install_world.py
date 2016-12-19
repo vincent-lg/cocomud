@@ -94,6 +94,12 @@ class InstallWorld:
             name = results.get("name")
             if destination is None or merge is None:
                 return
+
+            # If the world hasn't a location or name
+            if not destination.name:
+                destination.name = name
+                destination.location = name.lower()
+
             self.engine.prepare_world(destination, merge)
             destination.load()
         else:
@@ -116,11 +122,6 @@ class InstallWorld:
                 for key, value in values.items():
                     default = value.get("default")
                     data[key] = default
-
-        # If the world hasn't a location or name
-        if not destination.name:
-            destination.name = name
-            destination.location = name.lower()
 
         # Look for an existing world into which to merge config
         print "Found the world", self.name, destination

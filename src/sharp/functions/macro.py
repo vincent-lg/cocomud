@@ -41,4 +41,4 @@ class Macro(Function):
         key, modifiers = key_code(shortcut)
         macro = ObjMacro(key, modifiers, action, self.sharp_engine)
         if self.world:
-            self.world.macros.append(macro)
+            self.world.add_macro(macro)

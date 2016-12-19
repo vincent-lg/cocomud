@@ -169,6 +169,76 @@ class World:
         """Remove the world."""
         shutil.rmtree(self.path)
 
+    def add_alias(self, alias):
+        """Add the alias to the world's configuration, handling conflicts.
+
+        If another alias with the same name exists, either replace
+        it or ignore the second one.
+
+        """
+        for existing in self.aliases:
+            if existing.alias == alias.alias:
+                # There's a conflict, look at the 'merging' setting
+                if self.merging == MergingMethod.ignore:
+                    return
+                elif self.merging == MergingMethod.replace:
+                    existing.action = alias.action
+                    existing.level = alias.level
+                    return
+
+        # Otherwise, just add it at the end
+        self.aliases.append(alias)
+
+    def add_channel(self, channel):
+        """Add a channel, handling conflicts."""
+        for existing in self.channels:
+            if existing.name == channel.name:
+                return
+
+        # Otherwise, just add it at the end
+        self.channels.append(channel)
+
+    def add_macro(self, macro):
+        """Add the macro to the world's configuration, handling conflicts.
+
+        If another macro with the same shortcut exists, either replace
+        it or ignore the second one.
+
+        """
+        for existing in self.macros:
+            if existing.shortcut == macro.shortcut:
+                # There's a conflict, look at the 'merging' setting
+                if self.merging == MergingMethod.ignore:
+                    return
+                elif self.merging == MergingMethod.replace:
+                    existing.action = macro.action
+                    existing.level = macro.level
+                    return
+
+        # Otherwise, just add it at the end
+        self.macros.append(macro)
+
+    def add_trigger(self, trigger):
+        """Add the trigger to the world's configuration, handling conflicts.
+
+        If another trigger with the same reaction exists, either replace
+        it or ignore the second one.
+
+        """
+        for existing in self.triggers:
+            if existing.reaction == trigger.reaction:
+                # There's a conflict, look at the 'merging' setting
+                if self.merging == MergingMethod.ignore:
+                    return
+                elif self.merging == MergingMethod.replace:
+                    existing.action = trigger.action
+                    existing.mute = trigger.mute
+                    existing.level = trigger.level
+                    return
+
+        # Otherwise, just add it at the end
+        self.triggers.append(trigger)
+
     def reset_autocompletion(self):
         """Erase the list of possible choices in for the auto completion."""
         self.ac_choices[:] = []

@@ -45,7 +45,7 @@ class Channel(Function):
         if self.world:
             if name not in [ch.name for ch in self.world.channels]:
                 channel = ObjChannel(self.world, name)
-                self.world.channels.append(channel)
+                self.world.add_channel(channel)
             else:
                 if show:
                     dialog = ChannelsDialog(self.world.channels, name)

@@ -40,4 +40,4 @@ class Trigger(Function):
         trigger = ObjTrigger(self.sharp_engine, reaction, action)
         trigger.mute = mute
         if self.world:
-            self.world.triggers.append(trigger)
+            self.world.add_trigger(trigger)
