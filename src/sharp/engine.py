@@ -331,10 +331,14 @@ class SharpScript(object):
                 arguments[i] = self.escape_argument(argument)
 
             line = function + " " + " ".join(arguments)
+            if isinstance(line, str):
+                line = line.decode("utf-8", errors="replace")
+
             lines.append(line.rstrip(" "))
 
         if return_str:
             content = "\n".join(lines)
+
             return content
         else:
             return lines

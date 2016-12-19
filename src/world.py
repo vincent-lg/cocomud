@@ -164,6 +164,7 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         file = open(path, "w")
+        content = content.encode("latin-1")
         logger.debug(repr(content))
         file.write(content)
         file.close()
