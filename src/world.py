@@ -105,8 +105,11 @@ class World:
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
             file = open(path, "r")
-            content = file.read().replace("\r", "")
+            content = file.read()
             file.close()
+
+            # Convert the content to unicode
+            content = content.decode("latin-1", errors="replace")
 
             # Execute the script
             self.sharp_engine.execute(content, variables=False)
