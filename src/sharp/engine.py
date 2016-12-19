@@ -295,7 +295,7 @@ class SharpScript(object):
             self.logger.debug("#{} requests variable {}, value={}".format(
                     self.id, repr(variable), repr(value)))
 
-            return str(value)
+            return unicode(value)
 
         # Replace the variables
         line = RE_VAR.sub(spot, line)
@@ -335,8 +335,6 @@ class SharpScript(object):
 
         if return_str:
             content = "\n".join(lines)
-            if isinstance(content, unicode):
-                content = content.encode("latin-1")
             return content
         else:
             return lines

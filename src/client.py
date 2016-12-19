@@ -75,6 +75,7 @@ class Client(threading.Thread):
         self.running = True
         while self.running:
             time.sleep(self.timeout)
+            encoding = self.engine.settings["options.general.encoding"]
             if not self.client.get_socket():
                 break
 
@@ -84,6 +85,7 @@ class Client(threading.Thread):
                 break
 
             if msg:
+                msg = msg.decode(encoding, errors="replace")
                 self.handle_lines(msg)
 
         # Consider the thread as stopped
@@ -220,8 +222,6 @@ class GUIClient(Client):
             braille: should the braille be enabled?
 
         """
-        encoding = self.engine.settings["options.general.encoding"]
-        msg = msg.decode(encoding, "replace")
         msg = ANSI_ESCAPE.sub('', msg)
         if self.window and screen:
             self.window.handle_message(msg)

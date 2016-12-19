@@ -97,7 +97,7 @@ class Trigger:
         reaction = reaction.replace("\\*", "(.*?)")
         reaction = "^" + reaction + "$"
 
-        return re.compile(reaction, re.IGNORECASE)
+        return re.compile(reaction, re.IGNORECASE | re.UNICODE)
 
     def test(self, line, execute=False):
         """Should the trigger be triggered by the text?
@@ -115,7 +115,7 @@ class Trigger:
                 return True
 
             self.logger.debug("Trigger {}.{} fired.".format(
-                    world, self.reaction))
+                    world, repr(self.reaction)))
 
             engine = self.sharp_engine
             if "args" not in engine.locals:
@@ -127,7 +127,7 @@ class Trigger:
             i = 0
             for group in match.groups():
                 i += 1
-                args[str(i)] = group
+                args[unicode(i)] = group
 
             # Copy the named groups
             for name, group in match.groupdict().items():
