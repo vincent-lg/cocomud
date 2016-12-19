@@ -36,6 +36,7 @@ from client import GUIClient
 from config import Settings
 from log import logger, begin, end
 from sharp.engine import SharpScript
+from world import World, MergingMethod
 
 class Level(Enum):
 
@@ -134,6 +135,38 @@ class GameEngine:
         self.logger.debug("The documentation for the {} help file " \
                 "cannot be found, either using lang={} or lang=en".format(
                 name, lang))
+
+    def get_world(self, name):
+        """Return the selected world either by its name or location."""
+        name = name.lower()
+        for world in self.worlds.values():
+            if world.name.lower() == name:
+                return world
+            elif world.location == name:
+                return world
+
+        return None
+
+    def create_world(self, name):
+        """Create a world."""
+        world = World(name.lower())
+        world.engine = self
+        return world
+
+    def prepare_world(self, world, merge=None):
+        """Prepare the world, creating appropriate values."""
+        if not world.sharp_engine:
+            sharp_engine = SharpScript(self, None, world)
+            world.sharp_engine = sharp_engine
+
+        if merge is not None:
+            if merge == "ignore":
+                world.merging = MergingMethod.ignore
+            elif merge == "replace":
+                world.merging = MergingMethod.replace
+            else:
+                raise ValueError("unkwno merging method: {}".format(
+                        merge))
 
     def stop(self):
         """Stop the game engine and close the sessions."""

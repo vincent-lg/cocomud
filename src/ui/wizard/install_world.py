@@ -34,6 +34,143 @@ import json
 import wx
 from ytranslate import t
 
+class PreInstallDialog(wx.Dialog):
+
+    """Dialog to pre-install a world."""
+
+    def __init__(self, engine, name, worlds, merging):
+        wx.Dialog.__init__(self, None,
+                title="Preparing to install the world {}".format(name))
+        self.engine = engine
+        self.name = name
+        self.worlds = worlds
+        self.merging = merging
+        self.results = {}
+        self.InitUI()
+        self.Center()
+
+    def InitUI(self):
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.SetSizer(sizer)
+
+        # Create the dialog
+        choices = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        choices.InsertColumn(0, "World")
+        self.choices = choices
+
+        # Create the list of choices
+        for i, choice in enumerate(self.worlds):
+            if not choice.name:
+                text = "New world"
+            else:
+                text = choice.name
+
+            if i == 0:
+                text += " (recommended)"
+
+            choices.Append((text, ))
+
+        choices.Select(0)
+        choices.Focus(0)
+
+        # Name field
+        s_name = wx.BoxSizer(wx.VERTICAL)
+        l_name = wx.StaticText(self, label="Name")
+        self.name = wx.TextCtrl(self, value=self.name)
+        s_name.Add(l_name)
+        s_name.Add(self.name)
+
+        # Disable the name if world already has one
+        if self.worlds[0].name:
+            self.name.Disable()
+
+        # Merging methods
+        methods = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        methods.InsertColumn(0, "Column")
+        self.methods = methods
+
+        # Create the list of merging methods
+        for method in self.merging:
+            methods.Append((method, ))
+
+        methods.Select(0)
+        methods.Focus(0)
+
+        # Buttons
+        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+
+        # Main sizer
+        sizer.Add(choices)
+        sizer.Add(s_name)
+        sizer.Add(methods)
+        sizer.Add(buttons)
+        sizer.Fit(self)
+
+        # Event binding
+        choices.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=wx.ID_CANCEL)
+
+    def OnSelect(self, e):
+        """When the selection changes."""
+        index = self.choices.GetFirstSelected()
+        try:
+            world = self.worlds[index]
+        except IndexError:
+            pass
+        else:
+            if world.name:
+                self.name.Disable()
+            else:
+                self.name.Enable()
+                self.name.SelectAll()
+
+    def OnOK(self, e):
+        """The user pressed on OK."""
+        name = self.name.GetValue()
+        index = self.choices.GetFirstSelected()
+        merging = ["ignore", "replace"]
+        try:
+            world = self.worlds[index]
+        except IndexError:
+            wx.MessageBox("Cannot find the world.",
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+        else:
+            index = self.methods.GetFirstSelected()
+            try:
+                method = merging[index]
+            except IndexError:
+                wx.MessageBox("Cannot find the merging method.",
+                        t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+            else:
+                # Check that the location isn't already being used
+                for other in self.engine.worlds.values():
+                    if other is world:
+                        continue
+
+                    if other.location == name.lower():
+                        wx.MessageBox(
+                                "A world already exists at that location.", t("ui.alert.error"),
+                                wx.OK | wx.ICON_ERROR)
+                        return
+
+                # Check that the name is valid
+                if not name and not world.name:
+                    wx.MessageBox(
+                            "The name of this world is invalid.",
+                            t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+                    return
+
+                self.results["world"] = world
+                self.results["merge"] = method
+                self.results["name"] = name
+                self.Destroy()
+
+    def OnCancel(self, e):
+        """Simply destroy the dialog."""
+        self.Destroy()
+
+
 class InstallWorld(wx.Dialog):
 
     """Wizard-dialog to isntall a world."""

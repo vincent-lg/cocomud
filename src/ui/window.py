@@ -29,9 +29,11 @@
 
 """This file contains the ClientWindow class."""
 
+from __future__ import absolute_import
 import os
 import re
 import sys
+from zipfile import ZipFile
 
 from accesspanel import AccessPanel
 import wx
@@ -51,6 +53,7 @@ from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.trigger import TriggerDialog
 from ui.dialogs.worlds import WorldsDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
+from wizard.install_world import InstallWorld
 from world import World
 from updater import *
 from version import BUILD
@@ -127,9 +130,13 @@ class ClientWindow(DummyUpdater):
         fileMenu.AppendItem(close_tab)
 
         # Import
-        import_worlds = wx.MenuItem(fileMenu, -1, "Import a world...")
-        self.Bind(wx.EVT_MENU, self.OnImportWorlds, import_worlds)
-        fileMenu.AppendItem(import_worlds)
+        import_world = wx.Menu()
+        import_ondisk = import_world.Append(wx.ID_ANY, "On disk...")
+        import_online = import_world.Append(wx.ID_ANY, "Online...")
+        wx.MenuItem(fileMenu, -1, "Import a world")
+        self.Bind(wx.EVT_MENU, self.OnImportOndisk, import_ondisk)
+        self.Bind(wx.EVT_MENU, self.OnImportOnline, import_online)
+        fileMenu.AppendMenu(wx.ID_ANY, "Import a world", import_world)
 
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
@@ -253,8 +260,28 @@ class ClientWindow(DummyUpdater):
                     self.tabs.DeletePage(i)
                     break
 
-    def OnImportWorlds(self, e):
-        """Import a world."""
+    def OnImportOndisk(self, e):
+        """Import a world on disk."""
+        choose_file = t("ui.button.choose_file")
+        extensions = "Zip archive (*.zip)|*.zip"
+        dialog = wx.FileDialog(None, choose_file,
+                "", "", extensions, wx.OPEN)
+        result = dialog.ShowModal()
+        if result == wx.ID_OK:
+            filename = dialog.GetPath()
+
+            # Try to install the world from the archive
+            archive = ZipFile(filename)
+            files = {name: archive.read(name) for name in archive.namelist()}
+            options = files.get("world/options.conf")
+            if options:
+                infos = World.get_infos(options)
+                name = infos.get("connection", {}).get("name")
+                wizard = InstallWorld(self.engine, name, files)
+                wizard.start()
+
+    def OnImportOnline(self, e):
+        """Import a world online."""
         task = ImportWorlds()
         task.start()
         dialog = WorldsDialog(self.engine, task.worlds)

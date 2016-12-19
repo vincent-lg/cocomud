@@ -31,7 +31,9 @@
 from collections import OrderedDict
 import json
 
+from ui.wizard.install_world import PreInstallDialog
 from ui.wizard.install_world import InstallWorld as UI
+from world import World
 
 class InstallWorld:
 
@@ -50,14 +52,58 @@ class InstallWorld:
         self.engine = engine
         self.name = name
         self.files = files
-        if ui:
-            self.dialog = UI(self.engine, self)
-        else:
-            self.dialog = None
+        self.dialog = None
+        self.ui = ui
 
     def start(self):
-        """Display the UI, or assume default values."""
-        if self.dialog:
+        """Display the UI, or assume default values.
+
+        The process of installing a world when connected to a
+        user interface is as follows:
+
+        1. The world to install or merge into is sought out.
+        2. A dialog to select merging options is displayed.
+        3. The installation dialog is displayed.
+
+        """
+        # 1. Look for the world, if any
+        best = self.engine.get_world(self.name)
+        worlds = []
+        worlds = [self.engine.create_world(self.name)]
+        merging = ["ignore", "replace"]
+        if best is not None:
+            worlds.insert(0, best)
+
+        # Add the other worlds
+        others = []
+        for other in self.engine.worlds.values():
+            if other not in worlds:
+                others.append(other)
+
+        others.sort(key=lambda w: w.name)
+        worlds += others
+
+        # 2. Create the dialog to select merging options
+        if self.ui:
+            dialog = PreInstallDialog(self.engine, self.name, worlds,
+                    merging)
+            results = dialog.results
+            dialog.ShowModal()
+            destination = results.get("world")
+            merge = results.get("merge")
+            name = results.get("name")
+            if destination is None or merge is None:
+                return
+            self.engine.prepare_world(destination, merge)
+            destination.load()
+        else:
+            destination = worlds[0]
+            merge = merging[0]
+            name = destination.name
+
+        # 3. Show the installation dialog
+        if self.ui:
+            self.dialog = UI(self.engine, self)
             data = self.dialog.data
             self.dialog.ShowModal()
         else:
@@ -71,5 +117,34 @@ class InstallWorld:
                     default = value.get("default")
                     data[key] = default
 
-        print "ret", data
-        return data
+        # If the world hasn't a location or name
+        if not destination.name:
+            destination.name = name
+            destination.location = name.lower()
+
+        # Look for an existing world into which to merge config
+        print "Found the world", self.name, destination
+        self.engine.prepare_world(destination, merge)
+        sharp = destination.sharp_engine
+
+        # Copy the options
+        options = self.files.get("world/options.conf")
+        if options:
+            infos = World.get_infos(options)
+            hostname = infos.get("connection", {}).get("hostname")
+            port = int(infos.get("connection", {}).get("port"))
+            destination.name = infos.get("connection", {}).get("name")
+            destination.hostname = hostname
+            destination.port = port
+
+        # Install the world
+        if "world/install.py" in self.files:
+            print "Found the installation file"
+            install = self.files["world/install.py"]
+            globals = sharp.globals
+            locals = sharp.locals
+            locals.update(data)
+            exec(install, globals, locals)
+            destination.save()
+
+        # Copy all the other files

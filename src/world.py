@@ -29,15 +29,25 @@
 """This file contains the World class."""
 
 from codecs import open
+from enum import Enum
 import shutil
 import os
 import re
+from StringIO import StringIO
 from textwrap import dedent
 
 from configobj import ConfigObj
 
 from screenreader import ScreenReader
 from session import Session
+
+class MergingMethod(Enum):
+
+    """Enumeration to represent merging methods."""
+
+    ignore = 1
+    replace = 2
+
 
 class World:
 
@@ -65,6 +75,7 @@ class World:
         self.channels = []
         self.macros = []
         self.triggers = []
+        self.merging = MergingMethod.ignore
 
         # Auto completion
         self.words = {}
@@ -200,3 +211,20 @@ class World:
         session.engine = self.engine
         session.sharp_engine = self.sharp_engine
         return session
+
+    @classmethod
+    def get_infos(cls, configuration):
+        """Get the information in the configuration and return a dict."""
+        config = ConfigObj(StringIO(configuration))
+        data = {}
+
+        for key, value in config.items():
+            if key == "port":
+                try:
+                    value = int(value)
+                except ValueError:
+                    pass
+
+            data[key] = value
+
+        return data

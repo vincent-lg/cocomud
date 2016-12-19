@@ -116,7 +116,7 @@ class WorldsDialog(wx.Dialog):
             download.start()
 
             # Extract the world in memory
-            archive = ZipFile("world.zip")
+            archive = ZipFile(download.file)
             files = {name: archive.read(name) for name in archive.namelist()}
-            wizard = InstallWorld(self.engine, world.name, files)
+            wizard = InstallWorld(self.engine, "VanciaMUD", files)
             wizard.start()
