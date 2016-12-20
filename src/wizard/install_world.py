@@ -148,7 +148,6 @@ class InstallWorld:
             logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
             install = install.decode("latin-1").replace("\r", "")
-            print repr(install)
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
