@@ -131,12 +131,14 @@ class ClientWindow(DummyUpdater):
 
         # Import
         import_world = wx.Menu()
-        import_ondisk = import_world.Append(wx.ID_ANY, "On disk...")
-        import_online = import_world.Append(wx.ID_ANY, "Online...")
-        wx.MenuItem(fileMenu, -1, "Import a world")
+        import_ondisk = import_world.Append(wx.ID_ANY,
+                t("ui.menu.import_on_disk"))
+        import_online = import_world.Append(wx.ID_ANY,
+                t("ui.menu.import_online"))
+        wx.MenuItem(fileMenu, -1, t("ui.menu.import"))
         self.Bind(wx.EVT_MENU, self.OnImportOndisk, import_ondisk)
         self.Bind(wx.EVT_MENU, self.OnImportOnline, import_online)
-        fileMenu.AppendMenu(wx.ID_ANY, "Import a world", import_world)
+        fileMenu.AppendMenu(wx.ID_ANY, t("ui.menu.import"), import_world)
 
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))

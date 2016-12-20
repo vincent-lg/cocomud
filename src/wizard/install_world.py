@@ -75,7 +75,6 @@ class InstallWorld:
         best = self.engine.get_world(self.name)
         worlds = []
         worlds = [self.engine.create_world(self.name)]
-        merging = ["ignore", "replace"]
         if best is not None:
             worlds.insert(0, best)
 
@@ -91,8 +90,7 @@ class InstallWorld:
         # 2. Create the dialog to select merging options
         if self.ui:
             logger.debug("Opening the PreInstallDialog")
-            dialog = PreInstallDialog(self.engine, self.name, worlds,
-                    merging)
+            dialog = PreInstallDialog(self.engine, self.name, worlds)
             results = dialog.results
             dialog.ShowModal()
             destination = results.get("world")
@@ -125,7 +123,7 @@ class InstallWorld:
             data = {}
             install = self.files.get("world/install.json")
             if install:
-                values = json.loads(install, encoding="utf-8",
+                values = json.loads(install, encoding="latin-1",
                         object_pairs_hook=OrderedDict)
 
                 for key, value in values.items():
@@ -149,7 +147,7 @@ class InstallWorld:
         if "world/install.py" in self.files:
             logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
-            install = install.decode("utf-8")
+            install = install.decode("latin-1")
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
@@ -159,7 +157,7 @@ class InstallWorld:
         config = self.files.get("world/config.set")
         if config:
             logger.debug("Executing the config.set script")
-            config = config.decode("utf-8")
+            config = config.decode("latin-1")
             destination.sharp_engine.execute(config, variables=False)
 
         # Just saves the world
@@ -191,6 +189,6 @@ class InstallWorld:
                 file.write(content)
 
         # End of the wizard
+        self.engine.prepare_world(destination, "ignore")
         logger.info("The world {} has been installed successfully".format(
                 destination.name))
-

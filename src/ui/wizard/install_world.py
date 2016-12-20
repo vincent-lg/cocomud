@@ -38,13 +38,16 @@ class PreInstallDialog(wx.Dialog):
 
     """Dialog to pre-install a world."""
 
-    def __init__(self, engine, name, worlds, merging):
+    def __init__(self, engine, name, worlds):
         wx.Dialog.__init__(self, None,
                 title="Preparing to install the world {}".format(name))
         self.engine = engine
         self.name = name
         self.worlds = worlds
-        self.merging = merging
+        self.merging = [
+                t("wizard.install_world.merging.ignore"),
+                t("wizard.install_world.merging.replace"),
+        ]
         self.results = {}
         self.InitUI()
         self.Center()
@@ -54,19 +57,24 @@ class PreInstallDialog(wx.Dialog):
         self.SetSizer(sizer)
 
         # Create the dialog
+        s_choices = wx.BoxSizer(wx.VERTICAL)
+        l_choices = wx.StaticText(self, label=t("wizard.install_world.choice"))
         choices = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        choices.InsertColumn(0, "World")
+        choices.InsertColumn(0, t("common.world", 1))
         self.choices = choices
+        s_choices.Add(l_choices)
+        s_choices.Add(choices, proportion=3)
 
         # Create the list of choices
         for i, choice in enumerate(self.worlds):
             if not choice.name:
-                text = "New world"
+                text = t("wizard.install_world.new")
             else:
-                text = choice.name
+                text = "{} ({} {})".format(choice.name,
+                        choice.hostname, choice.port)
 
             if i == 0:
-                text += " (recommended)"
+                text += u" ({})".format(t("wizard.install_world.recommended"))
 
             choices.Append((text, ))
 
@@ -75,7 +83,7 @@ class PreInstallDialog(wx.Dialog):
 
         # Name field
         s_name = wx.BoxSizer(wx.VERTICAL)
-        l_name = wx.StaticText(self, label="Name")
+        l_name = wx.StaticText(self, label=t("wizard.install_world.name"))
         self.name = wx.TextCtrl(self, value=self.name)
         s_name.Add(l_name)
         s_name.Add(self.name)
@@ -85,9 +93,14 @@ class PreInstallDialog(wx.Dialog):
             self.name.Disable()
 
         # Merging methods
+        s_methods = wx.BoxSizer(wx.VERTICAL)
+        l_methods = wx.StaticText(self,
+                label=t("wizard.install_world.merging_methods"))
         methods = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        methods.InsertColumn(0, "Column")
+        methods.InsertColumn(0, t("wizard.install_world.method"))
         self.methods = methods
+        s_methods.Add(l_methods)
+        s_methods.Add(methods, proportion=2)
 
         # Create the list of merging methods
         for method in self.merging:
@@ -100,11 +113,12 @@ class PreInstallDialog(wx.Dialog):
         buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
 
         # Main sizer
-        sizer.Add(choices)
+        sizer.Add(s_choices)
         sizer.Add(s_name)
-        sizer.Add(methods)
+        sizer.Add(s_methods)
         sizer.Add(buttons)
         sizer.Fit(self)
+        choices.SetFocus()
 
         # Event binding
         choices.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
@@ -133,14 +147,14 @@ class PreInstallDialog(wx.Dialog):
         try:
             world = self.worlds[index]
         except IndexError:
-            wx.MessageBox("Cannot find the world.",
+            wx.MessageBox(t("wizard.install_world.unknown_world"),
                     t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             index = self.methods.GetFirstSelected()
             try:
                 method = merging[index]
             except IndexError:
-                wx.MessageBox("Cannot find the merging method.",
+                wx.MessageBox(t("wizard.install_world.unknown_method"),
                         t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
             else:
                 # Check that the location isn't already being used
@@ -150,14 +164,14 @@ class PreInstallDialog(wx.Dialog):
 
                     if other.location == name.lower():
                         wx.MessageBox(
-                                "A world already exists at that location.", t("ui.alert.error"),
-                                wx.OK | wx.ICON_ERROR)
+                                t("wizard.install_world.existing_world"),
+                                t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
                         return
 
                 # Check that the name is valid
                 if not name and not world.name:
                     wx.MessageBox(
-                            "The name of this world is invalid.",
+                            t("wizard.install_world.invalid_name"),
                             t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
                     return
 
@@ -173,11 +187,12 @@ class PreInstallDialog(wx.Dialog):
 
 class InstallWorld(wx.Dialog):
 
-    """Wizard-dialog to isntall a world."""
+    """Wizard-dialog to install a world."""
 
     def __init__(self, engine, wizard):
-        wx.Dialog.__init__(self, None, title="Installing the world {}".format(
-                wizard.name))
+        wx.Dialog.__init__(self, None,
+                title=t("wizard.install_world.installing",
+                        world=wizard.name))
         self.engine = engine
         self.wizard = wizard
         self.data = {}
@@ -194,7 +209,7 @@ class InstallWorld(wx.Dialog):
         # Create the dialog
         install = self.wizard.files.get("world/install.json")
         if install:
-            values = json.loads(install, encoding="utf-8",
+            values = json.loads(install, encoding="latin-1",
                     object_pairs_hook=OrderedDict)
 
         # Create each widget

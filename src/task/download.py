@@ -30,6 +30,8 @@ from StringIO import StringIO
 import os
 from urllib2 import urlopen
 
+from ytranslate import t
+
 from log import task as logger
 from task.base import BaseTask
 from ui.dialogs.task import TaskDialog
@@ -38,19 +40,13 @@ class Download(BaseTask):
 
     """Task used to download a file."""
 
-    def __init__(self, filename, url, background=False,
-            title="Downloading {url}",
-            downloading="Downloading... {percent}%",
-            confirmation="Do you want to cancel this download?"):
+    def __init__(self, filename, url, background=False):
         """Initialize the task.
 
         Parameters:
             filename: the name of file to be created (or None).
             url: the url of the file to be downloaded.
             background (default False): should the task run in the background?
-            title: the title of the window to be displayed.
-            downloading: the message to be displayed while downloading.
-            confirmation: message displayed if the user clicks on cancel.
 
         If the filename is None, then download in memory.  The file
         attribute will contain a StringIO pointing to this object.
@@ -60,13 +56,12 @@ class Download(BaseTask):
         self.filename = filename
         self.file = StringIO() if filename is None else None
         self.url = url
-        self.title = title
-        self.downloading = downloading
         if background:
             self.dialog = None
         else:
-            self.dialog = TaskDialog(self, title.format(url=url, progress=0))
-            self.dialog.confirmation = confirmation
+            self.dialog = TaskDialog(self, t("task.download.title",
+                    url=url, progress=0))
+            self.dialog.confirmation = t("task.download.confirmation")
 
     def cancel(self):
         """If the task is cancelled, delete the file."""
@@ -97,9 +92,9 @@ class Download(BaseTask):
             keep = True
             progress = 0.0
             percent = 0
-            self.update(title=self.title.format(
+            self.update(title=t("task.download.title",
                         url=self.url, progress=0),
-                        text=self.downloading.format(
+                        text=t("task.download.downloading",
                         url=self.url, percent=0))
 
             while keep:
@@ -107,9 +102,9 @@ class Download(BaseTask):
                 progress += chunk_size
                 percent = round((progress / size) * 100, 1)
                 if int(percent) != int(old_percent):
-                    self.update(title=self.title.format(
+                    self.update(title=t("task.download.title",
                             url=self.url, percent=int(percent)),
-                            text=self.downloading.format(
+                            text=t("task.download.downloading",
                             url=self.url, percent=int(percent)),
                             progress=int(percent))
 

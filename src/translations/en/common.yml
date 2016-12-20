@@ -20,3 +20,6 @@ shortcut: Shortcut
 trigger:
     1: Trigger
     2+: Triggers
+world:
+    1: World
+    2+: Worlds

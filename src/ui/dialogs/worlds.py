@@ -42,7 +42,7 @@ class WorldsDialog(wx.Dialog):
     """Worlds dialog to search, download and install a world."""
 
     def __init__(self, engine, worlds):
-        wx.Dialog.__init__(self, None, title="Importing worlds")
+        wx.Dialog.__init__(self, None, title=t("ui.dialog.worlds.title"))
         self.engine = engine
         self.online = worlds
         self.online.sort()
@@ -55,18 +55,18 @@ class WorldsDialog(wx.Dialog):
 
         # Create the dialog
         worlds = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        worlds.InsertColumn(0, "Name")
-        worlds.InsertColumn(1, "Author")
-        worlds.InsertColumn(2, "Last updated")
+        worlds.InsertColumn(0, t("common.name"))
+        worlds.InsertColumn(1, t("ui.dialog.worlds.author"))
+        worlds.InsertColumn(2, t("ui.dialog.worlds.last_updated"))
         self.worlds = worlds
 
         # Description field
-        l_description = wx.StaticText(self, label="Description")
+        l_description = wx.StaticText(self, label=t("common.description"))
         self.description = wx.TextCtrl(self, size=(600, 400),
                 style=wx.TE_MULTILINE | wx.TE_READONLY)
 
         # Buttons
-        install = wx.Button(self, label="Install this world...")
+        install = wx.Button(self, label=t("ui.dialog.worlds.install"))
 
         # Main sizer
         sizer.Add(worlds, proportion=4)
@@ -107,7 +107,7 @@ class WorldsDialog(wx.Dialog):
         try:
             world = self.online[index]
         except IndexError:
-            wx.MessageBox("Cannot find this world",
+            wx.MessageBox(t("ui.dialog.worlds.unknown_world"),
                     t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
         else:
             attachment = world.attachments[0]

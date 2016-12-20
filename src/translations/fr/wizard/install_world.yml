@@ -1,0 +1,18 @@
+﻿choice: >
+    Choisissez l'univeers dans lequel vous souhaitez installer cette
+    nouvelle configuration.
+existing_world: Un univers existe à cet emplacement.
+installing: Installation de l'univers {world}
+invalid_name: Le nom de cet univers est invalide.
+merging:
+    ignore: Garder l'ancienne configuration si des conflits surviennent
+    replace: Remplacer la configuration avec la nouvelle si des conflits surviennent
+merging_methods: >
+    Sélectionnez la méthode à utiliser pour gérer les conflits de
+    configuration durant l'installation.
+method: Méthode
+name: Nom de l'univers à créer
+new: Nouvel univers
+recommended: Recommandé
+unknown_method: La méthode de gestion de conflit ne peut être trouvée.
+unknown_world: L'univers sélectionné ne peut être trouvé.

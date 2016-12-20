@@ -1,0 +1,16 @@
+﻿choice: Choose the world in which you want to install this configuration.
+existing_world: A world already exists at that location.
+installing: Installing the world {world}
+invalid_name: The name of this world is invalid.
+merging:
+    ignore: Keep the old configuration when conflicts arise
+    replace: Replace with the new configuration when conflicts arise
+merging_methods: >
+    Choose the method used to handle conflicts while installing
+    the new configuration.
+method: Method
+name: Name of the world to create
+new: New world
+recommended: Recommended
+unknown_method: The selected merging method cannot be found.
+unknown_world: The selected world cannot be found.
