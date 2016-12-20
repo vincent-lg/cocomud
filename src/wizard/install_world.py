@@ -147,7 +147,8 @@ class InstallWorld:
         if "world/install.py" in self.files:
             logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
-            install = install.decode("latin-1")
+            install = install.decode("latin-1").replace("\r", "")
+            print repr(install)
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
@@ -162,6 +163,7 @@ class InstallWorld:
 
         # Just saves the world
         destination.save()
+        destination.load()
 
         # Copy all the other files
         to_skip = ("config.set", "install.py", "install.json", "options.conf")
