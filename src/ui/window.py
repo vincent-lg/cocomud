@@ -402,6 +402,10 @@ class MUDPanel(AccessPanel):
     def __init__(self, parent, window, engine, world, session):
         AccessPanel.__init__(self, parent, history=True, lock_input=True,
                 ansi=True)
+        self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
+        ansi = self.extensions["ANSI"]
+        ansi.default_foreground = wx.WHITE
+        ansi.default_background = wx.BLACK
         self.window = window
         self.engine = engine
         self.client = None
