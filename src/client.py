@@ -100,17 +100,18 @@ class Client(threading.Thread):
         lines = []
         triggers = []
         for line in msg.splitlines():
+            no_ansi_line = ANSI_ESCAPE.sub('', line)
             display = True
             for trigger in self.world.triggers:
                 try:
-                    test = trigger.test(line)
+                    test = trigger.test(no_ansi_line)
                 except Exception:
                     log = logger("client")
                     log.exception("The trigger {} failed".format(
                             repr(trigger.readction)))
                 else:
                     if test:
-                        triggers.append((trigger, line))
+                        triggers.append((trigger, no_ansi_line))
                         if trigger.mute:
                             display = False
 
