@@ -400,7 +400,8 @@ class ClientWindow(DummyUpdater):
 class MUDPanel(AccessPanel):
 
     def __init__(self, parent, window, engine, world, session):
-        AccessPanel.__init__(self, parent, history=True, lock_input=True)
+        AccessPanel.__init__(self, parent, history=True, lock_input=True,
+                ansi=True)
         self.window = window
         self.engine = engine
         self.client = None

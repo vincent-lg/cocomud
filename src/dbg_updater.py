@@ -37,17 +37,16 @@ import os
 from autoupdate import AutoUpdate
 from version import BUILD
 
-file = open("update.log", "w")
 autoupdate = AutoUpdate(BUILD, None)
-file.write("Checking for updates...\n")
+print "Checking for updates..."
 build = autoupdate.check()
 if build is not None:
-    file.write("A new update is available: {}.\n".format(build))
-    file.close()
-    autoupdater.download()
-    autoupdater.update()
+    print "A new update is available: {}.\n".format(build)
+    autoupdate.download(stdout=True)
+    autoupdate.update(stdout=True)
 else:
-    file.write("No update is available.\n")
-    file.close()
+    print "No update is available, but download anyway."
+    autoupdate.download(stdout=True)
+    autoupdate.update(stdout=True)
 
 os.system("pause")

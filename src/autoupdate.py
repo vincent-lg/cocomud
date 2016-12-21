@@ -112,14 +112,15 @@ class AutoUpdate(Thread):
             raise InvalidSyntaxUpdateError
 
         # If the recent build is greated than the current one
-        if new_build > self.current_version:
-            platform = ""
-            if sys.platform == "win32":
-                platform = "windows"
+        platform = ""
+        if sys.platform == "win32":
+            platform = "windows"
 
-            location = recent_build[str(new_build)].get(platform)
-            if location:
-                self.location = location
+        location = recent_build[str(new_build)].get(platform)
+        if location:
+            self.location = location
+        if new_build > self.current_version:
+            if self.location:
                 return new_build
             else:
                 raise UknownPlatformUpdateError

@@ -33,7 +33,7 @@ from cx_Freeze import setup, Executable
 
 client = Executable(
     script="cocomud.py",
-    #base="Win32GUI",
+    base="Win32GUI",
 )
 
 updater = Executable(
@@ -43,7 +43,6 @@ updater = Executable(
 
 dbg_updater = Executable(
     script="dbg_updater.py",
-    base="Win32GUI",
 )
 
 includefiles = [

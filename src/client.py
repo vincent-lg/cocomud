@@ -222,11 +222,11 @@ class GUIClient(Client):
             braille: should the braille be enabled?
 
         """
-        msg = ANSI_ESCAPE.sub('', msg)
         if self.window and screen:
             self.window.handle_message(msg)
 
         # In any case, tries to find the TTS
+        msg = ANSI_ESCAPE.sub('', msg)
         if self.engine.TTS_on or force_TTS:
             # If outside of the window
             tts = False
