@@ -32,7 +32,7 @@
 import re
 from textwrap import dedent
 
-from log import logger
+from log import sharp as logger
 
 class Trigger:
 
@@ -50,8 +50,11 @@ class Trigger:
         self.reaction = reaction
         self.re_reaction = self.find_regex(reaction)
         self.action = dedent(action.strip("\n"))
+
+        # Flags
         self.mute = False
-        self.logger = logger("sharp")
+        self.mark = False
+        self.logger = logger
 
         # Set the trigger's level
         self.level = sharp.engine.level
@@ -64,14 +67,16 @@ class Trigger:
     def sharp_script(self):
         """Return the SharpScript code to create this trigger."""
         mute = "+mute" if self.mute else ""
+        mark = "+mark" if self.mark else ""
         return self.sharp_engine.format((("#trigger", self.reaction,
-                self.action, mute), ))
+                self.action, mute, mark), ))
 
     @property
     def copied(self):
         """Return a copied version of the trigger."""
         copy = Trigger(self.sharp_engine, self.reaction, self.action)
         copy.mute = self.mute
+        copy.mark = self,mark
         copy.level = self.level
         return copy
 

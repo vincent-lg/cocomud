@@ -97,6 +97,7 @@ class Client(threading.Thread):
 
     def handle_lines(self, msg):
         """Handle multiple lines of text."""
+        mark = None
         lines = []
         triggers = []
         for line in msg.splitlines():
@@ -114,13 +115,15 @@ class Client(threading.Thread):
                         triggers.append((trigger, no_ansi_line))
                         if trigger.mute:
                             display = False
+                        if trigger.mark and mark is None:
+                            mark = len("\n".join(lines))
 
             if display:
                 lines.append(line)
 
         # Handle the remaining text
         try:
-            self.handle_message("\r\n".join(lines))
+            self.handle_message("\r\n".join(lines), mark=mark)
         except Exception:
             log = logger("client")
             log.exception(
@@ -131,7 +134,7 @@ class Client(threading.Thread):
             trigger.test(line, execute=True)
 
     def handle_message(self, msg, force_TTS=False, screen=True,
-            speech=True, braille=True):
+            speech=True, braille=True, mark=None):
         """When the client receives a message.
 
         Parameters
@@ -140,6 +143,7 @@ class Client(threading.Thread):
             screen: should the text appear on screen?
             speech: should the speech be enabled?
             braille: should the braille be enabled?
+            mark: the index on which to move the cursor
 
         """
         pass
@@ -212,7 +216,7 @@ class GUIClient(Client):
         window.client = self
 
     def handle_message(self, msg, force_TTS=False, screen=True,
-            speech=True, braille=True):
+            speech=True, braille=True, mark=None):
         """When the client receives a message.
 
         Parameters
@@ -221,10 +225,11 @@ class GUIClient(Client):
             screen: should the text appear on screen?
             speech: should the speech be enabled?
             braille: should the braille be enabled?
+            mark: the index where to move the cursor.
 
         """
         if self.window and screen:
-            self.window.handle_message(msg)
+            self.window.handle_message(msg, mark)
 
         # In any case, tries to find the TTS
         msg = ANSI_ESCAPE.sub('', msg)

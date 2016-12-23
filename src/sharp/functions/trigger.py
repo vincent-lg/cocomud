@@ -35,9 +35,10 @@ class Trigger(Function):
 
     """Function SharpScript 'trigger'."""
 
-    def run(self, reaction, action, mute=False):
+    def run(self, reaction, action, mute=False, mark=False):
         """Say the text."""
         trigger = ObjTrigger(self.sharp_engine, reaction, action)
         trigger.mute = mute
+        trigger.mark = mark
         if self.world:
             self.world.add_trigger(trigger)

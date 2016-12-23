@@ -65,7 +65,8 @@ class ClientWindow(DummyUpdater):
 
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
-        sizer = wx.BoxSizer()
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer = sizer
         self.main_panel = wx.Panel(self)
         self.tabs = wx.Notebook(self.main_panel)
         sizer.Add(self.tabs, 1, wx.EXPAND)
@@ -217,6 +218,7 @@ class ClientWindow(DummyUpdater):
         self.tabs.AddPage(MUDPanel(self.tabs, self, self.engine, world,
                 session), world.name)
         self.SetTitle("{} [CocoMUD]".format(world.name))
+        self.sizer.Fit(self)
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -413,7 +415,7 @@ class MUDPanel(AccessPanel):
         self.session = session
         self.focus = True
         self.last_ac = None
-        self.SetFocus()
+        self.output.SetFocus()
         self.nb_unread = 0
 
         # Event binding
@@ -442,8 +444,9 @@ class MUDPanel(AccessPanel):
         self.Send(message)
         ScreenReader.talk(message, interrupt=False)
 
-    def handle_message(self, message):
+    def handle_message(self, message, mark=None):
         """The client has just received a message."""
+        point = self.editing_pos
         lines = message.splitlines()
         lines = [line for line in lines if line]
         message = "\n".join(lines)
@@ -452,6 +455,10 @@ class MUDPanel(AccessPanel):
             world.feed_words(message)
 
         self.Send(message)
+
+        # If there's a mark, move the cursor to it
+        if mark is not None:
+            self.output.SetInsertionPoint(point + mark)
 
         # Change the window title if not focused
         if self.focus and not self.window.focus:
