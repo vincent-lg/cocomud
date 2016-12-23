@@ -76,7 +76,7 @@ class Trigger:
         """Return a copied version of the trigger."""
         copy = Trigger(self.sharp_engine, self.reaction, self.action)
         copy.mute = self.mute
-        copy.mark = self,mark
+        copy.mark = self.mark
         copy.level = self.level
         return copy
 
