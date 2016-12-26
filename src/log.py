@@ -182,6 +182,7 @@ if not os.path.exists("logs"):
     os.mkdir("logs")
 
 main = logger("")  # Main logger
+character = logger("character")  # Wizard logger
 client = logger("client")  # Client logger
 sharp = logger("sharp")  # SharpEngine logger
 task = logger("task")  # Task logger

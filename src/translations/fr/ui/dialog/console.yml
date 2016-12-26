@@ -1,0 +1,9 @@
+﻿title: Console Python
+warning: |
+    ATTENTION: cette console est destinée aux développeurs uniquement.
+    On peut faire beaucoup de dégâts via cette interface. C'est un
+    outil de déboguage fantastique, mais il est très facile de mal
+    l'utiliser.
+
+    Variables définies :
+        engine: GameEngine

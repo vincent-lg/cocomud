@@ -47,6 +47,7 @@ from session import Session
 from task.import_worlds import ImportWorlds
 from ui.dialogs.alias import AliasDialog
 from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
+from ui.dialogs.console import ConsoleDialog
 from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.preferences import PreferencesDialog
@@ -145,6 +146,11 @@ class ClientWindow(DummyUpdater):
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
+
+        # Console
+        console = wx.MenuItem(fileMenu, -1, t("ui.menu.console"))
+        self.Bind(wx.EVT_MENU, self.OnConsole, console)
+        fileMenu.AppendItem(console)
 
         # Quit
         quit = wx.MenuItem(fileMenu, -1, t("ui.menu.quit"))
@@ -296,6 +302,11 @@ class ClientWindow(DummyUpdater):
         dialog = PreferencesDialog(self.engine)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnConsole(self, e):
+        """Open the console dialog box."""
+        dialog = ConsoleDialog(self.engine)
+        dialog.ShowModal()
 
     def OnAlias(self, e):
         """Open the alias dialog box."""
