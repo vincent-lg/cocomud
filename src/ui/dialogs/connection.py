@@ -117,7 +117,7 @@ class ConnectionDialog(wx.Dialog):
         worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         try:
             index = worlds.index(world)
-        except IndexError:
+        except ValueError:
             index = 0
 
         self.populate_list(index)
@@ -174,9 +174,9 @@ class EditWorldDialog(wx.Dialog):
 
     def __init__(self, engine, world=None):
         if world.name:
-            title = t("ui.dialog.world.edit")
+            title = t("ui.message.world.edit")
         else:
-            title = t("ui.dialog.world.add")
+            title = t("ui.message.world.add")
 
         super(EditWorldDialog, self).__init__(None, title=title)
         self.engine = engine

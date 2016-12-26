@@ -1,4 +1,6 @@
-﻿hostname: >
+﻿add: Ajouter un univers
+edit: Editer un univers existant
+hostname: >
     Vous devez préciser un nom d'hôte valide pour cet univers.  Ce
     peut être une adresse IP (comme 10.35.1.128) ou un nom d'hôte (comme
     exemple.com).
