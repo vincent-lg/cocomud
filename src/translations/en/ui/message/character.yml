@@ -1,0 +1,4 @@
+﻿missing_name: You must specify a name to set this character.
+password: Password, if any
+post_login: Commands, if any, to send after the password
+username: Username or other commands to send before the password
