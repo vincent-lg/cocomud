@@ -114,7 +114,7 @@ class ConnectionDialog(wx.Dialog):
 
                 # Change the world's characters
                 self.characters.DeleteAllItems()
-                self.characters.Append(("Any", ))
+                self.characters.Append((t("ui.client.any_character"), ))
                 characters = sorted(world.characters.values(),
                         key=lambda c: c.location)
                 for character in characters:
@@ -134,7 +134,7 @@ class ConnectionDialog(wx.Dialog):
             characters = sorted(world.characters.values(),
                     key=lambda c: c.location)
             self.characters.DeleteAllItems()
-            self.characters.Append(("Any", ))
+            self.characters.Append((t("ui.client.any_character"), ))
             for character in characters:
                 self.characters.Append((character.name, ))
             self.characters.Select(0)
