@@ -12,6 +12,7 @@ game: "&Jeu"
 aliases: "&Alias"
 macro: "&Macro"
 triggers: "&Triggers"
+character: Changer les options de ce personnage...
 connection: "&Connexion"
 disconnect: "Se &déconnecter de cet univers"
 reconnect: "Se &reconnecter à cet univers"

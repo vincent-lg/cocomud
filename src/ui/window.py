@@ -175,7 +175,7 @@ class ClientWindow(DummyUpdater):
         gameMenu.AppendItem(triggers)
 
         # Character
-        character = wx.MenuItem(gameMenu, -1, "Set this character's configuration...")
+        character = wx.MenuItem(gameMenu, -1, t("ui.menu.character"))
         self.Bind(wx.EVT_MENU, self.OnCharacter, character)
         gameMenu.AppendItem(character)
 

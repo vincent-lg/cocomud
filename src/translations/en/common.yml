@@ -5,6 +5,9 @@ alias:
 channel:
     1: Channel
     2+: Channels
+character:
+    1: Character
+    2+: Characters
 connection: Connection
 description: Description
 function: Function

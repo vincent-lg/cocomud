@@ -37,7 +37,8 @@ class CharacterDialog(wx.Dialog):
     """Character dialog to change the character's preferences."""
 
     def __init__(self, engine, session):
-        super(CharacterDialog, self).__init__(None, title="Character")
+        super(CharacterDialog, self).__init__(None,
+                title=t("common.character", 1))
         self.engine = engine
         self.session = session
 
@@ -63,7 +64,8 @@ class CharacterDialog(wx.Dialog):
         sizer.Add(s_name)
 
         # Create the user field
-        l_username = wx.StaticText(self, label="Username and commands before the password")
+        l_username = wx.StaticText(self,
+                label=t("ui.message.character.username"))
         t_username = wx.TextCtrl(self, style=wx.TE_MULTILINE,
                 value=character and character.username or "")
         self.username = t_username
@@ -72,7 +74,8 @@ class CharacterDialog(wx.Dialog):
         sizer.Add(s_username)
 
         # Create the password field
-        l_password = wx.StaticText(self, label="Password")
+        l_password = wx.StaticText(self,
+                label=t("ui.message.character.password"))
         t_password = wx.TextCtrl(self, style=wx.TE_PASSWORD,
                 value=character and character.password or "")
         self.password = t_password
@@ -81,7 +84,8 @@ class CharacterDialog(wx.Dialog):
         sizer.Add(s_password)
 
         # Create the post-login field
-        l_post = wx.StaticText(self, label="Commands, if any, after the password")
+        l_post = wx.StaticText(self,
+                label=t("ui.message.character.post_login"))
         t_post = wx.TextCtrl(self, style=wx.TE_MULTILINE,
                 value=character and character.other_commands or "")
         self.post_login = t_post
@@ -108,7 +112,7 @@ class CharacterDialog(wx.Dialog):
         post_login = self.post_login.GetValue().encode("utf-8",
                 errors="replace")
         if not name:
-            wx.MessageBox("What's the name?",
+            wx.MessageBox(t("ui.message.character.missing_name"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.name.SetFocus()
         else:
@@ -120,7 +124,6 @@ class CharacterDialog(wx.Dialog):
             character.password = password
             character.other_commands = post_login
             character.save()
-            print character.__dict__
             self.session.character = character
             self.Destroy()
 
