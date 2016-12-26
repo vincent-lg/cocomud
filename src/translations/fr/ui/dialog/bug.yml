@@ -1,0 +1,29 @@
+﻿message: |
+    Une erreur s'est produite. Vous pouvez soit reporter ce bug aux
+    développeurs, soit fermer cette boîte de dialogue. Pour rapporter
+    ce bug, rendez-vous sur la page :
+    https://cocomud.plan.io/projects/fr/issues/new
+
+    Si vous n'avez pas de compte sur ce site, vous pouvez vous en créer
+    un et reporter le bug après. Voici les étapes pas à pas pour reporter
+    le bug une fois sur la page de la nouvelle demande :
+
+    1. Choisissez "Bug" dans la liste des trackers.
+    2. Renseignez un titre court dans le sujet de la demande.
+        Exemple : Erreur quand on importe l'univers XY
+        (Gardez le sujet aussi court et explicite que possible).
+    3. Dans la description du bug, vous pouvez mettre plus
+       d'indications sur comment reproduire le bug. Collez également
+       les informations suplémentaires (plutôt techniques) données
+       au-dessous, pour aider les développeurs à résoudre le bug :
+
+    <pre>
+    {traceback}
+    </pre>
+
+    4. Cliquez sur le bouton "créer".
+
+    En vous remerciant pour avoir pris le temps de reporter ce bug,
+report: Reporter le bug
+title: Rapport de bug
+url: "https://cocomud.plan.io/projects/fr/issues/new"

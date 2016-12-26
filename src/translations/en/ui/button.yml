@@ -2,6 +2,7 @@
 add_action: Add action
 browse: Browse...
 choose_file: Choose a file
+close: Close
 connect: Connect
 edit: Edit
 help: Help

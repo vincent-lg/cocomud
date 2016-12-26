@@ -45,6 +45,8 @@ import sys
 import threading
 import traceback
 
+from ui.dialogs.bug import BugDialog
+
 class CustomFormatter(logging.Formatter):
 
     """Special formatter to add hour and minute."""
@@ -192,6 +194,11 @@ def excepthook(type, value, tb):
     message = 'Uncaught exception:\n'
     message += "".join(traceback.format_exception(type, value, tb))
     main.error(message.strip())
+
+    # Create the bug dialog
+    dialog = BugDialog("".join(traceback.format_exception(
+            type, value, tb)).strip("\n"))
+    dialog.ShowModal()
 
 sys.excepthook = excepthook
 

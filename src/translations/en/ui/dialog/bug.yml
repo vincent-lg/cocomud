@@ -1,0 +1,28 @@
+﻿message: |
+    An error occurred while trying to perform this operation.  You
+    can either report this bug to the developers, or close this dialog
+    box.  To report it, you have to create a new issue on CocoMUD's website,
+    at: https://cocomud.plan.io/projects/cocomud-client/issues/new
+
+    If you don't have an account on this website yet, you can create
+    one and report this issue.  Here is the step-ty-step process to report this bug when you are on the page provided above.
+
+    1. Select "Bug" in the list of trackers.
+    2. Choose a brief but explicit title:
+       Example: Error when trying to import the world XY
+       (Keep the subject as short and explicit as possible).
+    3. In the description of the issue, you can indicate more
+       information about how to reproduce this bug.  You should also
+       paste the following information to help developers solve
+       this bug:
+
+    <pre>
+    {traceback}
+    </pre>
+
+    4. Click on the "Create" button.
+
+    We thank you for your help in creating a more stable MUD client.
+report: Report this bug
+title: Crash report
+url: "https://cocomud.plan.io/projects/cocomud-client/issues/new"
