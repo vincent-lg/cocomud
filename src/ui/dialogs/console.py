@@ -150,13 +150,15 @@ class GUIThread(threading.Thread):
 
 class ConsolePanel(AccessPanel):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent, engine, world=None):
         AccessPanel.__init__(self, parent, history=True, lock_input=True)
         self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
         self.engine = engine
+        self.world = world
         self.thread = GUIThread(self)
         self.locals = {
             "engine": self.engine,
+            "world": self.world,
         }
 
         # Event binding
@@ -194,16 +196,17 @@ class ConsolePanel(AccessPanel):
 
 class ConsoleDialog(wx.Dialog):
 
-    def __init__(self, engine):
+    def __init__(self, engine, world=None):
         wx.Dialog.__init__(self, None, title=t("ui.dialog.console.title"))
         self.engine = engine
+        self.world = world
 
         # Build the dialog
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
         # Add in the panel
-        self.panel = ConsolePanel(self, engine)
+        self.panel = ConsolePanel(self, engine, world)
 
         # Finish designing the window
         sizer.Add(self.panel)

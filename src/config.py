@@ -229,6 +229,7 @@ class Settings(Configuration):
             settings = GameSettings(self.engine, world)
             settings.load()
             self.engine.worlds[world.name] = world
+            world.load_characters()
 
         self.load_YAML_file("macros")
 

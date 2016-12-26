@@ -48,6 +48,7 @@ class ConnectionDialog(wx.Dialog):
 
     def InitUI(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
+        top = wx.BoxSizer(wx.HORIZONTAL)
         buttons = wx.BoxSizer(wx.HORIZONTAL)
         self.SetSizer(sizer)
 
@@ -57,6 +58,11 @@ class ConnectionDialog(wx.Dialog):
         worlds.InsertColumn(1, t("common.hostname"))
         worlds.InsertColumn(2, t("common.port"))
         self.worlds = worlds
+
+        # Characters
+        characters = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        characters.InsertColumn(0, t("common.name"))
+        self.characters = characters
 
         # Buttons
         connect = wx.Button(self, label=t("ui.button.connect"))
@@ -69,7 +75,9 @@ class ConnectionDialog(wx.Dialog):
         buttons.Add(remove)
 
         # Main sizer
-        sizer.Add(worlds, proportion=4)
+        top.Add(worlds)
+        top.Add(characters)
+        sizer.Add(top)
         sizer.Add(buttons)
         sizer.Fit(self)
 
@@ -79,6 +87,8 @@ class ConnectionDialog(wx.Dialog):
 
         # Event binding
         worlds.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        worlds.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelectWorld)
+        characters.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         connect.Bind(wx.EVT_BUTTON, self.OnConnect)
         edit.Bind(wx.EVT_BUTTON, self.OnEdit)
         remove.Bind(wx.EVT_BUTTON, self.OnRemove)
@@ -101,6 +111,34 @@ class ConnectionDialog(wx.Dialog):
                 pass
             else:
                 self.session.world = world
+
+                # Change the world's characters
+                self.characters.DeleteAllItems()
+                self.characters.Append(("Any", ))
+                characters = sorted(world.characters.values(),
+                        key=lambda c: c.location)
+                for character in characters:
+                    self.characters.Append((character.name, ))
+                self.characters.Select(0)
+                self.characters.Focus(0)
+
+    def OnSelectWorld(self, e):
+        """When the selection changes."""
+        index = self.worlds.GetFirstSelected()
+        worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
+        try:
+            world = worlds[index]
+        except IndexError:
+            pass
+        else:
+            characters = sorted(world.characters.values(),
+                    key=lambda c: c.location)
+            self.characters.DeleteAllItems()
+            self.characters.Append(("Any", ))
+            for character in characters:
+                self.characters.Append((character.name, ))
+            self.characters.Select(0)
+            self.characters.Focus(0)
 
     def OnKeyDown(self, e):
         """If Enter is pressed, connect to the selected world."""
@@ -164,7 +202,18 @@ class ConnectionDialog(wx.Dialog):
         worlds = sorted(self.engine.worlds.values(), key=lambda w: w.name)
         index = self.worlds.GetFirstSelected()
         world = worlds[index]
+
+        # Look for the character
+        characters = sorted(world.characters.values(),
+                key=lambda c: c.location)
+        index = self.characters.GetFirstSelected()
+        if index > 0:
+            character = characters[index - 1]
+        else:
+            character = None
+
         self.session.world = world
+        self.session.character = character
         self.Destroy()
 
 

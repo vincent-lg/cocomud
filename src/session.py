@@ -41,6 +41,7 @@ class Session:
     def __init__(self, client, world):
         self.client = client
         self.world = world
+        self.character = None
         self.engine = None
         self.sharp_engine = None
 

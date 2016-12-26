@@ -46,6 +46,7 @@ from scripting.key import key_name
 from session import Session
 from task.import_worlds import ImportWorlds
 from ui.dialogs.alias import AliasDialog
+from ui.dialogs.character import CharacterDialog
 from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
 from ui.dialogs.console import ConsoleDialog
 from ui.dialogs.loading import LoadingDialog
@@ -173,6 +174,11 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
         gameMenu.AppendItem(triggers)
 
+        # Character
+        character = wx.MenuItem(gameMenu, -1, "Set this character's configuration...")
+        self.Bind(wx.EVT_MENU, self.OnCharacter, character)
+        gameMenu.AppendItem(character)
+
         ## Connection menu
         # Disconnect
         disconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.disconnect"))
@@ -219,6 +225,7 @@ class ClientWindow(DummyUpdater):
                 return
 
             world = session.world
+            character = session.character
 
         self.connection = None
         self.tabs.AddPage(MUDPanel(self.tabs, self, self.engine, world,
@@ -305,7 +312,7 @@ class ClientWindow(DummyUpdater):
 
     def OnConsole(self, e):
         """Open the console dialog box."""
-        dialog = ConsoleDialog(self.engine)
+        dialog = ConsoleDialog(self.engine, self.world)
         dialog.ShowModal()
 
     def OnAlias(self, e):
@@ -325,6 +332,14 @@ class ClientWindow(DummyUpdater):
         dialog = TriggerDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnCharacter(self, e):
+        """Open the character dialog box."""
+        panel = self.panel
+        session = panel.session
+        print "Open for", session
+        dialog = CharacterDialog(self.engine, session)
+        dialog.ShowModal()
 
     def OnDisconnect(self, e):
         """Disconnect the current client."""
@@ -434,6 +449,12 @@ class MUDPanel(AccessPanel):
 
     def CreateClient(self):
         """Connect the MUDPanel."""
+        log = logger("client")
+        session = self.session
+        name = session.world and session.world.name or "unknown"
+        character = session.character and session.character.name or "any"
+        log.info("Selecting world {}, character {}".format(name, character))
+
         if self.client:
             self.client.disconnect()
 
@@ -444,9 +465,31 @@ class MUDPanel(AccessPanel):
         client = engine.open(hostname, port, world)
         client.link_window(self)
         world.load()
+        client.commands = self.login()
         client.start()
         self.session.client = client
         return client
+
+    def login(self):
+        """Return the commands to login if a character has been selected."""
+        if self.session.character:
+            character = self.session.character
+            username = character.username
+            password = character.password
+            post_login = character.other_commands
+
+            # Send these commands
+            commands = []
+
+            if username:
+                commands.extend(username.splitlines())
+            if password:
+                commands.extend(password.splitlines())
+            if post_login:
+                commands.extend(post_login.splitlines())
+            return commands
+
+        return []
 
     # Methods to handle client's events
     def handle_disconnection(self):

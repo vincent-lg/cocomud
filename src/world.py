@@ -37,6 +37,7 @@ from textwrap import dedent
 
 from configobj import ConfigObj
 
+from character import Character
 from log import sharp as logger
 from screenreader import ScreenReader
 from session import Session
@@ -117,6 +118,19 @@ class World:
         # Put the engine level back
         self.engine.level = level
 
+    def load_characters(self):
+        """Load the characters."""
+        location = self.path
+        for directory in os.listdir(location):
+            if os.path.isdir(os.path.join(location, directory)) and \
+                    os.path.exists(os.path.join(location,
+                    directory, ".passphrase")):
+                character = Character(self, directory)
+                logger.info("Loading the character {} from the world " \
+                        "{}".format(directory, self.name))
+                character.load()
+                self.characters[directory] = character
+
     def save(self):
         """Save the world in its configuration file."""
         if not os.path.exists(self.path):
@@ -165,13 +179,21 @@ class World:
         path = os.path.join(path, "config.set")
         file = open(path, "w")
         content = content.encode("latin-1")
-        logger.debug(repr(content))
         file.write(content)
         file.close()
 
     def remove(self):
         """Remove the world."""
         shutil.rmtree(self.path)
+
+    def add_character(self, location, name=None):
+        """Add a new character in the world."""
+        name = name or location
+        character = Character(self, location)
+        character.name = name
+        character.save()
+        self.characters[name] = character
+        return character
 
     def add_alias(self, alias):
         """Add the alias to the world's configuration, handling conflicts.

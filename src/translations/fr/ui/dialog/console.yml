@@ -6,4 +6,5 @@ warning: |
     l'utiliser.
 
     Variables définies :
-        engine: GameEngine
+        engine: le GameEngine
+        world: l'univers courant

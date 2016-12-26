@@ -7,3 +7,4 @@ warning: |
 
     Defined variables:
         engine: the game engine
+        world: the current world

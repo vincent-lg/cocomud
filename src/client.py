@@ -59,6 +59,7 @@ class Client(threading.Thread):
         self.engine = engine
         self.world = world
         self.running = False
+        self.commands = []
         self.sharp_engine = None
 
     def disconnect(self):
@@ -73,6 +74,11 @@ class Client(threading.Thread):
         # Try to connect to the specified host and port
         self.client = Telnet(self.host, self.port)
         self.running = True
+
+        # If the client has commands
+        for command in self.commands:
+            self.client.write(command + "\r\n")
+
         while self.running:
             time.sleep(self.timeout)
             encoding = self.engine.settings["options.general.encoding"]
