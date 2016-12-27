@@ -30,6 +30,7 @@
 
 from collections import namedtuple
 from redmine import Redmine
+from ytranslate import t
 
 from task.base import BaseTask
 from ui.dialogs.task import TaskDialog
@@ -46,30 +47,25 @@ class ImportWorlds(BaseTask):
 
     """
 
-    def __init__(self, background=False, title="Loading",
-            message="Downloading the world list..",
-            confirmation="Do you want to cancel loading?"):
+    def __init__(self, background=False):
         """Initialize the task.
 
         Parameters:
 
             background (default False): should the task run in bthe background?
-            title: title of the dialog to display.
-            message: message of the dialog to display.
-            confirmation: message when pressing on cancel in the dialog.
 
         """
         BaseTask.__init__(self)
         self.worlds = []
-        self.title = title
-        self.message = message
-        self.confirmation = confirmation
+        self.title = t("task.import_worlds.title")
+        self.message = t("task.import_worlds.message")
+        self.confirmation = t("task.import_worlds.confirmation")
         if background:
             self.dialog = None
         else:
-            self.dialog = TaskDialog(self, title.format(progress=0))
-            self.dialog.message = message
-            self.dialog.confirmation = confirmation
+            self.dialog = TaskDialog(self, self.title.format(progress=0))
+            self.dialog.message = self.message
+            self.dialog.confirmation = self.confirmation
 
     def execute(self):
         """Download the file at the URL."""
