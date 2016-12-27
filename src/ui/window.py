@@ -231,7 +231,6 @@ class ClientWindow(DummyUpdater):
         self.tabs.AddPage(MUDPanel(self.tabs, self, self.engine, world,
                 session), world.name)
         self.SetTitle("{} [CocoMUD]".format(world.name))
-        self.sizer.Fit(self)
         self.Maximize()
         self.Show()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -249,6 +248,7 @@ class ClientWindow(DummyUpdater):
         panel.CreateClient()
         self.tabs.AddPage(panel, world.name, select=True)
         panel.SetFocus()
+        self.sizer.Fit(self)
 
     def OnOpen(self, e):
         """Open the ConnectionDialog for an additional world."""
@@ -264,6 +264,7 @@ class ClientWindow(DummyUpdater):
         panel.CreateClient()
         self.tabs.AddPage(panel, world.name, select=True)
         panel.SetFocus()
+        self.sizer.Fit(self)
 
     def OnCloseTab(self, e):
         """Close the current tab."""
