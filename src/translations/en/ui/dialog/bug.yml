@@ -5,16 +5,18 @@
     at: https://cocomud.plan.io/projects/cocomud-client/issues/new
 
     If you don't have an account on this website yet, you can create
-    one and report this issue.  Here is the step-ty-step process to report this bug when you are on the page provided above.
+    one and report this issue.  Here is the step-ty-step process to
+    report this bug:
 
-    1. Select "Bug" in the list of trackers.
+    1. Click on the "report" button on this dialog box. It will open
+       your favorite web browser with the address given above.
     2. Choose a brief but explicit title:
        Example: Error when trying to import the world XY
        (Keep the subject as short and explicit as possible).
     3. In the description of the issue, you can indicate more
        information about how to reproduce this bug.  You should also
        paste the following information to help developers solve
-       this bug:
+       this bug (include the <pre> </pre> as follows):
 
     <pre>
     {traceback}
@@ -25,4 +27,4 @@
     We thank you for your help in creating a more stable MUD client.
 report: Report this bug
 title: Crash report
-url: "https://cocomud.plan.io/projects/cocomud-client/issues/new"
+url: "https://cocomud.plan.io/projects/cocomud-client/issues/new?issue[tracker_id]=3"

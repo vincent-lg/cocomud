@@ -6,16 +6,19 @@
 
     Si vous n'avez pas de compte sur ce site, vous pouvez vous en créer
     un et reporter le bug après. Voici les étapes pas à pas pour reporter
-    le bug une fois sur la page de la nouvelle demande :
+    le bug:
 
-    1. Choisissez "Bug" dans la liste des trackers.
+    1. Cliquez sur le bouton "reporter le bug" dans cette boîte de
+       dialogue. Cela ouvrira votre navigateur préféré avec l'adresse
+       indiquée ci-dessus.
     2. Renseignez un titre court dans le sujet de la demande.
         Exemple : Erreur quand on importe l'univers XY
         (Gardez le sujet aussi court et explicite que possible).
     3. Dans la description du bug, vous pouvez mettre plus
        d'indications sur comment reproduire le bug. Collez également
        les informations suplémentaires (plutôt techniques) données
-       au-dessous, pour aider les développeurs à résoudre le bug :
+       au-dessous, pour aider les développeurs à résoudre le bug
+       (copiez aussi les balises <pre> </pre> comme indiqué) :
 
     <pre>
     {traceback}
@@ -26,4 +29,4 @@
     En vous remerciant pour avoir pris le temps de reporter ce bug,
 report: Reporter le bug
 title: Rapport de bug
-url: "https://cocomud.plan.io/projects/fr/issues/new"
+url: "https://cocomud.plan.io/projects/fr/issues/new?issue[tracker_id]=3"

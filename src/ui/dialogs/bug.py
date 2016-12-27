@@ -71,7 +71,6 @@ class BugDialog(wx.Dialog):
         """The user clicked on the 'report' button."""
         url = t("ui.dialog.bug.url")
         os.startfile(url)
-        self.Destroy()
 
     def OnClose(self, e):
         """The user clicked on the 'close' button."""
