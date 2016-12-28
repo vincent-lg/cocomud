@@ -34,7 +34,7 @@ It is launched in a new thread, so as not to block the main thread.
 
 import os
 import re
-from telnetlib import Telnet, WONT, WILL, ECHO
+from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC
 import threading
 import time
 
@@ -69,11 +69,16 @@ class Client(threading.Thread):
 
         self.running = False
 
+    def pre_run(self):
+        """Method called before running."""
+        pass
+
     def run(self):
         """Run the thread."""
         # Try to connect to the specified host and port
         self.client = Telnet(self.host, self.port)
         self.running = True
+        self.pre_run()
 
         # If the client has commands
         for command in self.commands:
@@ -205,8 +210,6 @@ class GUIClient(Client):
             world=None):
         Client.__init__(self, host, port, timeout, engine, world)
         self.window = None
-        if self.client:
-            self.client.set_option_negotiation_callback(self.handle_option)
 
     def link_window(self, window):
         """Link to a window (a GUI object).
@@ -220,6 +223,10 @@ class GUIClient(Client):
         """
         self.window = window
         window.client = self
+
+    def pre_run(self):
+        """Method called before running."""
+        self.client.set_option_negotiation_callback(self.handle_option)
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True, mark=None):
@@ -261,10 +268,11 @@ class GUIClient(Client):
     def handle_option(self, socket, command, option):
         """Handle a received option."""
         name = ""
-        if command == WILL and option == ECHO:
+        if command == AYT:
+            log = logger("client")
+            log.debug("Received a AYT, replying with a NOP.")
+            socket.send(IAC + NOP)
+        elif command == WILL and option == ECHO:
             name = "hide"
         elif command == WONT and option == ECHO:
             name = "show"
-
-        if name and self.window:
-            self.window.handle_option(name)

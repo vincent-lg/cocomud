@@ -39,6 +39,7 @@ from accesspanel import AccessPanel
 import wx
 from ytranslate.tools import t
 
+from log import ui as logger
 from screenreader import ScreenReader
 
 class CocoIC(InteractiveConsole):
@@ -62,6 +63,7 @@ class CocoIC(InteractiveConsole):
         except AttributeError:
             sys.ps2 = "... "
         cprt = 'Type "help", "copyright", "credits" or "license" for more information.'
+        logger.debug(u"Sending the welcome prompt")
         if banner is None:
             self.write("Python %s on %s\n%s\n" %
                        (sys.version, sys.platform, cprt))
@@ -97,9 +99,11 @@ class CocoIC(InteractiveConsole):
                     stderr = sys.stderr
                     sys.stdout = self
                     sys.stderr = self
+                    logger.debug(u"Executing {}".format(repr(line)))
                     more = self.push(line)
                     sys.stdout = stdout
                     sys.stderr = stderr
+                    logger.debug("Exec successful")
 
                     # Display the prompt
                     if more:
@@ -131,6 +135,7 @@ class CocoIC(InteractiveConsole):
     def write(self, message):
         """Write the text to the interface."""
         message = message.decode("utf-8", errors="replace")
+        logger.debug(u"Received in answer {}".format(repr(message)))
         self.panel.Send(message)
 
 
@@ -146,6 +151,7 @@ class GUIThread(threading.Thread):
     def run(self):
         self.panel.Send(t("ui.dialog.console.warning"))
         self.console.interact()
+        logger.debug(u"Begin interacting with the Python console")
 
 
 class ConsolePanel(AccessPanel):
@@ -167,11 +173,13 @@ class ConsolePanel(AccessPanel):
         # Launch the console
         self.thread.console.locals = self.locals
         self.thread.start()
+        logger.debug(u"Starting the Python console thread")
 
     def OnInput(self, message):
         """Some text has been sent from the input."""
         # Converts the text back to 'str'
         message = message.encode("utf-8", errors="replace")
+        logger.debug(u"Received {}".format(repr(message)))
         self.thread.console.to_exec = message
 
     def OnPaste(self, e):
@@ -206,6 +214,7 @@ class ConsoleDialog(wx.Dialog):
         self.SetSizer(sizer)
 
         # Add in the panel
+        logger.debug("Creating the Python console")
         self.panel = ConsolePanel(self, engine, world)
 
         # Finish designing the window
