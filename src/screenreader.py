@@ -63,6 +63,10 @@ class ScreenReader:
             braille (default True): should the message be displayed?
 
         """
+        message = message.strip()
+        if not message:
+            return
+
         if say and speech:
             say(message, interrupt=interrupt)
 
