@@ -69,6 +69,10 @@ class Character:
     def __str__(self):
         return self.name
 
+    @property
+    def path(self):
+        return os.path.join(self.world.path, self.location)
+
     def create_safe(self):
         """Create a safe for this character."""
         location = os.path.join(self.world.path, self.location)

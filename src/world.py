@@ -36,9 +36,11 @@ from StringIO import StringIO
 from textwrap import dedent
 
 from configobj import ConfigObj
+from ytranslate import t
 
 from character import Character
 from log import sharp as logger
+from notepad import Notepad
 from screenreader import ScreenReader
 from session import Session
 
@@ -76,6 +78,7 @@ class World:
         self.channels = []
         self.macros = []
         self.triggers = []
+        self.notepad = None
         self.merging = MergingMethod.ignore
 
         # Auto completion
@@ -88,7 +91,8 @@ class World:
 
     @property
     def path(self):
-        return "worlds/" + self.location
+        """Return the path to the world."""
+        return os.path.join("worlds", self.location)
 
     def load(self):
         """Load the config.set script."""
@@ -307,6 +311,16 @@ class World:
         session.engine = self.engine
         session.sharp_engine = self.sharp_engine
         return session
+
+    def open_notepad(self):
+        """Open and return the notepad associated to this world."""
+        if self.notepad:
+            return self.notepad
+
+        self.notepad = Notepad(self)
+        empty_string = t("ui.message.notepad.world_empty", world=self.name)
+        self.notepad.open(empty_string)
+        return self.notepad
 
     @classmethod
     def get_infos(cls, configuration):

@@ -1,0 +1,8 @@
+﻿world_empty: |
+    You are editing the notepad of the world {world}.  You can remove
+    this text after reading it.  This notepad will be the same across
+    characters using this world.  Write in this text field, select,
+    remove, copy/paste, do whatever you please.  When you want to go
+    back to the MUD, just press the Escape key and this notepad will
+    close and save.  Next time you open it, either during this session
+    or later, you will find the text you have typed previously.
