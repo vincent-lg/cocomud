@@ -338,7 +338,6 @@ class ClientWindow(DummyUpdater):
         """Open the character dialog box."""
         panel = self.panel
         session = panel.session
-        print "Open for", session
         dialog = CharacterDialog(self.engine, session)
         dialog.ShowModal()
 
@@ -513,6 +512,10 @@ class MUDPanel(AccessPanel):
 
         # If there's a mark, move the cursor to it
         if mark is not None:
+            log = logger("ui")
+            word = self.output.GetRange(point + mark, point + mark + 10)
+            log.debug("A mark has been detected, move to {} : {}".format(
+                    mark, repr(word)))
             self.output.SetInsertionPoint(point + mark)
 
         # Change the window title if not focused

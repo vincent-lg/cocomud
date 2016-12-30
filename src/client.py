@@ -110,6 +110,7 @@ class Client(threading.Thread):
         """Handle multiple lines of text."""
         mark = None
         lines = []
+        no_ansi_lines = []
         triggers = []
         for line in msg.splitlines():
             no_ansi_line = ANSI_ESCAPE.sub('', line)
@@ -127,10 +128,13 @@ class Client(threading.Thread):
                         if trigger.mute:
                             display = False
                         if trigger.mark and mark is None:
-                            mark = len("\n".join(lines))
+                            before = "\n".join([l for l in no_ansi_lines])
+                            mark = len(before) + 1
 
             if display:
                 lines.append(line)
+                if no_ansi_line.strip():
+                    no_ansi_lines.append(no_ansi_line)
 
         # Handle the remaining text
         try:
