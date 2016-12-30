@@ -66,10 +66,13 @@ class Trigger:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this trigger."""
-        mute = "+mute" if self.mute else ""
-        mark = "+mark" if self.mark else ""
-        return self.sharp_engine.format((("#trigger", self.reaction,
-                self.action, mute, mark), ))
+        arguments = ["#trigger", self.reaction, self.action]
+        if self.mute:
+            arguments.append("+mute")
+        if self.mark:
+            arguments.append("+mark")
+        statement = self.sharp_engine.format((tuple(arguments), ))
+        return statement
 
     @property
     def copied(self):

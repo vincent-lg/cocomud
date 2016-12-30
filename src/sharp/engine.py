@@ -351,7 +351,7 @@ class SharpScript(object):
         elif "\n" in argument:
             lines = argument.splitlines()
             argument = "{\n    " + "\n    ".join(lines) + "\n}"
-        elif " " in argument:
+        elif " " in argument or argument == "":
             argument = "{" + argument + "}"
 
         return argument
@@ -359,7 +359,7 @@ class SharpScript(object):
     def extract_arguments(self, line):
         """Extract the funciton name and arguments.
 
-        This function returns a tuple of three informations:
+        This method returns a tuple of three informations:
 
         * The funciton name (a string)
         * A list of arguments (all strings)
