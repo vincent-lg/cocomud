@@ -1,4 +1,19 @@
-﻿world_empty: |
+﻿character_empty: |
+    Vous êtes en train d'éditer le bloc-notes du personnage {character} de
+    l'univers {world}. Vous pouvez supprimer ce texte après l'avoir lu.
+    Ce bloc-notes ne sera pas accessible hormis par le personnage {character}.
+    En d'autres termes, pour lire ce bloc-notes dans CocoMUD, vous devrez
+    vous connecter sur ce personnage. En revanche, le fichier contenant
+    ce bloc-notes n'est pas crypté, le système peut donc le lire. Écrivez
+    dans ce fichier, sélectionnez, supprimez, copiez/collez, faites ce
+    que vous voulez. Quand vous voulez retourner au jeu, appuyez
+    simplement sur Échappe pour fermer ce bloc-notes et l'enregistrer.
+    La prochaine fois que vous ouvrirez ce bloc-notes, soit durant la
+    même session, soit plus tard, vous retrouverez le texte que vous
+    avez entré précédemment.
+no_character: Il n'y a actuellement aucun personnage connecté sur cette session.
+title: Bloc-notes [CocoMUD]
+world_empty: |
     Vous êtes en train d'éditer le bloc-notes de l'univers {world}.
     Vous pouvez supprimer ce texte après l'avoir lu. Ce bloc-notes sera
     identique pour tous les personnages utilisant cet univers.

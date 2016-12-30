@@ -178,13 +178,13 @@ class ClientWindow(DummyUpdater):
         # Notepad
         notepad = wx.Menu()
         notepad_world = notepad.Append(wx.ID_ANY,
-                "World notepad...")
+                t("ui.menu.notepad_world"))
         notepad_character = notepad.Append(wx.ID_ANY,
-                "Character notepad...")
-        wx.MenuItem(gameMenu, -1, "Notepad")
+                t("ui.menu.notepad_character"))
+        wx.MenuItem(gameMenu, -1, t("ui.menu.notepad"))
         self.Bind(wx.EVT_MENU, self.OnNotepadWorld, notepad_world)
         self.Bind(wx.EVT_MENU, self.OnNotepadCharacter, notepad_character)
-        gameMenu.AppendMenu(wx.ID_ANY, "Notepad", notepad)
+        gameMenu.AppendMenu(wx.ID_ANY, t("ui.menu.notepad"), notepad)
 
         # Character
         character = wx.MenuItem(gameMenu, -1, t("ui.menu.character"))
@@ -357,6 +357,14 @@ class ClientWindow(DummyUpdater):
     def OnNotepadCharacter(self, e):
         """The user selected the Notepad -> Character... menu."""
         panel = self.panel
+        character = panel.session.character
+        if character is None:
+            wx.MessageBox(t("ui.message.notepad.no_character"),
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+        else:
+            notepad = character.open_notepad()
+            dialog = NotepadDialog(notepad)
+            dialog.ShowModal()
 
     def OnCharacter(self, e):
         """Open the character dialog box."""

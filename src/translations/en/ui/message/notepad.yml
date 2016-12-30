@@ -1,4 +1,17 @@
-﻿world_empty: |
+﻿character_empty: |
+    You are editing the notepad of the character {character} of the world
+    {world}.  You can remove this text after reading it.  This notepad will
+    not be accessible through other characters of this world; in other
+    worlds, in order to read it in CocoMUD, you will have to login to this
+    character.  However, the file isn't encrypted, so it can be read by
+    the system.  Write in this text field, select, remove, copy/paste,
+    do whatever you please.  When you want to go back to the MUD, just
+    press the Escape key and this notepad will close and save.
+    Next time you open it, either during this session or later, you
+    will find the text you have typed previously.
+no_character: There is currently hno character opened for this session.
+title: Notepad [CocoMUD]
+world_empty: |
     You are editing the notepad of the world {world}.  You can remove
     this text after reading it.  This notepad will be the same across
     characters using this world.  Write in this text field, select,

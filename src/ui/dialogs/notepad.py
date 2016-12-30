@@ -38,7 +38,7 @@ class NotepadDialog(wx.Dialog):
 
     def __init__(self, notepad):
         wx.Dialog.__init__(self, None,
-                title="Notepad")
+                title=t("ui.message.notepad.title"))
         self.notepad = notepad
         self.InitUI()
         self.Maximize()

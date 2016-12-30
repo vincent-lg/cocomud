@@ -30,7 +30,10 @@
 
 import os
 
+from ytranslate import t
+
 from log import character as logger
+from notepad import Notepad
 from safe import Safe
 
 class Character:
@@ -61,6 +64,7 @@ class Character:
         self.aliases = []
         self.macros = []
         self.triggers = []
+        self.notepad = None
 
     def __repr__(self):
         return "<Character {} (world={}, location={})>".format(self.name,
@@ -110,3 +114,14 @@ class Character:
         safe.store("username", self.username)
         safe.store("password", self.password)
         safe.store("other_commands", self.other_commands)
+
+    def open_notepad(self):
+        """Open and return the notepad associated to this character."""
+        if self.notepad:
+            return self.notepad
+
+        self.notepad = Notepad(self)
+        empty_string = t("ui.message.notepad.character_empty",
+                character=self.name, world=self.world.name)
+        self.notepad.open(empty_string)
+        return self.notepad
