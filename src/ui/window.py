@@ -51,6 +51,7 @@ from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
 from ui.dialogs.console import ConsoleDialog
 from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
+from ui.dialogs.notepad import NotepadDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.trigger import TriggerDialog
 from ui.dialogs.worlds import WorldsDialog
@@ -173,6 +174,17 @@ class ClientWindow(DummyUpdater):
         triggers = wx.MenuItem(gameMenu, -1, t("ui.menu.triggers"))
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
         gameMenu.AppendItem(triggers)
+
+        # Notepad
+        notepad = wx.Menu()
+        notepad_world = notepad.Append(wx.ID_ANY,
+                "World notepad...")
+        notepad_character = notepad.Append(wx.ID_ANY,
+                "Character notepad...")
+        wx.MenuItem(gameMenu, -1, "Notepad")
+        self.Bind(wx.EVT_MENU, self.OnNotepadWorld, notepad_world)
+        self.Bind(wx.EVT_MENU, self.OnNotepadCharacter, notepad_character)
+        gameMenu.AppendMenu(wx.ID_ANY, "Notepad", notepad)
 
         # Character
         character = wx.MenuItem(gameMenu, -1, t("ui.menu.character"))
@@ -333,6 +345,18 @@ class ClientWindow(DummyUpdater):
         dialog = TriggerDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnNotepadWorld(self, e):
+        """The user selected the Notepad -> World... menu."""
+        panel = self.panel
+        world = panel.world
+        notepad = world.open_notepad()
+        dialog = NotepadDialog(notepad)
+        dialog.ShowModal()
+
+    def OnNotepadCharacter(self, e):
+        """The user selected the Notepad -> Character... menu."""
+        panel = self.panel
 
     def OnCharacter(self, e):
         """Open the character dialog box."""
