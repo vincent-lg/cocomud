@@ -234,6 +234,13 @@ class EditTriggerDialog(wx.Dialog):
         self.mute = wx.CheckBox(self, label=t("ui.message.trigger.mute"))
         self.mute.SetValue(self.trigger.mute)
         sizer.Add(self.mute)
+
+        # Mark option
+        self.mark = wx.CheckBox(self, label=t("ui.message.trigger.mark"))
+        self.mark.SetValue(self.trigger.mark)
+        sizer.Add(self.mark)
+
+        # Rest of the dialoog
         sizer.Add(buttons)
         sizer.Fit(self)
 
@@ -248,18 +255,17 @@ class EditTriggerDialog(wx.Dialog):
         reaction = self.t_trigger.GetValue()
         action = self.trigger.action
         mute = self.mute.GetValue()
+        mark = self.mark.GetValue()
         if not reaction:
             wx.MessageBox(t("ui.message.trigger.missing_reaction"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.t_trigger.SetFocus()
-        elif not action:
-            wx.MessageBox(t("ui.message.trigger.missing_action"),
-                    t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
         else:
             self.trigger.reaction = reaction
             self.trigger.action = action
             self.trigger.re_reaction = self.trigger.find_regex(reaction)
             self.trigger.mute = mute
+            self.trigger.mark = mark
             if self.trigger not in self.triggers:
                 self.triggers.append(self.trigger)
             self.Destroy()

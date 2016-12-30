@@ -1,11 +1,9 @@
 ﻿add: Ajouter un trigger
 edit: Editer un trigger
-missing_action: >
-    Le champ de texte contenant l'action est vide. Veuillez préciser
-    l'action à associer à ce trigger.
 missing_reaction: >
     Le champ de texte contenant le nom du trigger est vide.
     Vous devez préciser une réaction pour ce trigger.
+mark: Trigger marqué
 mute: Trigger muet
 remove: >
     Êtes-vous sûr de vouloir retirer le trigger {trigger} ?

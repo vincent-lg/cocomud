@@ -1,10 +1,8 @@
 ﻿add: Add a trigger
 edit: Edit a trigger
-missing_action: >
-    The action field is empty.  Please specify the actions
-    associated with this trigger.
 missing_reaction: >
     The trigger field is empty.  Please specify the trigger's reaction.
+mark: Mark trigger
 mute: Mute trigger
 remove: >
     Are you sure you want to remove the trigger {trigger}?
