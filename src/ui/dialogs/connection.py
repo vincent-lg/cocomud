@@ -28,11 +28,16 @@
 
 """Module containing the connection dialog."""
 
-import wx
+from __future__ import absolute_import
+from zipfile import ZipFile
 
+import wx
 from ytranslate import t
 
+from task.import_worlds import ImportWorlds
+from ui.dialogs.worlds import WorldsDialog
 from world import World
+from wizard.install_world import InstallWorld
 
 class ConnectionDialog(wx.Dialog):
 
@@ -69,10 +74,12 @@ class ConnectionDialog(wx.Dialog):
         add = wx.Button(self, label=t("ui.button.add"))
         edit = wx.Button(self, label=t("ui.button.edit"))
         remove = wx.Button(self, label=t("ui.button.remove"))
+        b_import = wx.Button(self, label=t("ui.menu.import"))
         buttons.Add(connect)
         buttons.Add(add)
         buttons.Add(edit)
         buttons.Add(remove)
+        buttons.Add(b_import)
 
         # Main sizer
         top.Add(worlds)
@@ -93,6 +100,7 @@ class ConnectionDialog(wx.Dialog):
         edit.Bind(wx.EVT_BUTTON, self.OnEdit)
         remove.Bind(wx.EVT_BUTTON, self.OnRemove)
         add.Bind(wx.EVT_BUTTON, self.OnAdd)
+        b_import.Bind(wx.EVT_BUTTON, self.OnImport)
 
     def populate_list(self, selection=0):
         """Populate the list with existing worlds."""
@@ -216,6 +224,10 @@ class ConnectionDialog(wx.Dialog):
         self.session.character = character
         self.Destroy()
 
+    def OnImport(self, e):
+        """The user clicked on the import button."""
+        self.PopupMenu(ImportPopupMenu(self))
+
 
 class EditWorldDialog(wx.Dialog):
 
@@ -320,3 +332,47 @@ class EditWorldDialog(wx.Dialog):
     def OnCancel(self, e):
         """Simply exit the dialog."""
         self.Destroy()
+
+
+class ImportPopupMenu(wx.Menu):
+
+    """Popup menu that appears when clicking on the import button."""
+
+    def __init__(self, parent):
+        wx.Menu.__init__(self)
+        self.parent = parent
+
+        # Create the sub-menu
+        on_disk = wx.MenuItem(self, wx.NewId(), t("ui.menu.import_on_disk"))
+        self.AppendItem(on_disk)
+        self.Bind(wx.EVT_MENU, self.OnDisk, on_disk)
+        online = wx.MenuItem(self, wx.NewId(), t("ui.menu.import_online"))
+        self.AppendItem(online)
+        self.Bind(wx.EVT_MENU, self.Online, online)
+
+    def OnDisk(self, e):
+        """Import a world on disk."""
+        choose_file = t("ui.button.choose_file")
+        extensions = "Zip archive (*.zip)|*.zip"
+        dialog = wx.FileDialog(None, choose_file,
+                "", "", extensions, wx.OPEN)
+        result = dialog.ShowModal()
+        if result == wx.ID_OK:
+            filename = dialog.GetPath()
+
+            # Try to install the world from the archive
+            archive = ZipFile(filename)
+            files = {name: archive.read(name) for name in archive.namelist()}
+            options = files.get("world/options.conf")
+            if options:
+                infos = World.get_infos(options)
+                name = infos.get("connection", {}).get("name")
+                wizard = InstallWorld(self.parent.engine, name, files)
+                wizard.start()
+
+    def Online(self, e):
+        """Import a world online."""
+        task = ImportWorlds()
+        task.start()
+        dialog = WorldsDialog(self.parent.engine, task.worlds)
+        dialog.ShowModal()
