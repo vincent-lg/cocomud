@@ -119,4 +119,5 @@ class WorldsDialog(wx.Dialog):
             archive = ZipFile(download.file)
             files = {name: archive.read(name) for name in archive.namelist()}
             wizard = InstallWorld(self.engine, "VanciaMUD", files)
+            self.Destroy()
             wizard.start()

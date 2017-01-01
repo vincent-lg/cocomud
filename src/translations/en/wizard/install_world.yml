@@ -12,5 +12,6 @@ method: Method
 name: Name of the world to create
 new: New world
 recommended: Recommended
+success: The world {world} has been successfully installed.
 unknown_method: The selected merging method cannot be found.
 unknown_world: The selected world cannot be found.

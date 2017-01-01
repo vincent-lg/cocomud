@@ -31,6 +31,9 @@
 from collections import OrderedDict
 import json
 import os
+import wx
+
+from ytranslate import t
 
 from log import wizard as logger
 from ui.wizard.install_world import PreInstallDialog
@@ -160,6 +163,9 @@ class InstallWorld:
             config = config.decode("latin-1")
             destination.sharp_engine.execute(config, variables=False)
 
+        # Ensures the world is properly named
+        destination.name = name
+
         # Just saves the world
         destination.save()
         destination.load()
@@ -193,3 +199,10 @@ class InstallWorld:
         self.engine.prepare_world(destination, "ignore")
         logger.info("The world {} has been installed successfully".format(
                 destination.name))
+        # Add the world if not present
+        if name not in self.engine.worlds:
+            self.engine.worlds[name] = destination
+
+        if self.ui:
+            wx.MessageBox(t("wizard.install_world.success", world=name),
+                    t("ui.alert.success"), wx.OK | wx.ICON_INFORMATION)

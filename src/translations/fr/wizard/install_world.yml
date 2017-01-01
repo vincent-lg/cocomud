@@ -14,5 +14,6 @@ method: Méthode
 name: Nom de l'univers à créer
 new: Nouvel univers
 recommended: Recommandé
+success: L'univers {world} a bien été installé.
 unknown_method: La méthode de gestion de conflit ne peut être trouvée.
 unknown_world: L'univers sélectionné ne peut être trouvé.

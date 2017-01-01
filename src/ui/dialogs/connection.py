@@ -369,6 +369,8 @@ class ImportPopupMenu(wx.Menu):
                 name = infos.get("connection", {}).get("name")
                 wizard = InstallWorld(self.parent.engine, name, files)
                 wizard.start()
+                self.parent.populate_list()
+                self.parent.worlds.SetFocus()
 
     def Online(self, e):
         """Import a world online."""
@@ -376,3 +378,5 @@ class ImportPopupMenu(wx.Menu):
         task.start()
         dialog = WorldsDialog(self.parent.engine, task.worlds)
         dialog.ShowModal()
+        self.parent.populate_list()
+        self.parent.worlds.SetFocus()
