@@ -36,6 +36,7 @@ import wx
 from ytranslate import t
 
 from log import wizard as logger
+from sharp.functions.channel import Channel
 from ui.wizard.install_world import PreInstallDialog
 from ui.wizard.install_world import InstallWorld as UI
 from world import World
@@ -133,6 +134,7 @@ class InstallWorld:
                     default = value.get("default")
                     data[key] = default
 
+        Channel.allow_creation = False
         self.engine.prepare_world(destination, merge)
         sharp = destination.sharp_engine
 
@@ -162,6 +164,9 @@ class InstallWorld:
             logger.debug("Executing the config.set script")
             config = config.decode("latin-1")
             destination.sharp_engine.execute(config, variables=False)
+
+        # Replace the allow_creation for channels
+        Channel.allow_creation = True
 
         # Ensures the world is properly named
         destination.name = name

@@ -39,6 +39,7 @@ class Channel(Function):
     """Function SharpScript 'channel'."""
 
     description = "Create or display a channel"
+    allow_creation = True
 
     def run(self, name, show=True):
         """Create a channel."""
@@ -47,7 +48,7 @@ class Channel(Function):
                 channel = ObjChannel(self.world, name)
                 self.world.add_channel(channel)
             else:
-                if show:
+                if show and Channel.allow_creation:
                     dialog = ChannelsDialog(self.world.channels, name)
                     dialog.ShowModal()
 
