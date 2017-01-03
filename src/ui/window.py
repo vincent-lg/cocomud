@@ -255,6 +255,9 @@ class ClientWindow(DummyUpdater):
         world = World("")
         dialog = EditWorldDialog(self.engine, world)
         dialog.ShowModal()
+        if not world.name:
+            return
+
         self.SetTitle("{} [CocoMUD]".format(world.name))
         panel = MUDPanel(self.tabs, self, self.engine, world, session)
         panel.CreateClient()

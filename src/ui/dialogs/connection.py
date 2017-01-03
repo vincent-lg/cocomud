@@ -252,7 +252,6 @@ class EditWorldDialog(wx.Dialog):
         s_name = wx.BoxSizer(wx.HORIZONTAL)
         s_hostname = wx.BoxSizer(wx.HORIZONTAL)
         s_port = wx.BoxSizer(wx.HORIZONTAL)
-        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         self.SetSizer(sizer)
 
         # Create the name field
@@ -280,6 +279,7 @@ class EditWorldDialog(wx.Dialog):
         sizer.Add(s_port)
 
         # Main sizer
+        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         sizer.Add(buttons)
         sizer.Fit(self)
 
