@@ -421,9 +421,12 @@ class ClientWindow(DummyUpdater):
         if self.focus:
             # Reset the window's title
             panel = self.panel
-            world = self.world
-            panel.nb_unread = 0
-            self.SetTitle("{} [CocoMUD]".format(world.name))
+            if panel:
+                world = self.world
+                panel.nb_unread = 0
+                self.SetTitle("{} [CocoMUD]".format(world.name))
+            else:
+                self.SetTitle("CocoMUD")
 
         e.Skip()
 
