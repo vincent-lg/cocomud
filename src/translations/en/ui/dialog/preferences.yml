@@ -8,6 +8,10 @@ TTS:
     "on": Enable TTS (Text-To Speech)
     outside: Enable TTS when on a different window
     interrupt: Interrupt TTS when a new message is received
+richtext: Use rich-text control with colors
 update_language: >
     You have changed the CocoMUD anguage.  You have to restart the
     application to see these changes.
+update_richtext: >
+    You have changed the way the application is to display.  You have
+    to restart CocoMUD in order to see these modifications.

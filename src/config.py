@@ -231,8 +231,6 @@ class Settings(Configuration):
             self.engine.worlds[world.name] = world
             world.load_characters()
 
-        self.load_YAML_file("macros")
-
     def load_options(self):
         """Load the file containing the options."""
         lang = locale.getdefaultlocale()[0].split("_")[0]
@@ -243,6 +241,9 @@ class Settings(Configuration):
 
             [input]
                 command_stacking = string(default=";")
+
+            [output]
+                richtext = boolean(default=True)
 
             [TTS]
                 on = boolean(default=True)

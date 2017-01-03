@@ -276,10 +276,11 @@ class AccessibilityTab(wx.Panel):
 
     def InitUI(self):
         settings = self.engine.settings
-        sizer = wx.GridBagSizer(15, 15)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
         # TTS preferendces
+        s_TTS = wx.BoxSizer(wx.HORIZONTAL)
         self.TTS_on = wx.CheckBox(self,
                 label=t("ui.dialog.preferences.TTS.on"))
         self.TTS_on.SetValue(settings["options.TTS.on"])
@@ -291,9 +292,20 @@ class AccessibilityTab(wx.Panel):
         self.TTS_interrupt.SetValue(settings["options.TTS.interrupt"])
 
         # Append to the sizer
-        sizer.Add(self.TTS_on, pos=(0, 0))
-        sizer.Add(self.TTS_outside, pos=(0, 1))
-        sizer.Add(self.TTS_interrupt, pos=(1, 1))
+        s_TTS.Add(self.TTS_on)
+        s_TTS.Add(self.TTS_outside)
+        s_TTS.Add(self.TTS_interrupt)
+
+        # RichTextControl
+        s_other = wx.BoxSizer(wx.HORIZONTAL)
+        self.richtext = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.richtext"))
+        self.richtext.SetValue(settings["options.output.richtext"])
+        s_other.Add(self.richtext)
+
+        # Add to the main sizer
+        sizer.Add(s_TTS)
+        sizer.Add(s_other)
 
 
 class PreferencesTabs(wx.Notebook):
@@ -358,18 +370,25 @@ class PreferencesDialog(wx.Dialog):
         command_stacking = input.command_stacking.GetValue()
         old_language = settings["options.general.language"]
         interrupt = accessibility.TTS_interrupt.GetValue()
+        old_richtext = settings["options.output.richtext"]
+        richtext = accessibility.richtext.GetValue()
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
         settings["options.input.command_stacking"] = command_stacking
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options.TTS.interrupt"] = interrupt
+        settings["options.output.richtext"] = richtext
         settings["options"].write()
         self.engine.TTS_on = accessibility.TTS_on.GetValue()
         self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
         if old_language != new_language:
             wx.MessageBox(t("ui.dialog.preferences.update_language"),
                     t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
+        elif old_richtext != richtext:
+            wx.MessageBox(t("ui.dialog.preferences.update_richtext"),
+                    t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
+
         self.Destroy()
 
     def OnCancel(self, e):

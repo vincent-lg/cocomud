@@ -8,6 +8,10 @@ TTS:
     "on": Activer le TTS (Text-To-Speech)
     outside: Activer le TTS hors de la fenêtre
     interrupt: Interrompt le TTS quand un nouveau message est reçu
+richtext: Active le RichText avec ses couleurs
 update_language: >
     Vous avez modifié la langue du client CocoMUD. Vous devez
     redémarrer le programme pour voir ces modifications.
+update_richtext: >
+    Vous avez modifié la façon dont CocoMUD affiche son client. Pour
+    voir ces modifications, il vous faut redémarrer CocoMUD.

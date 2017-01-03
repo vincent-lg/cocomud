@@ -59,6 +59,7 @@ class Client(threading.Thread):
         self.engine = engine
         self.world = world
         self.running = False
+        self.strip_ansi = False
         self.commands = []
         self.sharp_engine = None
 
@@ -132,12 +133,17 @@ class Client(threading.Thread):
                             mark = len(before) + 1
 
             if display:
-                lines.append(line)
+                if self.strip_ansi:
+                    lines.append(no_ansi_line)
+                else:
+                    lines.append(line)
+
                 if no_ansi_line.strip():
                     no_ansi_lines.append(no_ansi_line)
 
         # Handle the remaining text
         try:
+            liens = [l for l in lines if l]
             self.handle_message("\r\n".join(lines), mark=mark)
         except Exception:
             log = logger("client")

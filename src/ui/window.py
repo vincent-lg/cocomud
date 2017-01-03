@@ -325,7 +325,7 @@ class ClientWindow(DummyUpdater):
 
     def OnConsole(self, e):
         """Open the console dialog box."""
-        dialog = ConsoleDialog(self.engine, self.world)
+        dialog = ConsoleDialog(self.engine, self.world, self.panel)
         dialog.ShowModal()
 
     def OnAlias(self, e):
@@ -463,12 +463,15 @@ class ClientWindow(DummyUpdater):
 class MUDPanel(AccessPanel):
 
     def __init__(self, parent, window, engine, world, session):
+        self.rich = engine.settings["options.output.richtext"]
+        print "Create a world with rich", self.rich
         AccessPanel.__init__(self, parent, history=True, lock_input=True,
-                ansi=True)
-        self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
-        ansi = self.extensions["ANSI"]
-        ansi.default_foreground = wx.WHITE
-        ansi.default_background = wx.BLACK
+                ansi=self.rich, rich=self.rich)
+        if self.rich:
+            self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
+            ansi = self.extensions["ANSI"]
+            ansi.default_foreground = wx.WHITE
+            ansi.default_background = wx.BLACK
         self.window = window
         self.engine = engine
         self.client = None
@@ -499,6 +502,7 @@ class MUDPanel(AccessPanel):
         port = world.port
         client = engine.open(hostname, port, world)
         client.link_window(self)
+        client.strip_ansi = not self.rich
         world.load()
         client.commands = self.login()
         client.start()
