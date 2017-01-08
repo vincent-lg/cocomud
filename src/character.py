@@ -103,7 +103,8 @@ class Character:
 
         # Retrieve encrypted information
         safe = self.create_safe()
-        self.name = safe.retrieve("name", "")
+        self.name = safe.retrieve("name", "").decode(
+                "utf-8", errors="replace")
         self.username = safe.retrieve("username", "")
         self.password = safe.retrieve("password", "")
         self.other_commands = safe.retrieve("other_commands", "")

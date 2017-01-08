@@ -494,7 +494,7 @@ class MUDPanel(AccessPanel):
         session = self.session
         name = session.world and session.world.name or "unknown"
         character = session.character and session.character.name or "any"
-        log.info("Selecting world {}, character {}".format(name, character))
+        log.info(u"Selecting world {}, character {}".format(name, character))
 
         if self.client:
             self.client.disconnect()
