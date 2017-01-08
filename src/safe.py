@@ -50,6 +50,10 @@ argument.  You can insantiate it as follows:
 login = safe.retrieve("login")
 password = safe.retrieve("password")
 
+Note that datas that is not a string (like a bool or float) will be
+saved as unprotected data.  If you want to save it encrypted, you can
+convert it to string.
+
 """
 
 import base64
@@ -154,6 +158,8 @@ class Safe:
         If the key isn't present in the dictionary, either
         return default if specified, or raise a KeyError.
 
+        If the value at this location isn't a string, return it as is.
+
         """
         if key not in self.data:
             if default:
@@ -162,18 +168,26 @@ class Safe:
             raise KeyError(key)
 
         value = self.data[key]
-        salt = self.get_salt_from_key(key)
-        return self.decrypt(value, salt)
+        if isinstance(value, basestring):
+            salt = self.get_salt_from_key(key)
+            return self.decrypt(value, salt)
+
+        return value
 
     def store(self, key, value):
         """Store the key in the file.
 
         If the key already exists, replaces it.
+        If the value is not a string or unicode, it will be stored
+        WITHOUT encryption.
 
         """
-        salt = self.get_salt_from_key(key)
-        crypted = self.encrypt(value, salt)
-        self.data[key] = crypted
+        if isinstance(value, basestring):
+            salt = self.get_salt_from_key(key)
+            crypted = self.encrypt(value, salt)
+            self.data[key] = crypted
+        else:
+            self.data[key] = value
 
         # Write the new data in the file
         with open(self.secret, "wb") as file:

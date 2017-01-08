@@ -123,12 +123,15 @@ class ConnectionDialog(wx.Dialog):
                 # Change the world's characters
                 self.characters.DeleteAllItems()
                 self.characters.Append((t("ui.client.any_character"), ))
-                characters = sorted(world.characters.values(),
-                        key=lambda c: c.location)
-                for character in characters:
-                    self.characters.Append((character.name, ))
                 self.characters.Select(0)
                 self.characters.Focus(0)
+                characters = sorted(world.characters.values(),
+                        key=lambda c: c.location)
+                for i, character in enumerate(characters):
+                    self.characters.Append((character.name, ))
+                    if character.default:
+                        self.characters.Select(i + 1)
+                        self.characters.Focus(i + 1)
 
     def OnSelectWorld(self, e):
         """When the selection changes."""
@@ -143,10 +146,13 @@ class ConnectionDialog(wx.Dialog):
                     key=lambda c: c.location)
             self.characters.DeleteAllItems()
             self.characters.Append((t("ui.client.any_character"), ))
-            for character in characters:
-                self.characters.Append((character.name, ))
             self.characters.Select(0)
             self.characters.Focus(0)
+            for i, character in enumerate(characters):
+                self.characters.Append((character.name, ))
+                if character.default:
+                    self.characters.Select(i + 1)
+                    self.characters.Focus(i + 1)
 
     def OnKeyDown(self, e):
         """If Enter is pressed, connect to the selected world."""

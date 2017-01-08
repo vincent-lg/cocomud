@@ -93,6 +93,11 @@ class CharacterDialog(wx.Dialog):
         s_post_login.Add(t_post)
         sizer.Add(s_post_login)
 
+        # Create the 'default character' checkbox
+        self.default = wx.CheckBox(self,
+                label=t("ui.message.character.default"))
+        self.default.SetValue(character and character.default or True)
+
         # Buttons
         sizer.Add(buttons)
         t_name.SetFocus()
@@ -111,6 +116,7 @@ class CharacterDialog(wx.Dialog):
         password = self.password.GetValue().encode("utf-8", errors="replace")
         post_login = self.post_login.GetValue().encode("utf-8",
                 errors="replace")
+        default = self.default.GetValue()
         if not name:
             wx.MessageBox(t("ui.message.character.missing_name"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
@@ -123,8 +129,20 @@ class CharacterDialog(wx.Dialog):
             character.username = username
             character.password = password
             character.other_commands = post_login
+            character.default = default
             character.save()
             self.session.character = character
+
+            # If 'default' is set to True, put other character.default
+            # to False (there can only be one default character)
+            for other in world.characters.values():
+                if other is character:
+                    continue
+
+                if default and other.default:
+                    other.default = False
+                    other.save()
+
             self.Destroy()
 
     def OnCancel(self, e):

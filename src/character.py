@@ -59,6 +59,7 @@ class Character:
         self.username = ""
         self.password = ""
         self.other_commands = ""
+        self.default = False
 
         # Character's configuration
         self.aliases = []
@@ -106,6 +107,7 @@ class Character:
         self.username = safe.retrieve("username", "")
         self.password = safe.retrieve("password", "")
         self.other_commands = safe.retrieve("other_commands", "")
+        self.default = safe.retrieve("default", False)
 
     def save(self):
         """Save the character."""
@@ -114,6 +116,7 @@ class Character:
         safe.store("username", self.username)
         safe.store("password", self.password)
         safe.store("other_commands", self.other_commands)
+        safe.store("default", self.default)
 
     def open_notepad(self):
         """Open and return the notepad associated to this character."""

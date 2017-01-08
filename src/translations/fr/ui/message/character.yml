@@ -1,4 +1,5 @@
-﻿missing_name: Vous devez préciser un nom pour modifier ce personnage.
+﻿default: Positionner ce personnage comme choix par défaut
+missing_name: Vous devez préciser un nom pour modifier ce personnage.
 password: Mot de passe optionnel
 post_login: Les commandes optionnelles à envoyer après le mot de passe
 username: >
