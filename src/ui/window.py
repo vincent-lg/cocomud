@@ -450,7 +450,7 @@ class ClientWindow(DummyUpdater):
             self.loading.Destroy()
             if build is None:
                 message = t("ui.message.update.noupdate")
-                wx.MessageBox(message, t("ui.message.information"),
+                wx.MessageBox(message, t("ui.alert.information"),
                         wx.OK | wx.ICON_INFORMATION)
 
         if build is not None:
