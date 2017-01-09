@@ -467,7 +467,6 @@ class MUDPanel(AccessPanel):
 
     def __init__(self, parent, window, engine, world, session):
         self.rich = engine.settings["options.output.richtext"]
-        print "Create a world with rich", self.rich
         AccessPanel.__init__(self, parent, history=True, lock_input=True,
                 ansi=self.rich, rich=self.rich)
         if self.rich:
@@ -539,6 +538,10 @@ class MUDPanel(AccessPanel):
         message = u"--- {} ---".format(t("ui.client.disconnected"))
         self.Send(message)
         ScreenReader.talk(message, interrupt=False)
+
+    def handle_reconnection(self):
+        """Attempts to reconnect."""
+        self.CreateClient()
 
     def handle_message(self, message, mark=None):
         """The client has just received a message."""

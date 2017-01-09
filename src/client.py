@@ -34,6 +34,7 @@ It is launched in a new thread, so as not to block the main thread.
 
 import os
 import re
+import socket
 from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC
 import threading
 import time
@@ -93,6 +94,9 @@ class Client(threading.Thread):
 
             try:
                 msg = self.client.read_very_eager()
+            except socket.error:
+                if self.window:
+                    self.window.handle_reconnection()
             except EOFError:
                 break
 
