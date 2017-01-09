@@ -470,7 +470,8 @@ class MUDPanel(AccessPanel):
         AccessPanel.__init__(self, parent, history=True, lock_input=True,
                 ansi=self.rich, rich=self.rich)
         if self.rich:
-            self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
+            self.output.SetForegroundColour(wx.WHITE)
+            self.output.SetBackgroundColour(wx.BLACK)
             ansi = self.extensions["ANSI"]
             ansi.default_foreground = wx.WHITE
             ansi.default_background = wx.BLACK
