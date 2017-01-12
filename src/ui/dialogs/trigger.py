@@ -208,6 +208,7 @@ class EditTriggerDialog(wx.Dialog):
 
     def InitUI(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
+        options = wx.BoxSizer(wx.HORIZONTAL)
         top = wx.BoxSizer(wx.HORIZONTAL)
         buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         self.SetSizer(sizer)
@@ -233,14 +234,26 @@ class EditTriggerDialog(wx.Dialog):
         # Mute option
         self.mute = wx.CheckBox(self, label=t("ui.message.trigger.mute"))
         self.mute.SetValue(self.trigger.mute)
-        sizer.Add(self.mute)
+        options.Add(self.mute)
 
         # Mark option
         self.mark = wx.CheckBox(self, label=t("ui.message.trigger.mark"))
         self.mark.SetValue(self.trigger.mark)
-        sizer.Add(self.mark)
+        options.Add(self.mark)
+
+        # Substitution
+        s_substitution = wx.BoxSizer(wx.VERTICAL)
+        l_substitution = wx.StaticText(self,
+                label=t("ui.message.trigger.substitution"))
+        t_substitution = wx.TextCtrl(self, value=self.trigger.substitution,
+                style=wx.TE_MULTILINE)
+        self.substitution = t_substitution
+        s_substitution.Add(l_substitution)
+        s_substitution.Add(t_substitution)
+        sizer.Add(s_substitution)
 
         # Rest of the dialoog
+        sizer.Add(options)
         sizer.Add(buttons)
         sizer.Fit(self)
 
@@ -254,6 +267,7 @@ class EditTriggerDialog(wx.Dialog):
         """Save the trigger."""
         reaction = self.t_trigger.GetValue()
         action = self.trigger.action
+        substitution = self.substitution.GetValue()
         mute = self.mute.GetValue()
         mark = self.mark.GetValue()
         if not reaction:
@@ -264,6 +278,7 @@ class EditTriggerDialog(wx.Dialog):
             self.trigger.reaction = reaction
             self.trigger.action = action
             self.trigger.re_reaction = self.trigger.find_regex(reaction)
+            self.trigger.substitution = substitution
             self.trigger.mute = mute
             self.trigger.mark = mark
             if self.trigger not in self.triggers:

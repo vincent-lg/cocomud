@@ -6,6 +6,7 @@ mark: Mark trigger
 mute: Mute trigger
 remove: >
     Are you sure you want to remove the trigger {trigger}?
+substitution: "Message to substitute to the triggered line, if any:"
 unknown: >
     Unable to find this trigger.
 unsaved: >

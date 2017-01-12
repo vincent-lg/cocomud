@@ -7,6 +7,8 @@ mark: Trigger marqué
 mute: Trigger muet
 remove: >
     Êtes-vous sûr de vouloir retirer le trigger {trigger} ?
+substitution: >
+    Message de remplacement de la ligne ayant déclenché le trigger :
 unknown: >
     Impossible de trouver ce trigger.
 unsaved: >
