@@ -45,11 +45,12 @@ class Trigger:
 
     """
 
-    def __init__(self, sharp, reaction, action):
+    def __init__(self, sharp, reaction, action, substitution=""):
         self.sharp_engine = sharp
         self.reaction = reaction
         self.re_reaction = self.find_regex(reaction)
         self.action = dedent(action.strip("\n"))
+        self.substitution = substitution
 
         # Flags
         self.mute = False
@@ -67,17 +68,22 @@ class Trigger:
     def sharp_script(self):
         """Return the SharpScript code to create this trigger."""
         arguments = ["#trigger", self.reaction, self.action]
+        if self.substitution:
+            arguments.append(self.substitution)
+
         if self.mute:
             arguments.append("+mute")
         if self.mark:
             arguments.append("+mark")
+
         statement = self.sharp_engine.format((tuple(arguments), ))
         return statement
 
     @property
     def copied(self):
         """Return a copied version of the trigger."""
-        copy = Trigger(self.sharp_engine, self.reaction, self.action)
+        copy = Trigger(self.sharp_engine, self.reaction, self.action,
+                self.substitution)
         copy.mute = self.mute
         copy.mark = self.mark
         copy.level = self.level
@@ -107,12 +113,61 @@ class Trigger:
 
         return re.compile(reaction, re.IGNORECASE | re.UNICODE)
 
+    def set_variables(self, match):
+        """Set the variables of the trigger in the SharpScript engine.
+
+        This method, to be used internally, put the trigger's variables
+        in the SharpEngine locales.  Obviously, this should only be
+        used before executing the trigger or asking for the substitution.
+
+        The match can be a string.  In this case, the regular expression
+        associated with this trigger is executed and the match is
+        created, if the expression matches.
+
+        """
+        if isinstance(match, basestring):
+            match = self.re_reaction.search(match)
+            if not match:
+                return False
+
+        world = self.world
+        engine = self.sharp_engine
+        if "args" not in engine.locals:
+            engine.locals["args"] = {}
+
+        args = engine.locals["args"]
+
+        # Copy the groups of this match
+        i = 0
+        for group in match.groups():
+            i += 1
+            args[unicode(i)] = group
+
+        # Copy the named groups
+        for name, group in match.groupdict().items():
+            engine.locals[name] = group
+
+        return True
+
+    def replace(self):
+        """Return the replacement text if a substitution is set.
+
+        The substsitution is itself a text that can contain variables.
+        It is returned, with the variable replaced the same way as
+        in SharpScript.  The 'set_variables' must be called before
+        calling this method (either directly, or using the 'test'
+        method).
+
+        """
+        engine = self.sharp_engine
+        return engine.replace_variables(self.substitution)
+
     def test(self, line, execute=False):
         """Should the trigger be triggered by the text?
 
-        This function return either True or False.  If the 'execute'
-        argument is set to True, and the trigger should be fired, then
-        call the 'execute' method.
+        This function return either the matching expression or None.
+        If the 'execute' argument is set to True, and the trigger
+        should be fired, then call the 'execute' method.
 
         """
         match = self.re_reaction.search(line)
@@ -120,32 +175,19 @@ class Trigger:
             world = self.world
             world = world and world.name or "unknown"
             if not execute:
-                return True
+                return match
 
             self.logger.debug("Trigger {}.{} fired.".format(
                     world, repr(self.reaction)))
 
-            engine = self.sharp_engine
-            if "args" not in engine.locals:
-                engine.locals["args"] = {}
-
-            args = engine.locals["args"]
-
-            # Copy the groups of this match
-            i = 0
-            for group in match.groups():
-                i += 1
-                args[unicode(i)] = group
-
-            # Copy the named groups
-            for name, group in match.groupdict().items():
-                engine.locals[name] = group
+            # Put the variables in the SharpEngine locales
+            self.set_variables(match)
 
             # Execute the trigger
             self.execute()
-            return True
+            return match
 
-        return False
+        return None
 
     def execute(self):
         """Execute the trigger."""

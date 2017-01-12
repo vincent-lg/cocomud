@@ -122,19 +122,26 @@ class Client(threading.Thread):
             display = True
             for trigger in self.world.triggers:
                 try:
-                    test = trigger.test(no_ansi_line)
+                    match = trigger.test(no_ansi_line)
                 except Exception:
                     log = logger("client")
                     log.exception("The trigger {} failed".format(
                             repr(trigger.readction)))
                 else:
-                    if test:
-                        triggers.append((trigger, no_ansi_line))
+                    if match:
+                        triggers.append((trigger, match, no_ansi_line))
                         if trigger.mute:
                             display = False
                         if trigger.mark and mark is None:
                             before = "\n".join([l for l in no_ansi_lines])
                             mark = len(before) + 1
+
+                        # Handle triggers with substitution
+                        if trigger.substitution:
+                            display = False
+                            trigger.set_variables(match)
+                            replacement = trigger.replace()
+                            lines.extend(replacement.splitlines())
 
             if display:
                 if self.strip_ansi:
@@ -155,8 +162,9 @@ class Client(threading.Thread):
                     "An error occurred when handling a message")
 
         # Execute the triggers
-        for trigger, line in triggers:
-            trigger.test(line, execute=True)
+        for trigger, match, line in triggers:
+            trigger.set_variables(match)
+            trigger.execute()
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True, mark=None):
