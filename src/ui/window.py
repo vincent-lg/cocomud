@@ -440,6 +440,8 @@ class ClientWindow(DummyUpdater):
 
         tab = self.tabs.GetCurrentPage()
         tab.focus = True
+        pos = tab.output.GetInsertionPoint()
+        tab.output.SetInsertionPoint(pos)
         world = tab.world
         self.SetTitle("{} [CocoMUD]".format(world.name))
         e.Skip()
