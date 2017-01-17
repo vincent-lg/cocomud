@@ -1,12 +1,12 @@
-add: Ajouter
+add: "&Ajouter"
 add_action: Ajouter l'action
 browse: Parcourir...
 choose_file: Sélectionner un fichier
 close: Fermer
 connect: Connecter
-edit: Éditer
+edit: "&Editer"
 help: Aide
-remove: Supprimer
+remove: "&Supprimer"
 restart: Redémarrage
 test: Test
 what:
