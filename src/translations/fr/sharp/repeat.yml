@@ -1,0 +1,9 @@
+﻿command: >
+    La commande à répéter (laissez ce champ vide pour envoyer la
+    dernière commande de votre historique) :
+description: Répète une commande X fois
+empty_times: >
+    Vous n'avez pas précisé le nombre de fois que vous voulez répéter
+    cette commande. Précisez au moins 1.
+invalid_times: Le nombre de fois entré n'est pas un nombre valide.
+times: "Nombre de fois où la commande doit être répétée :"

@@ -1,0 +1,9 @@
+﻿command: >
+    Command to repeat (leave blank to send the last command in
+    your history):
+description: Repeat a command X times
+empty_times: >
+    You didn't specify the number of times you want this command to
+    repeat.  Specify 1 at least.
+invalid_times: The number of times you specified isn't a valid number.
+times: "Number of times to repeat the command to send:"

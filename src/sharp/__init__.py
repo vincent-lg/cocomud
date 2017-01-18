@@ -6,6 +6,7 @@ from sharp.functions.channel import Channel
 from sharp.functions.feed import Feed
 from sharp.functions.macro import Macro
 from sharp.functions.play import Play
+from sharp.functions.repeat import Repeat
 from sharp.functions.say import Say
 from sharp.functions.send import Send
 from sharp.functions.trigger import Trigger
@@ -17,6 +18,7 @@ FUNCTIONS = {
     "feed": Feed,
     "macro": Macro,
     "play": Play,
+    "repeat": Repeat,
     "say": Say,
     "send": Send,
     "trigger": Trigger,

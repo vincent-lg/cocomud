@@ -76,7 +76,7 @@ class Send(Function):
             empty_commands = "The commands field is empty."
 
         if not commands:
-            wx.MessageBox(empty_commands, t("ui.message.error"),
+            wx.MessageBox(empty_commands, t("ui.alert.error"),
                     wx.OK | wx.ICON_ERROR)
             dialog.commands.SetFocus()
             return None
