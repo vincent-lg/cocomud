@@ -627,11 +627,9 @@ class MUDPanel(AccessPanel):
 
         if self.world:
             # Test the different macros
-            for macro in self.world.macros:
-                code = (macro.key, macro.modifiers)
-                if code == (key, modifiers):
-                    macro.execute(self.engine, self.client)
-                    return
+            if self.client.test_macros(key, modifiers):
+                self.output.SetInsertionPoint(self.editing_pos)
+                return
 
             # Test auto-completion
             if key == wx.WXK_TAB and modifiers == wx.MOD_NONE:

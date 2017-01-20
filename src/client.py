@@ -102,7 +102,8 @@ class Client(threading.Thread):
 
             if msg:
                 msg = msg.decode(encoding, errors="replace")
-                self.handle_lines(msg)
+                with self.world.lock:
+                    self.handle_lines(msg)
 
         # Consider the thread as stopped
         self.running = False
@@ -121,6 +122,7 @@ class Client(threading.Thread):
             no_ansi_line = ANSI_ESCAPE.sub('', line)
             display = True
             for trigger in self.world.triggers:
+                trigger.sharp_engine = self.sharp_engine
                 try:
                     match = trigger.test(no_ansi_line)
                 except Exception:
@@ -207,17 +209,34 @@ class Client(threading.Thread):
             else:
                 chunks = [text.encode(encoding, "replace")]
 
-            for text in chunks:
-                # Test the aliases
-                if alias:
-                    for alias in self.world.aliases:
-                        if alias.test(text):
-                            return
+            with self.world.lock:
+                for text in chunks:
+                    # Test the aliases
+                    if alias:
+                        for alias in self.world.aliases:
+                            alias.sharp_engine = self.sharp_engine
+                            if alias.test(text):
+                                return
 
                 if not text.endswith("\r\n"):
                     text += "\r\n"
 
                 self.client.write(text)
+
+    def test_macros(self, key, modifiers):
+        """Test the macros of this world."""
+        found = False
+        with self.world.lock:
+            for macro in self.world.macros:
+                code = (macro.key, macro.modifiers)
+                macro.sharp_engine = self.sharp_engine
+                if code == (key, modifiers):
+                    macro.execute(self.engine, self)
+                    found = True
+                    break
+
+        return found
+
 
 
 class GUIClient(Client):

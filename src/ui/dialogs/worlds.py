@@ -80,6 +80,7 @@ class WorldsDialog(wx.Dialog):
         self.worlds.SetFocus()
 
         # Event binding
+        self.worlds.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnSelect)
         install.Bind(wx.EVT_BUTTON, self.OnInstall)
 
     def populate_list(self, selection=0):
@@ -101,6 +102,17 @@ class WorldsDialog(wx.Dialog):
                 self.worlds.Select(selection)
                 self.worlds.Focus(selection)
 
+    def OnSelect(self, e):
+        """When the selection changes."""
+        index = self.worlds.GetFirstSelected()
+        try:
+            world = self.online[index]
+        except IndexError:
+            wx.MessageBox(t("ui.dialog.worlds.unknown_world"),
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+        else:
+            self.description.SetValue(world.description)
+
     def OnInstall(self, e):
         """The user clicked on 'install'>"""
         index = self.worlds.GetFirstSelected()
@@ -118,6 +130,6 @@ class WorldsDialog(wx.Dialog):
             # Extract the world in memory
             archive = ZipFile(download.file)
             files = {name: archive.read(name) for name in archive.namelist()}
-            wizard = InstallWorld(self.engine, "VanciaMUD", files)
+            wizard = InstallWorld(self.engine, world.name, files)
             self.Destroy()
             wizard.start()
