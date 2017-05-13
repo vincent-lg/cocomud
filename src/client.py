@@ -28,7 +28,9 @@
 
 """This file contains the client that can connect to a MUD.
 
-It is launched in a new thread, so as not to block the main thread.
+Starting from CocoMUD 45, the network is handled by Twisted.  The
+Client class inherits from 'twisted.conch.telnet.Telnet', which
+already handles a great deal of the Telnet protocol.
 
 """
 
@@ -39,78 +41,68 @@ from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC
 import threading
 import time
 
+from twisted.internet.error import ConnectionDone
+from twisted.internet.protocol import ReconnectingClientFactory
+from twisted.conch.telnet import Telnet
+import wx
+from wx.lib.pubsub import pub, setupkwargs
+
 from log import logger
+from screenreader import ScreenReader
 from screenreader import ScreenReader
 
 # Constants
 ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
 
-class Client(threading.Thread):
+class Client(Telnet):
 
-    """Class to receive data from the MUD."""
-
-    def __init__(self, host, port=4000, timeout=0.1, engine=None,
-            world=None):
-        """Connects to the MUD."""
-        threading.Thread.__init__(self)
-        self.client = None
-        self.host = host
-        self.port = port
-        self.timeout = timeout
-        self.engine = engine
-        self.world = world
-        self.running = False
-        self.strip_ansi = False
-        self.commands = []
-        self.sharp_engine = None
+    """Class to receive data from the MUD using a Telnet protocol."""
 
     def disconnect(self):
         """Disconnect, close the client."""
-        if self.client and self.client.get_socket():
-            self.client.close()
+        if self.transport:
+            self.transport.loseConnection()
 
         self.running = False
 
-    def pre_run(self):
-        """Method called before running."""
-        pass
+    def connectionMade(self):
+        """Established connection, send the differed commands."""
+        host = self.transport.getPeer().host
+        port = self.transport.getPeer().port
+        log = logger("client")
+        log.info("Connected to {host}:{port}".format(
+                host=host, port=port))
+        self.factory.resetDelay()
+        for command in self.factory.commands:
+            self.transport.write(command + "\r\n")
+
+    def connectionLost(self, reason):
+        """The connection was lost."""
+        host = self.transport.getPeer().host
+        port = self.transport.getPeer().port
+        log = logger("client")
+        log.info("Lost Connection on {host}:{port}: {reason}".format(
+                host=host, port=port, reason=reason.type))
+        wx.CallAfter(pub.sendMessage, "disconnect", reason=reason)
+        if reason.type is ConnectionDone:
+            self.factory.stopTrying()
+
+    def applicationDataReceived(self, data):
+        """Receive something."""
+        encoding = self.factory.engine.settings["options.general.encoding"]
+        msg = data.decode(encoding, errors="replace")
+        with self.factory.world.lock:
+            self.handle_lines(msg)
 
     def run(self):
         """Run the thread."""
         # Try to connect to the specified host and port
-        self.client = Telnet(self.host, self.port)
+        host = self.transport.getPeer().host
+        port = self.transport.getPeer().port
+        log = logger("client")
+        log.info("Connecting client for {host}:{port}".format(
+                host=host, port=port))
         self.running = True
-        self.pre_run()
-
-        # If the client has commands
-        for command in self.commands:
-            self.client.write(command + "\r\n")
-
-        while self.running:
-            time.sleep(self.timeout)
-            encoding = self.engine.settings["options.general.encoding"]
-            if not self.client.get_socket():
-                break
-
-            try:
-                msg = self.client.read_very_eager()
-            except socket.error:
-                if self.window:
-                    self.window.handle_reconnection()
-            except EOFError:
-                break
-
-            if msg:
-                msg = msg.decode(encoding, errors="replace")
-                with self.world.lock:
-                    self.handle_lines(msg)
-
-        # Consider the thread as stopped
-        self.running = False
-
-        # If there's still an open window
-        if self.window:
-            self.window.handle_disconnection()
 
     def handle_lines(self, msg):
         """Handle multiple lines of text."""
@@ -121,8 +113,8 @@ class Client(threading.Thread):
         for line in msg.splitlines():
             no_ansi_line = ANSI_ESCAPE.sub('', line)
             display = True
-            for trigger in self.world.triggers:
-                trigger.sharp_engine = self.sharp_engine
+            for trigger in self.factory.world.triggers:
+                trigger.sharp_engine = self.factory.sharp_engine
                 try:
                     match = trigger.test(no_ansi_line)
                 except Exception:
@@ -146,7 +138,7 @@ class Client(threading.Thread):
                             lines.extend(replacement.splitlines())
 
             if display:
-                if self.strip_ansi:
+                if self.factory.strip_ansi:
                     lines.append(no_ansi_line)
                 else:
                     lines.append(line)
@@ -178,142 +170,98 @@ class Client(threading.Thread):
             screen: should the text appear on screen?
             speech: should the speech be enabled?
             braille: should the braille be enabled?
-            mark: the index on which to move the cursor
+            mark: the index where to move the cursor.
 
         """
-        pass
+        if screen:
+            wx.CallAfter(pub.sendMessage, "message", message=msg, mark=mark)
+
+        # In any case, tries to find the TTS
+        msg = ANSI_ESCAPE.sub('', msg)
+        panel = self.factory.panel
+        if self.factory.engine.TTS_on or force_TTS:
+            # If outside of the window
+            tts = False
+            if force_TTS:
+                tts = True
+            elif panel.inside and panel.focus:
+                tts = True
+            elif not panel.inside and self.factory.engine.settings[
+                    "options.TTS.outside"]:
+                tts = True
+
+            if tts:
+                interrupt = self.factory.engine.settings[
+                        "options.TTS.interrupt"]
+                ScreenReader.talk(msg, speech=speech, braille=braille,
+                        interrupt=interrupt)
 
     def write(self, text, alias=True):
         """Write text to the client."""
-        if text.startswith("#"):
-            self.sharp_engine.execute(text)
+        # Break in chunks based on the command stacking, if active
+        settings = self.factory.engine.settings
+        stacking = settings["options.input.command_stacking"]
+        encoding = settings["options.general.encoding"]
+        if stacking:
+            delimiter = re.escape(stacking)
+            re_del = re.compile("(?<!{s}){s}(?!{s})".format(s=delimiter), re.UNICODE)
+            chunks = re_del.split(text)
+
+            # Reset ;; as ; (or other command stacking character)
+            def reset_del(match):
+                return match.group(0)[1:]
+
+            for i, chunk in enumerate(chunks):
+                chunks[i] = re.sub(delimiter + "{2,}", reset_del, chunk)
+                if isinstance(chunks[i], unicode):
+                    chunks[i] = chunks[i].encode(encoding,
+                            errors="replace")
         else:
-            # Break in chunks based on the command stacking, if active
-            settings = self.engine.settings
-            stacking = settings["options.input.command_stacking"]
-            encoding = settings["options.general.encoding"]
-            if stacking:
-                delimiter = re.escape(stacking)
-                re_del = re.compile("(?<!{s}){s}(?!{s})".format(s=delimiter), re.UNICODE)
-                chunks = re_del.split(text)
+            chunks = [text.encode(encoding, "replace")]
 
-                # Reset ;; as ; (or other command stacking character)
-                def reset_del(match):
-                    return match.group(0)[1:]
+        with self.factory.world.lock:
+            for text in chunks:
+                # Test the aliases
+                if alias:
+                    for alias in self.factory.world.aliases:
+                        alias.sharp_engine = self.factory.sharp_engine
+                        if alias.test(text):
+                            return
 
-                for i, chunk in enumerate(chunks):
-                    chunks[i] = re.sub(delimiter + "{2,}", reset_del, chunk)
-                    if isinstance(chunks[i], unicode):
-                        chunks[i] = chunks[i].encode(encoding,
-                                errors="replace")
-            else:
-                chunks = [text.encode(encoding, "replace")]
+            if not text.endswith("\r\n"):
+                text += "\r\n"
 
-            with self.world.lock:
-                for text in chunks:
-                    # Test the aliases
-                    if alias:
-                        for alias in self.world.aliases:
-                            alias.sharp_engine = self.sharp_engine
-                            if alias.test(text):
-                                return
-
-                if not text.endswith("\r\n"):
-                    text += "\r\n"
-
-                self.client.write(text)
+            self.transport.write(text)
 
     def test_macros(self, key, modifiers):
         """Test the macros of this world."""
         found = False
-        with self.world.lock:
-            for macro in self.world.macros:
+        with self.factory.world.lock:
+            for macro in self.factory.world.macros:
                 code = (macro.key, macro.modifiers)
-                macro.sharp_engine = self.sharp_engine
+                macro.sharp_engine = self.factory.sharp_engine
                 if code == (key, modifiers):
-                    macro.execute(self.engine, self)
+                    macro.execute(self.factory.engine, self)
                     found = True
                     break
 
         return found
 
 
+class CocoFactory(ReconnectingClientFactory):
 
-class GUIClient(Client):
+    """Factory used by CocoMUD client to generate Telnet clients."""
 
-    """Client specifically linked to a GUI window.
+    def __init__(self, world, panel):
+        self.world = world
+        self.panel = panel
+        self.engine = world.engine
+        self.sharp_engine = world.sharp_engine
+        self.commands = []
+        self.strip_ansi = False
 
-    This client proceeds to send the text it receives to the frame.
-
-    """
-
-    def __init__(self, host, port=4000, timeout=0.1, engine=None,
-            world=None):
-        Client.__init__(self, host, port, timeout, engine, world)
-        self.window = None
-
-    def link_window(self, window):
-        """Link to a window (a GUI object).
-
-        This objectt can be of various types.  The client only interacts
-        with it in two ways:  First, whenever it receives a message,
-        it sends it to the window's 'handle_message' method.  It also
-        calls the window's 'handle_option' method whenever it receives
-        a Telnet option that it can recognize.
-
-        """
-        self.window = window
-        window.client = self
-
-    def pre_run(self):
-        """Method called before running."""
-        self.client.set_option_negotiation_callback(self.handle_option)
-
-    def handle_message(self, msg, force_TTS=False, screen=True,
-            speech=True, braille=True, mark=None):
-        """When the client receives a message.
-
-        Parameters
-            msg: the text to be displayed (str)
-            force_TTS: should the text be spoken regardless?
-            screen: should the text appear on screen?
-            speech: should the speech be enabled?
-            braille: should the braille be enabled?
-            mark: the index where to move the cursor.
-
-        """
-        if self.window and screen:
-            self.window.handle_message(msg, mark)
-
-        # In any case, tries to find the TTS
-        msg = ANSI_ESCAPE.sub('', msg)
-        if self.engine.TTS_on or force_TTS:
-            # If outside of the window
-            tts = False
-            panel = self.window
-            window = getattr(panel, "window", None)
-            focus = (window.focus and panel.focus) if panel else False
-            outside = (not window.focus and panel.focus) if panel else False
-            if force_TTS:
-                tts = True
-            elif focus:
-                tts = True
-            elif outside and self.engine.settings["options.TTS.outside"]:
-                tts = True
-
-            if tts:
-                interrupt = self.engine.settings["options.TTS.interrupt"]
-                ScreenReader.talk(msg, speech=speech, braille=braille,
-                        interrupt=interrupt)
-
-    def handle_option(self, socket, command, option):
-        """Handle a received option."""
-        name = ""
-        if command == AYT:
-            log = logger("client")
-            log.debug("Received a AYT, replying with a NOP.")
-            socket.send(IAC + NOP)
-        elif command == WILL and option == ECHO:
-            name = "hide"
-        elif command == WONT and option == ECHO:
-            name = "show"
+    def buildProtocol(self, addr):
+        client = Client()
+        client.factory = self
+        self.panel.client = client
+        return client

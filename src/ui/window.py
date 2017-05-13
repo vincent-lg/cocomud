@@ -37,6 +37,7 @@ from zipfile import ZipFile
 
 from accesspanel import AccessPanel
 import wx
+from wx.lib.pubsub import pub, setupkwargs
 from ytranslate.tools import t
 
 from autoupdate import AutoUpdate
@@ -408,22 +409,31 @@ class ClientWindow(DummyUpdater):
 
     def OnClose(self, e):
         """Properly close the interface."""
-        # Close all clients
-        for page in self.tabs.GetChildren():
-            if page.client:
-                page.client.disconnect()
-
         self.Destroy()
-
         if self.engine:
             self.engine.stop()
 
     def OnActivate(self, e):
         """The window gains or loses focus."""
+        if not self or not self.tabs:
+            return
+
         self.focus = e.GetActive()
+
+        # Set all tabs has unfocused
+        for tab in self.tabs.GetChildren():
+            tab.focus = False
+            tab.inside = self.focus
+
+        # Change the focus for the currently selected tab
+        panel = self.panel
+        if panel:
+            panel.focus = True
+            if self.focus:
+                panel.output.SetFocus()
+
         if self.focus:
             # Reset the window's title
-            panel = self.panel
             if panel:
                 world = self.world
                 panel.nb_unread = 0
@@ -483,12 +493,15 @@ class MUDPanel(AccessPanel):
         self.world = world
         self.session = session
         self.focus = True
+        self.inside = True
         self.last_ac = None
         self.output.SetFocus()
         self.nb_unread = 0
 
         # Event binding
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
+        pub.subscribe(self.handle_disconnection, "disconnect")
+        pub.subscribe(self.handle_message, "message")
 
     def CreateClient(self):
         """Connect the MUDPanel."""
@@ -505,12 +518,10 @@ class MUDPanel(AccessPanel):
         world = self.world
         hostname = world.hostname
         port = world.port
-        client = engine.open(hostname, port, world)
-        client.link_window(self)
+        client = engine.open(hostname, port, world, self)
         client.strip_ansi = not self.rich
         world.load()
         client.commands = self.login()
-        client.start()
         self.session.client = client
         return client
 
@@ -536,17 +547,14 @@ class MUDPanel(AccessPanel):
         return []
 
     # Methods to handle client's events
-    def handle_disconnection(self):
+    def handle_disconnection(self, reason=None):
         """The client has been disconnected for any reason."""
         message = u"--- {} ---".format(t("ui.client.disconnected"))
-        self.Send(message)
+        if self:
+            self.Send(message)
         ScreenReader.talk(message, interrupt=False)
 
-    def handle_reconnection(self):
-        """Attempts to reconnect."""
-        self.CreateClient()
-
-    def handle_message(self, message, mark=None):
+    def handle_message(self, message="", mark=None):
         """The client has just received a message."""
         point = self.editing_pos
         lines = message.splitlines()
@@ -555,6 +563,9 @@ class MUDPanel(AccessPanel):
         world = self.world
         if world:
             world.feed_words(message)
+
+        if not self:
+            return
 
         self.Send(message)
 
@@ -567,26 +578,10 @@ class MUDPanel(AccessPanel):
             self.output.SetInsertionPoint(point + mark)
 
         # Change the window title if not focused
-        if self.focus and not self.window.focus:
+        if self.focus and not self.inside:
             self.nb_unread += 1
             self.window.SetTitle("({}) {} [CocoMUD]".format(
                     self.nb_unread, world.name))
-
-    def handle_option(self, command):
-        """Handle the specified option.
-
-        The command is a string representing the received option.
-        The following options are supported:
-            "hide":  the input should be hidden
-            "show":  the input should be shown
-
-        """
-        if command == "hide":
-            evt = FocusEvent(myEVT_FOCUS, -1, "password")
-            wx.PostEvent(self.panel, evt)
-        elif command == "show":
-            evt = FocusEvent(myEVT_FOCUS, -1, "input")
-            wx.PostEvent(self.panel, evt)
 
     def OnInput(self, message):
         """Some text has been sent from the input."""

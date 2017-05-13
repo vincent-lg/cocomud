@@ -29,13 +29,18 @@
 """This demo file creates a simple client with TTS support."""
 
 import wx
+from twisted.internet import wxreactor
+wxreactor.install()
+
+from twisted.internet import reactor
 from ytranslate import init, select
 
 from game import GameEngine
 import init
+from log import end
 from ui.window import ClientWindow
 
-app = wx.App()
+app = wx.App(False)
 # Load the user configuration
 engine = GameEngine()
 engine.load()
@@ -48,5 +53,7 @@ select(lang)
 window = ClientWindow(engine)
 world = window.world
 if world is not None:
-    window.panel.CreateClient()
-    app.MainLoop()
+    reactor.callLater(0, window.panel.CreateClient)
+    reactor.registerWxApp(app)
+    reactor.run(installSignalHandlers=0)
+    end()

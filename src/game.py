@@ -31,10 +31,11 @@
 import os
 
 from enum import Enum
+from twisted.internet import reactor
 
-from client import GUIClient
+from client import CocoFactory
 from config import Settings
-from log import logger, begin, end
+from log import logger, begin
 from sharp.engine import SharpScript
 from world import World, MergingMethod
 
@@ -89,22 +90,22 @@ class GameEngine:
         for world in self.worlds.values():
             world.engine = self
 
-    def open(self, host, port, world):
+    def open(self, host, port, world, panel=None):
         """Connect to the specified host and port.
 
-        This method creates and returns a 'GUIClient' class initialized
-        with the specified information.
+        This method creates and returns a 'Factory' class initialized
+        with the specified information.  It also tries to connect a
+        client to this factory.
 
         """
         self.logger.info("Creating a client for {host}:{port}".format(
                 host=host, port=port))
 
-        client = GUIClient(host, port, engine=self, world=world)
-        sharp_engine = SharpScript(self, client, world)
-        world.client = client
-        client.sharp_engine = sharp_engine
-        world.sharp_engine = sharp_engine
-        return client
+        self.prepare_world(world)
+        factory = CocoFactory(world, panel)
+
+        reactor.connectTCP(host, port, factory)
+        return factory
 
     def open_help(self, name):
         """Open the selected help file in HTML format.
@@ -170,4 +171,4 @@ class GameEngine:
 
     def stop(self):
         """Stop the game engine and close the sessions."""
-        end()
+        reactor.stop()
