@@ -622,7 +622,7 @@ class MUDPanel(AccessPanel):
 
         if self.world:
             # Test the different macros
-            if self.client.test_macros(key, modifiers):
+            if self.client and self.client.test_macros(key, modifiers):
                 self.output.SetInsertionPoint(self.editing_pos)
                 return
 

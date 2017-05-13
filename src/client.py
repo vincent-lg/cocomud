@@ -264,4 +264,5 @@ class CocoFactory(ReconnectingClientFactory):
         client = Client()
         client.factory = self
         self.panel.client = client
+        self.sharp_engine.bind_client(client)
         return client

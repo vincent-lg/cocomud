@@ -68,6 +68,12 @@ class SharpScript(object):
             self.functions[name] = function
             self.globals[name] = function.run
 
+    def bind_client(self, client):
+        """Bind a client to the sharp engine."""
+        self.client = client
+        for function in self.functions.values():
+            function.client = client
+
     def execute(self, code, debug=False, variables=False):
         """Execute the SharpScript code given as an argument."""
         if isinstance(code, basestring):
