@@ -33,6 +33,7 @@ from __future__ import absolute_import
 import os
 import re
 import sys
+from threading import RLock
 from zipfile import ZipFile
 
 from accesspanel import AccessPanel
@@ -69,6 +70,7 @@ class ClientWindow(DummyUpdater):
 
     def __init__(self, engine, world=None):
         super(ClientWindow, self).__init__(None)
+        self.lock = RLock()
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer = sizer
         self.main_panel = wx.Panel(self)
@@ -249,6 +251,8 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
         self.tabs.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnTabChanged)
+        pub.subscribe(self.disconnectClient, "disconnect")
+        pub.subscribe(self.messageClient, "message")
 
     def OnCreate(self, e):
         """Open the dialog to add a new world."""
@@ -456,6 +460,26 @@ class ClientWindow(DummyUpdater):
         self.SetTitle("{} [CocoMUD]".format(world.name))
         e.Skip()
 
+    def disconnectClient(self, client=None, reason=None):
+        """A client disconnects."""
+        if not self:
+            return
+
+        panel = client.factory.panel
+        if panel:
+            with self.lock:
+                panel.handle_disconnection(reason)
+
+    def messageClient(self, client, message, mark=None):
+        """A client receives a message."""
+        if not self:
+            return
+
+        panel = client.factory.panel
+        if panel:
+            with self.lock:
+                panel.handle_message(message, mark=mark)
+
     def OnResponseUpdate(self, build=None):
         """The check for updates has returned."""
         if self.loading:
@@ -500,8 +524,6 @@ class MUDPanel(AccessPanel):
 
         # Event binding
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
-        pub.subscribe(self.handle_disconnection, "disconnect")
-        pub.subscribe(self.handle_message, "message")
 
     def CreateClient(self):
         """Connect the MUDPanel."""
@@ -588,11 +610,12 @@ class MUDPanel(AccessPanel):
         if self.world:
             self.world.reset_autocompletion()
 
-        try:
-            self.client.write(message)
-        except Exception:
-            log = logger("client")
-            log.exception("An error occurred when sending a message")
+        with self.window.lock:
+            try:
+                self.client.write(message)
+            except Exception:
+                log = logger("client")
+                log.exception("An error occurred when sending a message")
 
     def OnPaste(self, e):
         """Paste several lines in the input field.
@@ -600,18 +623,19 @@ class MUDPanel(AccessPanel):
         This event simply sends this text to be processed.
 
         """
-        clipboard = wx.TextDataObject()
-        success = wx.TheClipboard.GetData(clipboard)
-        if success:
-            clipboard = clipboard.GetText()
-            input = self.input + clipboard
-            if input.endswith("\n"):
-                lines = input.splitlines()
-                for line in lines:
-                    self.OnInput(line)
-                self.ClearInput()
-            else:
-                e.Skip()
+        with self.window.lock:
+            clipboard = wx.TextDataObject()
+            success = wx.TheClipboard.GetData(clipboard)
+            if success:
+                clipboard = clipboard.GetText()
+                input = self.input + clipboard
+                if input.endswith("\n"):
+                    lines = input.splitlines()
+                    for line in lines:
+                        self.OnInput(line)
+                    self.ClearInput()
+                else:
+                    e.Skip()
 
     def OnKeyDown(self, e):
         """A key is pressed in the window."""

@@ -83,7 +83,8 @@ class Client(Telnet):
         log = logger("client")
         log.info("Lost Connection on {host}:{port}: {reason}".format(
                 host=host, port=port, reason=reason.type))
-        wx.CallAfter(pub.sendMessage, "disconnect", reason=reason)
+        wx.CallAfter(pub.sendMessage, "disconnect", client=self,
+                reason=reason)
         if reason.type is ConnectionDone:
             self.factory.stopTrying()
 
@@ -174,7 +175,8 @@ class Client(Telnet):
 
         """
         if screen:
-            wx.CallAfter(pub.sendMessage, "message", message=msg, mark=mark)
+            wx.CallAfter(pub.sendMessage, "message", client=self,
+                    message=msg, mark=mark)
 
         # In any case, tries to find the TTS
         msg = ANSI_ESCAPE.sub('', msg)
