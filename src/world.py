@@ -67,6 +67,7 @@ class World:
         self.name = ""
         self.hostname = ""
         self.port = 4000
+        self.protocol = "telnet"
         self.characters = {}
         self.settings = None
         self.lock = RLock()
@@ -147,6 +148,7 @@ class World:
                 name = "unknown"
                 hostname = "unknown.ext"
                 port = 0
+                protocol = "telnet"
         """).strip("\n")
 
         if self.settings is None:
@@ -156,6 +158,7 @@ class World:
         connection["name"] = self.name
         connection["hostname"] = self.hostname
         connection["port"] = self.port
+        connection["protocol"] = self.protocol
         self.settings.filename = os.path.join(self.path, "options.conf")
         self.settings.write()
         self.save_config()

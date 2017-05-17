@@ -98,11 +98,13 @@ class Client(Telnet):
     def run(self):
         """Run the thread."""
         # Try to connect to the specified host and port
-        host = self.transport.getPeer().host
-        port = self.transport.getPeer().port
+        host = self.factory.world.hostname
+        port = self.factory.world.port
+        protocol = self.factory.world.protocol.lower()
+        protocol = "SSL" if protocol == "ssl" else "telnet"
         log = logger("client")
-        log.info("Connecting client for {host}:{port}".format(
-                host=host, port=port))
+        log.info("Connecting {protocol} client for {host}:{port}".format(
+                protocol=protocol, host=host, port=port))
         self.running = True
 
     def handle_lines(self, msg):
@@ -265,6 +267,7 @@ class CocoFactory(ReconnectingClientFactory):
     def buildProtocol(self, addr):
         client = Client()
         client.factory = self
+        client.run()
         self.panel.client = client
         self.sharp_engine.bind_client(client)
         return client

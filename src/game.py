@@ -31,7 +31,7 @@
 import os
 
 from enum import Enum
-from twisted.internet import reactor
+from twisted.internet import ssl, reactor
 
 from client import CocoFactory
 from config import Settings
@@ -104,7 +104,12 @@ class GameEngine:
         self.prepare_world(world)
         factory = CocoFactory(world, panel)
 
-        reactor.connectTCP(host, port, factory)
+        if world.protocol.lower() == "ssl":
+            reactor.connectSSL(host, port, factory,
+                    ssl.ClientContextFactory())
+        else:
+            reactor.connectTCP(host, port, factory)
+
         return factory
 
     def open_help(self, name):

@@ -280,9 +280,11 @@ class GameSettings(Configuration):
                 name = string
                 hostname = string
                 port = integer
+                protocol = string(default="telnet")
         """).strip("\n")
         self.load_config_file("options", spec, world.path)
         world.name = self["options.connection.name"]
         world.hostname = self["options.connection.hostname"]
         world.port = self["options.connection.port"]
+        world.protocol = self["options.connection.protocol"]
         world.settings = self["options"]
