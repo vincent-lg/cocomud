@@ -4,6 +4,7 @@ encodings: Encodings
 input: Input
 command_stacking: Command stacking
 accessibility: Accessibility
+screenreader: Enable screen reader support
 TTS:
     "on": Enable TTS (Text-To Speech)
     outside: Enable TTS when on a different window

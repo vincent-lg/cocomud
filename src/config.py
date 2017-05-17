@@ -238,6 +238,7 @@ class Settings(Configuration):
             [general]
                 language = option('en', 'fr', default='{lang}')
                 encoding = string(default="iso8859_15")
+                screenreader = boolean(default=True)
 
             [input]
                 command_stacking = string(default=";")

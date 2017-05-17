@@ -327,7 +327,7 @@ class ClientWindow(DummyUpdater):
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""
-        dialog = PreferencesDialog(self.engine)
+        dialog = PreferencesDialog(self, self.engine)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -505,6 +505,8 @@ class MUDPanel(AccessPanel):
         self.rich = engine.settings["options.output.richtext"]
         AccessPanel.__init__(self, parent, history=True, lock_input=True,
                 ansi=self.rich, rich=self.rich)
+        self.screenreader_support = engine.settings[
+                "options.general.screenreader"]
         if self.rich:
             self.output.SetForegroundColour(wx.WHITE)
             self.output.SetBackgroundColour(wx.BLACK)

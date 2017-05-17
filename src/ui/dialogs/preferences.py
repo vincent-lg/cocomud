@@ -303,6 +303,13 @@ class AccessibilityTab(wx.Panel):
         self.richtext.SetValue(settings["options.output.richtext"])
         s_other.Add(self.richtext)
 
+        # Screen reader support (srs)
+        s_srs = wx.BoxSizer(wx.HORIZONTAL)
+        self.srs_on = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.screenreader"))
+        self.srs_on.SetValue(settings["options.general.screenreader"])
+        s_other.Add(self.srs_on)
+
         # Add to the main sizer
         sizer.Add(s_TTS)
         sizer.Add(s_other)
@@ -332,8 +339,9 @@ class PreferencesDialog(wx.Dialog):
 
     """Preferences dialog."""
 
-    def __init__(self, engine):
+    def __init__(self, window, engine):
         super(PreferencesDialog, self).__init__(None, title="Preferences")
+        self.window = window
         self.engine = engine
 
         self.InitUI()
@@ -372,8 +380,10 @@ class PreferencesDialog(wx.Dialog):
         interrupt = accessibility.TTS_interrupt.GetValue()
         old_richtext = settings["options.output.richtext"]
         richtext = accessibility.richtext.GetValue()
+        srs = accessibility.srs_on.GetValue()
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
+        settings["options.general.screenreader"] = srs
         settings["options.input.command_stacking"] = command_stacking
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
@@ -382,6 +392,12 @@ class PreferencesDialog(wx.Dialog):
         settings["options"].write()
         self.engine.TTS_on = accessibility.TTS_on.GetValue()
         self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
+
+        # Repercute screen reader support
+        print "Turning srs", srs
+        for tab in self.window.tabs.GetChildren():
+            tab.screenreader_support = srs
+
         if old_language != new_language:
             wx.MessageBox(t("ui.dialog.preferences.update_language"),
                     t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
