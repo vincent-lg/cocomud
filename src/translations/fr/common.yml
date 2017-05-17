@@ -18,8 +18,11 @@ macro:
 message: Message
 name: Nom
 port: Port
+protocol: Protocole
 script: Script
 shortcut: Raccourci
+SSL: Telnet sécurisé (SSL)
+telnet: Telnet
 trigger:
     1: Trigger
     2+: Triggers

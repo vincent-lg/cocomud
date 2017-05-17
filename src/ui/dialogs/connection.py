@@ -258,6 +258,7 @@ class EditWorldDialog(wx.Dialog):
         s_name = wx.BoxSizer(wx.HORIZONTAL)
         s_hostname = wx.BoxSizer(wx.HORIZONTAL)
         s_port = wx.BoxSizer(wx.HORIZONTAL)
+        s_protocol = wx.BoxSizer(wx.HORIZONTAL)
         self.SetSizer(sizer)
 
         # Create the name field
@@ -284,6 +285,21 @@ class EditWorldDialog(wx.Dialog):
         s_port.Add(t_port)
         sizer.Add(s_port)
 
+        # Create the protocol radio button
+        l_protocol = wx.StaticText(self, label=t("common.protocol"))
+        telnet = wx.RadioButton(self, label=t("common.telnet"),
+                style=wx.RB_GROUP)
+        SSL = wx.RadioButton(self, label=t("common.SSL"))
+        is_telnet = self.world.protocol.lower() == "telnet"
+        telnet.SetValue(is_telnet)
+        SSL.SetValue(not is_telnet)
+        self.telnet = telnet
+        self.SSL = SSL
+        s_protocol.Add(l_protocol)
+        s_protocol.Add(telnet)
+        s_protocol.Add(SSL)
+        sizer.Add(s_protocol)
+
         # Main sizer
         buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
         sizer.Add(buttons)
@@ -300,6 +316,8 @@ class EditWorldDialog(wx.Dialog):
         name = self.name.GetValue()
         hostname = self.hostname.GetValue()
         port = self.port.GetValue()
+        telnet = self.telnet.GetValue()
+        protocol = "telnet" if telnet else "SSL"
         if not name:
             wx.MessageBox(t("ui.message.world.missing"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
@@ -326,6 +344,7 @@ class EditWorldDialog(wx.Dialog):
             self.world.name = name
             self.world.hostname = hostname
             self.world.port = port
+            self.world.protocol = protocol
             if self.world not in self.worlds.values():
                 for name, t_world in tuple(self.worlds.items()):
                     if t_world is self.world:

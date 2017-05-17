@@ -56,4 +56,4 @@ if world is not None:
     reactor.callLater(0, window.panel.CreateClient)
     reactor.registerWxApp(app)
     reactor.run(installSignalHandlers=0)
-    end()
+end()
