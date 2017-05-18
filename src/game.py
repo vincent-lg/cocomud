@@ -74,6 +74,7 @@ class GameEngine:
         self.logger = logger("")
         begin()
         self.settings = Settings(self)
+        self.sounds = True
         self.worlds = {}
         self.default_world = None
         self.level = Level.engine

@@ -52,7 +52,12 @@ class Play(Function):
     def run(self, filename):
         """Play the audio file."""
         log = logger("sharp")
-        log.debug("#play {}".format(filename))
+        if self.engine.sounds:
+            log.debug("#play {}".format(repr(filename)))
+        else:
+            log.debug("#play-silent {}".format(repr(filename)))
+            return
+
         filename = self.find_abs_filename(filename)
         if os.path.exists(filename):
             log.debug("#play playing {}".format(repr(filename)))

@@ -16,6 +16,7 @@ notepad: Bloc-notes
 notepad_world: "Pour cet &univers..."
 notepad_character: "Pour ce &personnage..."
 character: Changer les options de ce personnage...
+sounds: Jouer les sons des triggers
 connection: "&Connexion"
 disconnect: "Se &déconnecter de cet univers"
 reconnect: "Se &reconnecter à cet univers"

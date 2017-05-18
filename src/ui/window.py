@@ -194,6 +194,12 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnCharacter, character)
         gameMenu.AppendItem(character)
 
+        # Play sounds
+        self.chk_sounds = gameMenu.Append(wx.ID_ANY, t("ui.menu.sounds"),
+                t("ui.menu.sounds"), kind=wx.ITEM_CHECK)
+        gameMenu.Check(self.chk_sounds.GetId(), True)
+        self.Bind(wx.EVT_MENU, self.ToggleSounds, self.chk_sounds)
+
         ## Connection menu
         # Disconnect
         disconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.disconnect"))
@@ -380,6 +386,10 @@ class ClientWindow(DummyUpdater):
         session = panel.session
         dialog = CharacterDialog(self.engine, session)
         dialog.ShowModal()
+
+    def ToggleSounds(self, e):
+        """Toggle the "play sounds" checkbox."""
+        self.engine.sounds = self.chk_sounds.IsChecked()
 
     def OnDisconnect(self, e):
         """Disconnect the current client."""

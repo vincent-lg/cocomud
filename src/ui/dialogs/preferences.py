@@ -394,7 +394,6 @@ class PreferencesDialog(wx.Dialog):
         self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
 
         # Repercute screen reader support
-        print "Turning srs", srs
         for tab in self.window.tabs.GetChildren():
             tab.screenreader_support = srs
 
