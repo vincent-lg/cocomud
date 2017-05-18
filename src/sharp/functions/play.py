@@ -55,10 +55,10 @@ class Play(Function):
         log.debug("#play {}".format(filename))
         filename = self.find_abs_filename(filename)
         if os.path.exists(filename):
-            log.debug("#play playing {}".format(filename))
+            log.debug("#play playing {}".format(repr(filename)))
         else:
             log.warning("#play cannot find the file at {}".format(
-                    filename))
+                    repr(filename)))
 
         sound = mixer.Sound(filename)
         sound.play()
