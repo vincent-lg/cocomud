@@ -51,7 +51,7 @@ class Send(Function):
         text = dedent(text.strip("\n"))
         if self.client:
             for line in text.splitlines():
-                self.client.write(line)
+                self.client.write(line, alias=False)
 
     def display(self, dialog, commands=""):
         """Display the function's argument."""
