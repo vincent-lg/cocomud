@@ -113,6 +113,13 @@ class Client(Telnet):
         lines = []
         no_ansi_lines = []
         triggers = []
+
+        # Line breaks are different whether rich text is used or not
+        if self.factory.panel and self.factory.panel.rich:
+            nl = "\n"
+        else:
+            nl = "\r\n"
+
         for line in msg.splitlines():
             no_ansi_line = ANSI_ESCAPE.sub('', line)
             display = True
@@ -130,8 +137,8 @@ class Client(Telnet):
                         if trigger.mute:
                             display = False
                         if trigger.mark and mark is None:
-                            before = "\n".join([l for l in no_ansi_lines])
-                            mark = len(before) + 1
+                            before = nl.join([l for l in no_ansi_lines])
+                            mark = len(before) + len(nl)
 
                         # Handle triggers with substitution
                         if trigger.substitution:

@@ -601,12 +601,12 @@ class MUDPanel(AccessPanel):
         if not self:
             return
 
-        self.Send(message)
+        self.Send(message, pos=mark)
 
         # If there's a mark, move the cursor to it
         if mark is not None:
             log = logger("ui")
-            word = self.output.GetRange(point + mark, point + mark + 10)
+            word = self.output.GetRange(point + mark, point + mark + 15)
             log.debug("A mark has been detected, move to {} : {}".format(
                     mark, repr(word)))
             self.output.SetInsertionPoint(point + mark)
