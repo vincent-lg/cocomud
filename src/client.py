@@ -1,4 +1,5 @@
 ﻿# Copyright (c) 2016, LE GOFF Vincent
+# Copyright (c) 2016, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -215,7 +216,8 @@ class Client(Telnet):
         encoding = settings["options.general.encoding"]
         if stacking:
             delimiter = re.escape(stacking)
-            re_del = re.compile("(?<!{s}){s}(?!{s})".format(s=delimiter), re.UNICODE)
+            re_stacking = u"(?<!{s}){s}(?!{s})".format(s=delimiter)
+            re_del = re.compile(re_stacking, re.UNICODE)
             chunks = re_del.split(text)
 
             # Reset ;; as ; (or other command stacking character)
@@ -239,10 +241,10 @@ class Client(Telnet):
                         if alias.test(text):
                             return
 
-            if not text.endswith("\r\n"):
-                text += "\r\n"
+                if not text.endswith("\r\n"):
+                    text += "\r\n"
 
-            self.transport.write(text)
+                self.transport.write(text)
 
     def test_macros(self, key, modifiers):
         """Test the macros of this world."""
