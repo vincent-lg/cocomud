@@ -34,9 +34,10 @@ import os.path
 from textwrap import dedent
 
 from yaml import safe_dump, safe_load
-from configobj import ConfigObj
+from configobj import ConfigObj, ParseError
 from validate import Validator
 
+from log import main as logger
 from world import World
 
 class Configuration(object):
@@ -142,8 +143,15 @@ class Configuration(object):
                 os.mkdir(base)
 
         # Create the ConfigObj
-        config = ConfigObj(fullpath + ".conf", encoding="latin-1",
-                configspec=spec.split("\n"))
+        try:
+            config = ConfigObj(fullpath + ".conf", encoding="latin-1",
+                    configspec=spec.split("\n"))
+        except ParseError:
+            logger.warning("Unable to parse {}, try without encoding".format(
+                    repr(fullpath)))
+            config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"))
+            config.encoding = "latin-1"
+            config.write()
 
         # Validates the configuration
         validator = Validator()

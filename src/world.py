@@ -36,7 +36,7 @@ from StringIO import StringIO
 from textwrap import dedent
 from threading import RLock
 
-from configobj import ConfigObj
+from configobj import ConfigObj, ParseError
 from ytranslate import t
 
 from character import Character
@@ -152,7 +152,14 @@ class World:
         """).strip("\n")
 
         if self.settings is None:
-            self.settings = ConfigObj(spec.split("\n"), encoding="latin-1")
+            try:
+                self.settings = ConfigObj(spec.split("\n"), encoding="latin-1")
+            except ParseError:
+                logger.warning("Error while parsing the config file, " \
+                        "trying without encoding")
+                self.settings = ConfigObj(spec.split("\n"))
+                self.settings.encoding = "latin-1"
+                self.settings.write()
 
         connection = self.settings["connection"]
         connection["name"] = self.name
