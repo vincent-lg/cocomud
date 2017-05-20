@@ -152,7 +152,7 @@ class World:
         """).strip("\n")
 
         if self.settings is None:
-            self.settings = ConfigObj(spec.split("\n"))
+            self.settings = ConfigObj(spec.split("\n"), encoding="latin-1")
 
         connection = self.settings["connection"]
         connection["name"] = self.name
@@ -330,7 +330,7 @@ class World:
     @classmethod
     def get_infos(cls, configuration):
         """Get the information in the configuration and return a dict."""
-        config = ConfigObj(StringIO(configuration))
+        config = ConfigObj(StringIO(configuration), encoding="latin-1")
         data = {}
 
         for key, value in config.items():

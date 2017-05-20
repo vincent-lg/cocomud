@@ -142,7 +142,8 @@ class Configuration(object):
                 os.mkdir(base)
 
         # Create the ConfigObj
-        config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"))
+        config = ConfigObj(fullpath + ".conf", encoding="latin-1",
+                configspec=spec.split("\n"))
 
         # Validates the configuration
         validator = Validator()

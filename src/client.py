@@ -216,7 +216,7 @@ class Client(Telnet):
         encoding = settings["options.general.encoding"]
         if stacking:
             delimiter = re.escape(stacking)
-            re_stacking = "(?<!{s}){s}(?!{s})".format(s=delimiter)
+            re_stacking = u"(?<!{s}){s}(?!{s})".format(s=delimiter)
             re_del = re.compile(re_stacking, re.UNICODE)
             chunks = re_del.split(text)
 
