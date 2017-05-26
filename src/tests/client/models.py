@@ -56,7 +56,7 @@ class MockClient(unittest.TestCase):
             """Private function to return a set of default settings."""
             default = {
                     "options.input.command_stacking": "",
-                    "options.general.encoding": "utf-8",
+                    "options.general.encoding": "latin-1",
             }
             return default[address]
 

@@ -288,6 +288,11 @@ class SharpScript(object):
             "You can earn \$$sum if you move quickly."
 
         """
+        if self.engine:
+            encoding = self.engine.settings["options.general.encoding"]
+        else:
+            encoding = "utf-8"
+
         def spot(match):
             """A variable has been found and should be replaced."""
             variable = match.group(1)
@@ -298,10 +303,14 @@ class SharpScript(object):
             else:
                 value = self.locals.get(variable, "")
 
+            if isinstance(value, str):
+                value = value.decode(encoding, errors="replace")
+            else:
+                value = unicode(value)
+
             self.logger.debug("#{} requests variable {}, value={}".format(
                     self.id, repr(variable), repr(value)))
-
-            return unicode(value)
+            return value
 
         # Replace the variables
         line = RE_VAR.sub(spot, line)
@@ -363,7 +372,7 @@ class SharpScript(object):
         return argument
 
     def extract_arguments(self, line):
-        """Extract the funciton name and arguments.
+        """Extract the function name and arguments.
 
         This method returns a tuple of three informations:
 

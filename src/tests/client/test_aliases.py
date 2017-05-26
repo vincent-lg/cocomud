@@ -60,6 +60,13 @@ class TestAliases(MockClient):
         self.client.write(u"syes!")
         self.client.transport.write.assert_called_once_with("say yes!\r\n")
 
+    def test_variable_special(self):
+        """Test an alias with one variable containing special characters."""
+        alias = Alias(self.client.factory.sharp_engine, "s*", "say $1")
+        self.client.factory.world.aliases = [alias]
+        self.client.write(u"s\x82lite")
+        self.client.transport.write.assert_called_once_with("say \x82lite\r\n")
+
     def test_variables(self):
         """Test a simple alias with several variables."""
         alias = Alias(self.client.factory.sharp_engine,
