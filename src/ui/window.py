@@ -534,6 +534,15 @@ class MUDPanel(AccessPanel):
         self.output.SetFocus()
         self.nb_unread = 0
 
+        # font setup
+        size = 12
+        # modern is a monotype font
+        family = wx.FONTFAMILY_MODERN
+
+        font = wx.Font(size, family, wx.NORMAL, wx.NORMAL)
+        # only sets the output window font
+        self.output.SetFont(font)
+
         # Event binding
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
 
