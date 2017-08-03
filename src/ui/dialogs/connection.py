@@ -228,7 +228,7 @@ class ConnectionDialog(wx.Dialog):
 
         self.session.world = world
         self.session.character = character
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
 
     def OnImport(self, e):
         """The user clicked on the import button."""

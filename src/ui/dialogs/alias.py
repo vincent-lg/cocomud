@@ -161,7 +161,7 @@ class AliasDialog(wx.Dialog):
             aliases.append(alias)
 
         self.world.save_config()
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
 
     def OnClose(self, e):
         """Simply exit the dialog."""
@@ -176,14 +176,14 @@ class AliasDialog(wx.Dialog):
             act_aliases[alias.alias] = alias.action
 
         if dlg_aliases == act_aliases:
-            self.Destroy()
+            self.EndModal(wx.ID_CANCEL)
         else:
             value = wx.MessageBox(t("ui.message.alias.unsaved"),
                     t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                self.Destroy()
+                self.EndModal(wx.ID_CANCEL)
 
 
 class EditAliasDialog(wx.Dialog):
@@ -255,8 +255,9 @@ class EditAliasDialog(wx.Dialog):
             self.alias.re_alias = self.alias.find_regex(self.alias.alias)
             if self.alias not in self.aliases:
                 self.aliases.append(self.alias)
-            self.Destroy()
+            self.EndModal(wx.ID_OK)
 
     def OnCancel(self, e):
         """Simply exit the dialog."""
-        self.Destroy()
+        self.EndModal(wx.ID_CANCEL)
+

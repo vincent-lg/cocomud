@@ -404,8 +404,9 @@ class PreferencesDialog(wx.Dialog):
             wx.MessageBox(t("ui.dialog.preferences.update_richtext"),
                     t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)
 
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, e):
         """Simply exit the dialog."""
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
+

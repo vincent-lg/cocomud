@@ -215,7 +215,7 @@ class MacroDialog(wx.Dialog):
             macros.append(macro)
 
         self.world.save_config()
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
 
     def OnClose(self, e):
         """Simply exit the dialog."""
@@ -230,14 +230,14 @@ class MacroDialog(wx.Dialog):
             act_macros[macro.key, macro.modifiers] = macro.action
 
         if dlg_macros == act_macros:
-            self.Destroy()
+            self.EndModal(wx.ID_CANCEL)
         else:
             value = wx.MessageBox(t("ui.message.macro.unsaved"),
                     t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                self.Destroy()
+                self.EndModal(wx.ID_CANCEL)
 
 
 class EditMacroDialog(wx.Dialog):
@@ -328,8 +328,9 @@ class EditMacroDialog(wx.Dialog):
             self.macro.action = action
             if self.macro not in self.macros:
                 self.macros.append(self.macro)
-            self.Destroy()
+            self.EndModal(wx.ID_OK)
 
     def OnCancel(self, e):
         """Simply exit the dialog."""
-        self.Destroy()
+        self.EndModal(wx.ID_CANCEL)
+

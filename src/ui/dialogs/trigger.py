@@ -162,7 +162,7 @@ class TriggerDialog(wx.Dialog):
             triggers.append(trigger)
 
         self.world.save_config()
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
 
     def OnClose(self, e):
         """Simply exit the dialog."""
@@ -177,14 +177,14 @@ class TriggerDialog(wx.Dialog):
             act_triggers[trigger.reaction] = trigger.action
 
         if dlg_triggers == act_triggers:
-            self.Destroy()
+            self.EndModal(wx.ID_CANCEL)
         else:
             value = wx.MessageBox(t("ui.message.trigger.unsaved"),
                     t("ui.alert.confirm"),
                     wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
             if value == wx.YES:
-                self.Destroy()
+                self.EndModal(wx.ID_CANCEL)
 
 
 class EditTriggerDialog(wx.Dialog):
@@ -283,8 +283,9 @@ class EditTriggerDialog(wx.Dialog):
             self.trigger.mark = mark
             if self.trigger not in self.triggers:
                 self.triggers.append(self.trigger)
-            self.Destroy()
+            self.EndModal(wx.ID_OK)
 
     def OnCancel(self, e):
         """Simply exit the dialog."""
-        self.Destroy()
+        self.EndModal(wx.ID_OK)
+

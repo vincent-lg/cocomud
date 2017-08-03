@@ -33,12 +33,13 @@ from cx_Freeze import setup, Executable
 
 client = Executable(
     script="cocomud.py",
-    base="Win32GUI",
+    base="Console",
+    #base="Win32GUI",
 )
 
 updater = Executable(
     script="updater.py",
-    base="Win32GUI",
+    #base="Win32GUI",
 )
 
 dbg_updater = Executable(
@@ -53,14 +54,17 @@ includefiles = [
 
     # Requests
     "cacert.pem",
-
-    # UniversalSpeech DLLs
-    "../dolapi.dll",
-    "../jfwapi.dll",
-    "../nvdaControllerClient.dll",
-    "../SAAPI32.dll",
-    "../UniversalSpeech.dll",
 ]
+
+if os.name == "nt":
+    includefiles += [
+        # UniversalSpeech DLLs
+        "../dolapi.dll",
+        "../jfwapi.dll",
+        "../nvdaControllerClient.dll",
+        "../SAAPI32.dll",
+        "../UniversalSpeech.dll",
+    ]
 
 if os.path.exists("build/CocoMUD"):
     shutil.rmtree("build/CocoMUD")
@@ -74,7 +78,7 @@ setup(
             "excludes": ["_gtkagg", "_tkagg", "bsddb", "curses",
                     "pywin.debugger", "pywin.debugger.dbgcon",
                     "pywin.dialogs", "tcl", "Tkconstants", "Tkinter"],
-            "packages": ["accesspanel", "redmine.resources"],
+            "packages": ["accesspanel", "redminelib.resources", "_cffi_backend"],
     }},
     executables = [client, updater, dbg_updater]
 )

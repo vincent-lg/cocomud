@@ -74,4 +74,5 @@ class BugDialog(wx.Dialog):
 
     def OnClose(self, e):
         """The user clicked on the 'close' button."""
-        self.Destroy()
+        self.EndDialog(wx.ID_CANCEL)
+

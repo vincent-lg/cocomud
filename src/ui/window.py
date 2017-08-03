@@ -236,8 +236,8 @@ class ClientWindow(DummyUpdater):
 
     def InitUI(self, world=None):
         self.create_updater(just_checking=True)
+        session = Session(None, None)
         if world is None:
-            session = Session(None, None)
             dialog = ConnectionDialog(self.engine, session)
             self.connection = dialog
             value = dialog.ShowModal()

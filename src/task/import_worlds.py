@@ -29,7 +29,7 @@
 """Asynchronous task to import worlds from the website."""
 
 from collections import namedtuple
-from redmine import Redmine
+from redminelib import Redmine
 from ytranslate import t
 
 from task.base import BaseTask
