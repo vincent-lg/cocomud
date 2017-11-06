@@ -376,7 +376,7 @@ class PreferencesDialog(wx.Dialog):
         new_language = general.get_selected_language()
         encoding = display.get_selected_encoding()
         command_stacking = input.command_stacking.GetValue()
-        old_language = settings["options.general.language"]
+        old_language = settings.get_language()
         interrupt = accessibility.TTS_interrupt.GetValue()
         old_richtext = settings["options.output.richtext"]
         richtext = accessibility.richtext.GetValue()
