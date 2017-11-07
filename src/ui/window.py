@@ -646,9 +646,16 @@ class MUDPanel(AccessPanel):
         """
         with self.window.lock:
             clipboard = wx.TextDataObject()
+            if not wx.TheClipboard.IsOpened():
+                wx.TheClipboard.Open()
             success = wx.TheClipboard.GetData(clipboard)
+            wx.TheClipboard.Close()
             if success:
                 clipboard = clipboard.GetText()
+                if self.IsEditing():
+                    print "no edit"
+                    self.output.SetInsertionPoint(self.output.GetLastPosition())
+
                 input = self.input + clipboard
                 if input.endswith("\n"):
                     lines = input.splitlines()
