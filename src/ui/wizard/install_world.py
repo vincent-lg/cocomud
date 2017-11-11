@@ -209,7 +209,7 @@ class InstallWorld(wx.Dialog):
         # Create the dialog
         install = self.wizard.files.get("world/install.json")
         if install:
-            values = json.loads(install, encoding="latin-1",
+            values = json.loads(install, encoding="utf-8",
                     object_pairs_hook=OrderedDict)
 
         # Create each widget

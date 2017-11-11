@@ -127,7 +127,7 @@ class InstallWorld:
             data = {}
             install = self.files.get("world/install.json")
             if install:
-                values = json.loads(install, encoding="latin-1",
+                values = json.loads(install, encoding="utf-8",
                         object_pairs_hook=OrderedDict)
 
                 for key, value in values.items():
@@ -152,7 +152,7 @@ class InstallWorld:
         if "world/install.py" in self.files:
             logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
-            install = install.decode("latin-1").replace("\r", "")
+            install = install.decode("utf-8").replace("\r", "")
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
@@ -162,7 +162,7 @@ class InstallWorld:
         config = self.files.get("world/config.set")
         if config:
             logger.debug("Executing the config.set script")
-            config = config.decode("latin-1")
+            config = config.decode("utf-8")
             destination.sharp_engine.execute(config, variables=False)
 
         # Replace the allow_creation for channels

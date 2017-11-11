@@ -102,6 +102,7 @@ class World:
         from game import Level
         level = self.engine.level
         self.engine.level = Level.world
+        to_save = False
 
         # Reset some of the world's configuration
         self.aliases = []
@@ -117,7 +118,6 @@ class World:
             file.close()
 
             # Convert the content to unicode
-            to_save = False
             try:
                 content = content.decode("utf-8")
             except UnicodeError:
