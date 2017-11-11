@@ -144,13 +144,13 @@ class Configuration(object):
 
         # Create the ConfigObj
         try:
-            config = ConfigObj(fullpath + ".conf", encoding="latin-1",
+            config = ConfigObj(fullpath + ".conf", encoding="utf-8",
                     configspec=spec.split("\n"))
-        except ParseError:
-            logger.warning("Unable to parse {}, try without encoding".format(
+        except (ParseError, UnicodeError):
+            logger.warning("Unable to parse {}, try in latin-1 encoding".format(
                     repr(fullpath)))
-            config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"))
-            config.encoding = "latin-1"
+            config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"), encoding="latin-1")
+            config.encoding = "utf-8"
             config.write()
 
         # Validates the configuration

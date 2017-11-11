@@ -117,13 +117,23 @@ class World:
             file.close()
 
             # Convert the content to unicode
-            content = content.decode("latin-1", errors="replace")
+            to_save = False
+            try:
+                content = content.decode("utf-8")
+            except UnicodeError:
+                logger.warning("Cannot read the world's configuration in " \
+                        "utf-8, try in latin-1 and force-save")
+                content = content.decode("latin-1", errors="replace")
+                to_save = True
 
             # Execute the script
             self.sharp_engine.execute(content, variables=False)
 
         # Put the engine level back
         self.engine.level = level
+
+        if to_save:
+            self.save()
 
     def load_characters(self):
         """Load the characters."""
@@ -194,7 +204,7 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         file = open(path, "w")
-        content = content.encode("latin-1")
+        content = content.encode("utf-8")
         file.write(content)
         file.close()
 
