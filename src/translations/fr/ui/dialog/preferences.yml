@@ -3,6 +3,7 @@ display: Affichage
 encodings: Encodages
 input: Commandes
 command_stacking: Multiple commandes
+auto_send_paste: Envoyer le texte au serveur quand on colle depuis le presse-papier
 accessibility: Accessibilité
 screenreader: Activer le support pour lecteur d'écran
 TTS:

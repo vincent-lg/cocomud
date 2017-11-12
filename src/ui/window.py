@@ -668,7 +668,8 @@ class MUDPanel(AccessPanel):
                     self.output.SetInsertionPoint(self.output.GetLastPosition())
 
                 input = self.input + clipboard
-                if input.endswith("\n"):
+                if input.endswith("\n") and self.engine.settings[
+                        "options.input.auto_send_paste"]:
                     lines = input.splitlines()
                     for line in lines:
                         self.OnInput(line)

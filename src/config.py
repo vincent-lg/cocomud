@@ -144,13 +144,15 @@ class Configuration(object):
 
         # Create the ConfigObj
         try:
-            config = ConfigObj(fullpath + ".conf", encoding="utf-8",
+            config = ConfigObj(fullpath + ".conf", encoding="UTF8",
                     configspec=spec.split("\n"))
+            config.backup_encoding = "utf-8"
         except (ParseError, UnicodeError):
             logger.warning("Unable to parse {}, try in latin-1 encoding".format(
                     repr(fullpath)))
             config = ConfigObj(fullpath + ".conf", configspec=spec.split("\n"), encoding="latin-1")
-            config.encoding = "utf-8"
+            config.encoding = "UTF8"
+            config.backup_encoding = "utf-8"
             config.write()
 
         # Validates the configuration
@@ -243,7 +245,7 @@ class Settings(Configuration):
     def load_options(self):
         """Load the file containing the options."""
         lang = locale.getdefaultlocale()[0].split("_")[0]
-        spec = dedent("""
+        spec = dedent(u"""
             [general]
                 language = option('en', 'fr', default='{lang}')
                 encoding = string(default="iso8859_15")
@@ -251,6 +253,7 @@ class Settings(Configuration):
 
             [input]
                 command_stacking = string(default=";")
+                auto_send_paste = boolean(default=True)
 
             [output]
                 richtext = boolean(default=True)
@@ -285,7 +288,7 @@ class GameSettings(Configuration):
     def load_options(self):
         """Load the file containing the options."""
         world = self.world
-        spec = dedent("""
+        spec = dedent(u"""
             [connection]
                 name = string
                 hostname = string

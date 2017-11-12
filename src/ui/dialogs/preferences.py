@@ -250,10 +250,16 @@ class InputTab(wx.Panel):
         h_stacking = wx.Button(self,
                 label=t("ui.button.what.command_stacking"))
 
+        # Auto-send
+        self.auto_send_paste = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.auto_send_paste"))
+        self.auto_send_paste.SetValue(settings["options.input.auto_send_paste"])
+
         # Append to the sizer
         sizer.Add(l_stacking, pos=(0, 0))
         sizer.Add(t_stacking, pos=(1, 0))
         sizer.Add(h_stacking, pos=(0, 1))
+        sizer.Add(self.auto_send_paste, pos=(2, 0))
 
         # Event binding
         h_stacking.Bind(wx.EVT_BUTTON, self.OnHelpStacking)
@@ -379,16 +385,20 @@ class PreferencesDialog(wx.Dialog):
         old_language = settings.get_language()
         interrupt = accessibility.TTS_interrupt.GetValue()
         old_richtext = settings["options.output.richtext"]
+        auto_send_paste = input.auto_send_paste.GetValue()
         richtext = accessibility.richtext.GetValue()
         srs = accessibility.srs_on.GetValue()
         settings["options.general.language"] = new_language
         settings["options.general.encoding"] = encoding
         settings["options.general.screenreader"] = srs
         settings["options.input.command_stacking"] = command_stacking
+        settings["options.input.auto_send_paste"] = auto_send_paste
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options.TTS.interrupt"] = interrupt
         settings["options.output.richtext"] = richtext
+        print repr(settings["options.input.command_stacking"])
+        import pdb; pdb.set_trace()
         settings["options"].write()
         self.engine.TTS_on = accessibility.TTS_on.GetValue()
         self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()

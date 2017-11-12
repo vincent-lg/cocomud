@@ -163,12 +163,12 @@ class World:
 
         if self.settings is None:
             try:
-                self.settings = ConfigObj(spec.split("\n"), encoding="latin-1")
-            except ParseError:
+                self.settings = ConfigObj(spec.split("\n"), encoding="utf-8")
+            except (ParseError, UnicodeError):
                 logger.warning("Error while parsing the config file, " \
                         "trying without encoding")
                 self.settings = ConfigObj(spec.split("\n"))
-                self.settings.encoding = "latin-1"
+                self.settings.encoding = "utf-8"
                 self.settings.write()
 
         connection = self.settings["connection"]
@@ -347,7 +347,7 @@ class World:
     @classmethod
     def get_infos(cls, configuration):
         """Get the information in the configuration and return a dict."""
-        config = ConfigObj(StringIO(configuration), encoding="latin-1")
+        config = ConfigObj(StringIO(configuration), encoding="utf-8")
         data = {}
 
         for key, value in config.items():

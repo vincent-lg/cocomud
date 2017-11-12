@@ -3,6 +3,7 @@ display: Display
 encodings: Encodings
 input: Input
 command_stacking: Command stacking
+auto_send_paste: Send the text to the server when pasting from the clipboard
 accessibility: Accessibility
 screenreader: Enable screen reader support
 TTS:
