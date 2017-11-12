@@ -1,0 +1,8 @@
+﻿aliases: Exporter les aliases de l'univers
+cant_write: Le fichier sélectionné ne peut être créé ou écrit.
+channels: Exporter les canaux de l'univers
+macros: Exporter les macros de l'univers
+name: Nom du fichier dans lequel enregistrer l'univers à exporter
+success: L'univers a correctement été exporté et enregistré dans le fichier {filename}.
+title: Exporter un univers
+triggers: Exporter les triggers de l'univers

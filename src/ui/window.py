@@ -56,7 +56,7 @@ from ui.dialogs.macro import MacroDialog
 from ui.dialogs.notepad import NotepadDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.trigger import TriggerDialog
-from ui.dialogs.worlds import WorldsDialog
+from ui.dialogs.worlds import WorldsDialog, ExportWorldDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
 from wizard.install_world import InstallWorld
 from world import World
@@ -146,6 +146,11 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnImportOndisk, import_ondisk)
         self.Bind(wx.EVT_MENU, self.OnImportOnline, import_online)
         fileMenu.AppendMenu(wx.ID_ANY, t("ui.menu.import"), import_world)
+
+        # Export
+        export = wx.MenuItem(fileMenu, -1, t("ui.menu.export"))
+        self.Bind(wx.EVT_MENU, self.OnExportWorld, export)
+        fileMenu.AppendItem(export)
 
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
@@ -330,6 +335,12 @@ class ClientWindow(DummyUpdater):
         task.start()
         dialog = WorldsDialog(self.engine, task.worlds)
         dialog.ShowModal()
+
+    def OnExportWorld(self, e):
+        """Open the export world dialog box."""
+        dialog = ExportWorldDialog(self, self.engine, self.world)
+        dialog.ShowModal()
+        dialog.Destroy()
 
     def OnPreferences(self, e):
         """Open the preferences dialog box."""

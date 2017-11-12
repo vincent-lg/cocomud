@@ -1,0 +1,8 @@
+﻿aliases: Export the world aliases
+cant_write: The selected file cannot be written to disk.
+channels: Export the world channels
+macros: Export the world macros
+name: Name of the file in which to save the world to export
+success: The world was successfully exported to disk in {filename}.
+title: Export a world
+triggers: Export the world triggers

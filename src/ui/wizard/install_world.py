@@ -207,6 +207,7 @@ class InstallWorld(wx.Dialog):
         self.SetSizer(sizer)
 
         # Create the dialog
+        values = {}
         install = self.wizard.files.get("world/install.json")
         if install:
             values = json.loads(install, encoding="utf-8",

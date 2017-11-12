@@ -29,12 +29,14 @@
 """Module containing the Worlds dialog."""
 
 from __future__ import absolute_import
+import os
 from zipfile import ZipFile
 
 import wx
 from ytranslate import t
 
 from task.download import Download
+from task.export_world import ExportWorld as Export
 from wizard.install_world import InstallWorld
 
 class WorldsDialog(wx.Dialog):
@@ -133,3 +135,122 @@ class WorldsDialog(wx.Dialog):
             wizard = InstallWorld(self.engine, world.name, files)
             self.Destroy()
             wizard.start()
+
+
+# Export a world
+class ExportWorldDialog(wx.Dialog):
+
+    """Export a world in a ZIP archive."""
+
+    def __init__(self, parent, engine, world):
+        super(ExportWorldDialog, self).__init__(parent,
+                title=t("ui.dialog.export_world.title"))
+        self.engine = engine
+        self.world = world
+        self.InitUI()
+        self.Center()
+
+    def InitUI(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        options = wx.BoxSizer(wx.HORIZONTAL)
+        buttons = self.CreateButtonSizer(wx.OK | wx.CANCEL)
+        self.SetSizer(sizer)
+
+        # Create the trigger field
+        s_name = wx.BoxSizer(wx.HORIZONTAL)
+        l_name = wx.StaticText(self, label=t("ui.dialog.export_world.name"))
+        t_name = wx.TextCtrl(self, value=self.world.name + ".zip")
+        self.t_name = t_name
+        s_name.Add(l_name)
+        s_name.Add(t_name)
+        sizer.Add(s_name)
+        sizer.Add((15, -1))
+
+        # Options
+        self.aliases = wx.CheckBox(self,
+                label=t("ui.dialog.export_world.aliases"))
+        self.aliases.SetValue(True)
+        options.Add(self.aliases)
+        self.channels = wx.CheckBox(self,
+                label=t("ui.dialog.export_world.channels"))
+        self.channels.SetValue(True)
+        options.Add(self.channels)
+        self.macros = wx.CheckBox(self,
+                label=t("ui.dialog.export_world.macros"))
+        self.macros.SetValue(True)
+        options.Add(self.macros)
+        self.triggers = wx.CheckBox(self,
+                label=t("ui.dialog.export_world.triggers"))
+        self.triggers.SetValue(True)
+        options.Add(self.triggers)
+
+        self.t_name.SetFocus()
+
+        # Event binding
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=wx.ID_CANCEL)
+
+    def OnOK(self, e):
+        """Export the world."""
+        filename = self.t_name.GetValue()
+        aliases = self.aliases.GetValue()
+        channels = self.channels.GetValue()
+        macros = self.macros.GetValue()
+        triggers = self.triggers.GetValue()
+
+        # Check that we can export into the file
+        filename = "export/" + os.path.split(filename)[1]
+        if not filename.lower().endswith(".zip"):
+            filename += ".zip"
+
+        if not os.path.exists("export"):
+            os.mkdir("export")
+
+        if os.path.exists(filename) and not os.access(filename, os.W_OK):
+            wx.MessageBox(t("ui.dialog.export_world.cant_write"),
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+        else:
+            # Ready the configuration
+            lines = []
+
+            # Aliases
+            if aliases:
+                for alias in self.world.aliases:
+                    lines.append(alias.sharp_script)
+
+            # Channels
+            if channels:
+                for channel in self.world.channels:
+                    lines.append("#channel {{{}}}".format(channel.name))
+
+            # Macros
+            if macros:
+                for macro in self.world.macros:
+                    lines.append(macro.sharp_script)
+
+            # Triggers
+            if triggers:
+                for trigger in self.world.triggers:
+                    lines.append(trigger.sharp_script)
+
+            configuration = "\n".join(lines) + "\n"
+            configuration = configuration.encode("utf-8")
+
+            # Ready files to copy
+            to_copy = []
+            if os.path.exists(os.path.join(self.world.path, "sounds")):
+                sounds = os.listdir(os.path.join(self.world.path, "sounds"))
+                to_copy += ["sounds/" + sound for sound in sounds]
+
+            # Create the task
+            task = Export(self.world, filename, configuration, to_copy)
+            task.start()
+            wx.MessageBox(t("ui.dialog.export_world.success", filename=filename),
+                    t("ui.alert.success"), wx.OK | wx.ICON_INFORMATION)
+            os.startfile("export")
+
+            self.EndModal(wx.ID_OK)
+
+    def OnCancel(self, e):
+        """Simply exit the dialog."""
+        self.EndModal(wx.ID_OK)

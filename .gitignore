@@ -1,6 +1,9 @@
 # Documentation
 doc/
 
+# Export
+src/export
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

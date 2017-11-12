@@ -117,7 +117,7 @@ class InstallWorld:
             name = destination.name
 
         # 3. Show the installation dialog
-        if self.ui:
+        if self.ui and "world/install.json" in self.files:
             logger.debug("Opening the installation dialog")
             self.dialog = UI(self.engine, self)
             data = self.dialog.data
