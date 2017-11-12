@@ -33,8 +33,7 @@ from cx_Freeze import setup, Executable
 
 client = Executable(
     script="cocomud.py",
-    base="Console",
-    #base="Win32GUI",
+    base="Win32GUI",
 )
 
 updater = Executable(

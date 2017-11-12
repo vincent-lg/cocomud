@@ -15,8 +15,8 @@ import re
 import sys
 import urllib2
 
-from redmine import Redmine
-from redmine.exceptions import ResourceNotFoundError
+from redminelib import Redmine
+from redminelib.exceptions import ResourceNotFoundError
 
 # Create an argument parser
 parser = argparse.ArgumentParser(
