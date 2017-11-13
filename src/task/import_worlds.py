@@ -78,7 +78,6 @@ class ImportWorlds(BaseTask):
         self.update(text=message.format(15), progress=15)
         progress_per_task = 85.0 / size / 4
         progress = 15
-        print pages
         for page in pages:
             if page.title == "Wiki":
                 continue
