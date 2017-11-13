@@ -78,6 +78,7 @@ class ImportWorlds(BaseTask):
         self.update(text=message.format(15), progress=15)
         progress_per_task = 85.0 / size / 4
         progress = 15
+        print pages
         for page in pages:
             if page.title == "Wiki":
                 continue
@@ -86,7 +87,8 @@ class ImportWorlds(BaseTask):
             progress += progress_per_task
             self.update(text=message.format(int(progress)),
                     progress=int(progress))
-            author = page.author.name
+            author = getattr(page, "author", None)
+            author = author and author.name or "unknown"
             progress += progress_per_task
             self.update(text=message.format(int(progress)),
                     progress=int(progress))
