@@ -13,6 +13,7 @@ game: "&Jeu"
 aliases: "&Alias"
 macro: "&Macro"
 triggers: "&Triggers"
+channels: "&Channels"
 notepad: Bloc-notes
 notepad_world: "Pour cet &univers..."
 notepad_character: "Pour ce &personnage..."

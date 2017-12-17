@@ -49,7 +49,7 @@ class Channel(Function):
                 self.world.add_channel(channel)
             else:
                 if show and Channel.allow_creation:
-                    dialog = ChannelsDialog(self.world.channels, name)
+                    dialog = ChannelsDialog(self.engine, self.world, self.world.channels, name)
                     dialog.ShowModal()
 
     def display(self, dialog, name="", show=True):

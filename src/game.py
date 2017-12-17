@@ -139,7 +139,7 @@ class GameEngine:
             return
 
         # Neither worked
-        self.logger.debug("The documentation for the {} help file " \
+        self.logger.warning("The documentation for the {} help file " \
                 "cannot be found, either using lang={} or lang=en".format(
                 name, lang))
 

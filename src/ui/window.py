@@ -48,6 +48,7 @@ from scripting.key import key_name
 from session import Session
 from task.import_worlds import ImportWorlds
 from ui.dialogs.alias import AliasDialog
+from ui.dialogs.channel import ChannelsDialog
 from ui.dialogs.character import CharacterDialog
 from ui.dialogs.connection import ConnectionDialog, EditWorldDialog
 from ui.dialogs.console import ConsoleDialog
@@ -182,6 +183,11 @@ class ClientWindow(DummyUpdater):
         triggers = wx.MenuItem(gameMenu, -1, t("ui.menu.triggers"))
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
         gameMenu.AppendItem(triggers)
+
+        # Channels
+        channels = wx.MenuItem(gameMenu, -1, t("ui.menu.channels"))
+        self.Bind(wx.EVT_MENU, self.OnChannels, channels)
+        gameMenu.AppendItem(channels)
 
         # Notepad
         notepad = wx.Menu()
@@ -364,6 +370,11 @@ class ClientWindow(DummyUpdater):
         dialog = MacroDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
+
+    def OnChannels(self, e):
+        """Open the channels dialog box."""
+        dialog = ChannelsDialog(self.engine, self.world, self.world.channels)
+        dialog.ShowModal()
 
     def OnTriggers(self, e):
         """Open the triggers dialog box."""

@@ -13,6 +13,7 @@ game: "&Game"
 aliases: "&Aliases"
 macro: "&Macro"
 triggers: "&Triggers"
+channels: "&Channels"
 notepad: Notepad
 notepad_world: "For this &world..."
 notepad_character: "For this &character..."
