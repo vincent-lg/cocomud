@@ -32,6 +32,7 @@
 import json
 import os
 import shutil
+from subprocess import popen
 import sys
 from threading import Thread
 from urllib2 import urlopen
@@ -273,7 +274,9 @@ class AutoUpdate(Thread):
 
         if self.object:
             self.object.AskDestroy()
-        os.startfile("bgupdating.bat")
+        #os.startfile("bgupdating.bat")
+        hidden = 0x08000000 # Windows only
+        Popen(["bgupdating.bat"], bufsize=-1, creationflags=hidden)
         sys.exit(0)
 
 

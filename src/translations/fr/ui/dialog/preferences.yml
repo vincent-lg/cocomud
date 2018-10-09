@@ -9,7 +9,7 @@ screenreader: Activer le support pour lecteur d'écran
 TTS:
     "on": Activer le TTS (Text-To-Speech)
     outside: Activer le TTS hors de la fenêtre
-    interrupt: Interromre le TTS quand un nouveau message est reçu
+    interrupt: Interrompre le TTS quand un nouveau message est reçu
 richtext: Activer le RichText avec ses couleurs
 update_language: >
     Vous avez modifié la langue du client CocoMUD. Vous devez
