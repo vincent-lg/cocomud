@@ -31,14 +31,11 @@
 import os
 from random import choice
 
-from pygame import mixer
 import wx
 from ytranslate import t
 
 from log import logger
 from sharp import Function
-
-mixer.init(buffer=1024)
 
 class RandPlay(Function):
 

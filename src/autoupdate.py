@@ -32,10 +32,10 @@
 import json
 import os
 import shutil
-from subprocess import popen
+from subprocess import Popen
 import sys
 from threading import Thread
-from urllib2 import urlopen
+from urllib.request import urlopen
 from zipfile import ZipFile, BadZipfile
 
 class AutoUpdate(Thread):
@@ -51,7 +51,7 @@ class AutoUpdate(Thread):
 
     def __init__(self, current_version, object=None, just_checking=False):
         Thread.__init__(self)
-        if isinstance(current_version, basestring):
+        if isinstance(current_version, str):
             if not current_version.isdigit():
                 raise ValueError("the current version {} isn't an int".format(
                         repr(current_version)))
@@ -140,7 +140,7 @@ class AutoUpdate(Thread):
 
         os.mkdir("updating")
         if stdout:
-            print "Downloading the build at", self.location
+            print("Downloading the build at", self.location)
 
         # Get the build
         response = urlopen(self.location)
@@ -174,7 +174,7 @@ class AutoUpdate(Thread):
                 file.write(chunk)
 
             if stdout:
-                print "\r  Downloading... 100%"
+                print("\r  Downloading... 100%")
 
         self.path_archive = path_archive
 
@@ -211,7 +211,7 @@ class AutoUpdate(Thread):
 
                 # Extract these files
                 if stdout:
-                    print "Extracting {}o".format(total)
+                    print("Extracting {}o".format(total))
 
                 extracted = 0.0
                 if stdout:
@@ -233,7 +233,7 @@ class AutoUpdate(Thread):
                     extracted += info.file_size
 
                 if stdout:
-                    print "\r  Extracting files... 100%"
+                    print("\r  Extracting files... 100%")
         except BadZipfile:
             raise InvalidSyntaxUpdateError
 

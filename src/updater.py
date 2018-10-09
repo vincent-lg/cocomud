@@ -34,7 +34,7 @@ import os
 from configobj import ConfigObj
 from ytranslate import init, select, t
 import wx
-from wx.lib.pubsub import pub, setupkwargs
+from wx.lib.pubsub import pub
 
 from autoupdate import AutoUpdate
 from version import BUILD

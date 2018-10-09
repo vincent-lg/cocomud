@@ -271,7 +271,7 @@ class AddEditFunctionDialog(wx.Dialog):
                 lines.append(line)
 
             if self.escape:
-                print "escaping lines"
+                print("escaping lines")
                 for i, line in enumerate(lines):
                     if line.startswith("#send "):
                         line = line[6:]

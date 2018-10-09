@@ -46,7 +46,7 @@ from twisted.internet.error import ConnectionDone
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.conch.telnet import Telnet
 import wx
-from wx.lib.pubsub import pub, setupkwargs
+from wx.lib.pubsub import pub
 
 from log import logger
 from screenreader import ScreenReader

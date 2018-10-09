@@ -30,7 +30,7 @@
 
 from ytranslate import t
 import wx
-from wx.lib.pubsub import pub, setupkwargs
+from wx.lib.pubsub import pub
 
 from screenreader import ScreenReader
 

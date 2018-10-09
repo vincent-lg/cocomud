@@ -38,7 +38,7 @@ from zipfile import ZipFile
 
 from accesspanel import AccessPanel
 import wx
-from wx.lib.pubsub import pub, setupkwargs
+from wx.lib.pubsub import pub
 from ytranslate.tools import t
 
 from autoupdate import AutoUpdate
@@ -685,7 +685,7 @@ class MUDPanel(AccessPanel):
             if success:
                 clipboard = clipboard.GetText()
                 if self.IsEditing():
-                    print "no edit"
+                    print("no edit")
                     self.output.SetInsertionPoint(self.output.GetLastPosition())
 
                 input = self.input + clipboard

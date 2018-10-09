@@ -32,7 +32,7 @@ from enum import Enum
 import shutil
 import os
 import re
-from StringIO import StringIO
+from io import StringIO
 from textwrap import dedent
 from threading import RLock
 

@@ -30,14 +30,14 @@
 
 import os
 
-from pygame import mixer
+#from pygame import mixer
 import wx
 from ytranslate import t
 
 from log import logger
 from sharp import Function
 
-mixer.init(buffer=1024)
+#mixer.init(buffer=1024)
 
 class Play(Function):
 

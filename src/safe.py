@@ -60,7 +60,7 @@ import base64
 import os
 import pickle
 
-from Crypto.Cipher import AES
+#from Crypto.Cipher import AES
 from pbkdf2 import PBKDF2
 
 class Safe:

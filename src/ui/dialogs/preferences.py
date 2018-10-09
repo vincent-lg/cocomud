@@ -397,7 +397,7 @@ class PreferencesDialog(wx.Dialog):
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options.TTS.interrupt"] = interrupt
         settings["options.output.richtext"] = richtext
-        print repr(settings["options.input.command_stacking"])
+        print(repr(settings["options.input.command_stacking"]))
         settings["options"].write()
         self.engine.TTS_on = accessibility.TTS_on.GetValue()
         self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
