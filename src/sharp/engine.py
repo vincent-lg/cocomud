@@ -76,7 +76,7 @@ class SharpScript(object):
 
     def execute(self, code, debug=False, variables=False):
         """Execute the SharpScript code given as an argument."""
-        if isinstance(code, basestring):
+        if isinstance(code, str):
             instructions = self.feed(code, variables=variables)
         else:
             instructions = [code]
@@ -330,7 +330,7 @@ class SharpScript(object):
         * If the argument contains semi colons, keep it on one line.
 
         """
-        if isinstance(content, basestring):
+        if isinstance(content, str):
             instructions = self.split_statements(content)
         else:
             instructions = content

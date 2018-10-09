@@ -113,18 +113,9 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
-            file = open(path, "r")
+            file = open(path, "r", encoding="utf-8")
             content = file.read()
             file.close()
-
-            # Convert the content to unicode
-            try:
-                content = content.decode("utf-8")
-            except UnicodeError:
-                logger.warning("Cannot read the world's configuration in " \
-                        "utf-8, try in latin-1 and force-save")
-                content = content.decode("latin-1", errors="replace")
-                to_save = True
 
             # Execute the script
             self.sharp_engine.execute(content, variables=False)

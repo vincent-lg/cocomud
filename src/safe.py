@@ -31,7 +31,7 @@
 
 This feature requires:
     pbkdf2
-    Crypto
+    pyaes
 
 The module contains a class named 'Safe', that should be insantiated
 in order to manipulate the encrypting
@@ -47,8 +47,8 @@ argument.  You can insantiate it as follows:
 >>> safe.store("login", "kredh")
 >>> safe.store("password", "YoudWishIToldYou")
 >>> # Retrieve the data (can be later)
-login = safe.retrieve("login")
-password = safe.retrieve("password")
+>>> login = safe.retrieve("login")
+>>> password = safe.retrieve("password")
 
 Note that datas that is not a string (like a bool or float) will be
 saved as unprotected data.  If you want to save it encrypted, you can
@@ -60,7 +60,7 @@ import base64
 import os
 import pickle
 
-#from Crypto.Cipher import AES
+import pyaes
 from pbkdf2 import PBKDF2
 
 class Safe:
@@ -118,11 +118,14 @@ class Safe:
 
         # Prepare cipher key
         key = PBKDF2(self.passphrase, salt).read(self.key_size)
-        cipher = AES.new(key, AES.MODE_CBC, init_vector)
+        cipher = pyaes.AESModeOfOperationCBC(key, iv=init_vector)
 
         bs = self.block_size
+        if isinstance(plaintext, str):
+            plaintext = plaintext.encode("utf-8")
+
         return init_vector + cipher.encrypt(plaintext + \
-                " " * (bs - (len(plaintext) % bs)))
+                b" " * (bs - (len(plaintext) % bs)))
 
     def decrypt(self, ciphertext, salt):
         """Reconstruct the cipher object and decrypt.
@@ -138,18 +141,29 @@ class Safe:
         init_vector = ciphertext[:self.iv_size]
         ciphertext = ciphertext[self.iv_size:]
 
-        cipher = AES.new(key, AES.MODE_CBC, init_vector)
+        cipher = pyaes.AESModeOfOperationCBC(key, iv=init_vector)
 
-        return cipher.decrypt(ciphertext).rstrip(" ")
+        decrypted = cipher.decrypt(ciphertext).rstrip(b" ")
+        return decrypted.decode("utf-8")
 
     def load(self):
         """Load the data from the 'secret' file if exists."""
         if os.path.exists(self.secret):
-            with open(self.secret, "rb") as file:
-                upic = pickle.Unpickler(file)
-                self.data = upic.load()
-                if not isinstance(self.data, dict):
-                    raise ValueError("the data contained in the file " \
+            try:
+                with open(self.secret, "rb") as file:
+                    upic = pickle.Unpickler(file, encoding="utf-8")
+                    print("Load as UTF8")
+                    self.data = upic.load()
+            except UnicodeDecodeError:
+                with open(self.secret, "rb") as file:
+                    upic = pickle.Unpickler(file, encoding="latin-1")
+                    print("Load at latin-1")
+                    self.data = upic.load()
+
+                self.save()
+
+            if not isinstance(self.data, dict):
+                raise ValueError("the data contained in the file " \
                             "'{}' is not a dictionary".format(self.secret))
 
     def retrieve(self, key, *default):
@@ -168,7 +182,7 @@ class Safe:
             raise KeyError(key)
 
         value = self.data[key]
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             salt = self.get_salt_from_key(key)
             return self.decrypt(value, salt)
 
@@ -178,11 +192,11 @@ class Safe:
         """Store the key in the file.
 
         If the key already exists, replaces it.
-        If the value is not a string or unicode, it will be stored
+        If the value is not a string, it will be stored
         WITHOUT encryption.
 
         """
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             salt = self.get_salt_from_key(key)
             crypted = self.encrypt(value, salt)
             self.data[key] = crypted
@@ -190,6 +204,10 @@ class Safe:
             self.data[key] = value
 
         # Write the new data in the file
+        self.save()
+
+    def save(self):
+        """Save the data in the secret file."""
         with open(self.secret, "wb") as file:
             pic = pickle.Pickler(file)
             pic.dump(self.data)

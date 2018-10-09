@@ -1,5 +1,6 @@
 ﻿# Copyright (c) 2016, LE GOFF Vincent
 # Copyright (c) 2016, LE GOFF Vincent
+# Copyright (c) 2016, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -75,7 +76,7 @@ class Client(Telnet):
                 host=host, port=port))
         self.factory.resetDelay()
         for command in self.factory.commands:
-            self.transport.write(command + "\r\n")
+            self.transport.write(command.encode() + b"\r\n")
 
     def connectionLost(self, reason):
         """The connection was lost."""
@@ -226,11 +227,6 @@ class Client(Telnet):
 
             for i, chunk in enumerate(chunks):
                 chunks[i] = re.sub(delimiter + "{2,}", reset_del, chunk)
-                if isinstance(chunks[i], unicode):
-                    chunks[i] = chunks[i].encode(encoding,
-                            errors="replace")
-        else:
-            chunks = [text.encode(encoding, "replace")]
 
         with self.factory.world.lock:
             for text in chunks:
@@ -244,7 +240,7 @@ class Client(Telnet):
                 if not text.endswith("\r\n"):
                     text += "\r\n"
 
-                self.transport.write(text)
+                self.transport.write(text.encode(encoding, errors="replace"))
 
     def test_macros(self, key, modifiers):
         """Test the macros of this world."""
