@@ -1,0 +1,13 @@
+﻿add: Agregar una nueva abreviatura
+edit: Editar una abreviatura
+missing_action: >
+    El campo de acción está vacío. Por favor escriba una o mas aciones asociada a esta abreviatura.
+missing_alias: >
+    El campo abreviatura está vacío. Especifique la abreviatura.
+remove: >
+    ¿Está seguro de que quiere eliminar la abreviatura {alias}?
+unknown: >
+    No se puede encontrar esta abreviatura.
+unsaved: >
+    Hay abreviaturas sin guardar. ¿Quiere salir y descartar las modificaciones?
+    Si desea guardar, elija 'no' y luego elija aceptar.

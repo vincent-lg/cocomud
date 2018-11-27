@@ -1,0 +1,9 @@
+﻿character_empty: |
+    Estás editando el archivo para el personage {character} en el mundo {world}.
+    Puedes eliminar este texto y reemplazarlo con lo que quieras. La única manera de acceder será abriendo el editor para este personage.
+    Sin embargo, el sistema podrá tener acceso al contenido ya que no se cifra.
+no_character: Actualmente no hay ningún personage abierto en esta sesión.
+title: Editor [CocoMUD]
+world_empty: |
+    Este es el editor para el mundo {world}. Puedes reemplazar este texto y añadir alias, disparadores y macros.
+    El texto será accesible desde la carpeta del mundo.

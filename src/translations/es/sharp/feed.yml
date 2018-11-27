@@ -1,0 +1,5 @@
+﻿channel: Nombre del canal al que se enviará
+description: Cargar un mensaje en un canal
+empty_channel: El nombre del canal está vacío.
+empty_message: El mensaje está vacío.
+message: Mensaje que se enviará al canal

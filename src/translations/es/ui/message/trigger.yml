@@ -1,0 +1,14 @@
+﻿add: Agregar un disparador
+edit: Editar un disparador
+missing_reaction: >
+    El campo del disparador está vacío. Especifique un disparador.
+mark: Destacar disparador
+mute: Silenciar disparador
+remove: >
+    ¿Está seguro de que quiere borrar el disparador {trigger}?
+substitution: "Mensaje con el que se substituirá la línea, si hay alguno:"
+unknown: >
+    No se puede encontrar este disparador.
+unsaved: >
+    Hay disparadores sin guardar y si continúa se perderán. ¿Quiere cerrar esta ventana de todos modos?
+    Si quiere guardarlos, elija 'no' y pulse aceptar.

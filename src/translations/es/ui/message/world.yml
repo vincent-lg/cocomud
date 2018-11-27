@@ -1,0 +1,16 @@
+﻿add: Agregar un mundo nuevo
+edit: Editar un mundo existente
+hostname: >
+    Tiene que especificar un nombre de host válido.
+    Puede ser tanto una dirección IP (10.34.5.56) como un nombre de host (example.com).
+invalid_port: >
+    Tiene que especificar un número de puerto válido.
+    Puede Ser cualquier número entre 0 y 65536.
+missing: >
+    Tiene que especificar un nombre para este mundo.
+port: >
+    Tiene que especificar un puerto para este mundo.
+remove: >
+    ¿Realmente quiere eliminar este mundo?
+unknown: >
+    El mundo seleccionado no se puede encontrar.

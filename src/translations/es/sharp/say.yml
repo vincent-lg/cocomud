@@ -1,0 +1,6 @@
+﻿braille: Mostrar el mensaje en la pantalla braille
+description: Muestra un mensaje y lo envía al lector de pantallas.
+empty_text: El campo de texto está vacío. ¿Qué quieres mostrar?
+screen: Mostrar el mensaje en el cliente
+speech: Hablar el mensaje
+text: Texto a mostrar

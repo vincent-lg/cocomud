@@ -1,0 +1,29 @@
+﻿file: "&Archivo"
+create: "Crear un &mundo...\tCtrl+N"
+open: "&Abrir un mundo en otra pestaña...\tCtrl+O"
+close_tab: "&Cerrar esta pestaña\tCtrl+w"
+import: "&Importar un mundo"
+import_on_disk: En disco...
+import_online: En línea...
+export: "&Exportar este mundo..."
+preferences: "&Preferencias\tAlt+Enter"
+console: Abrir la consolaa python...
+quit: "&Salir"
+game: "&Juego"
+aliases: "&Abreviaturas"
+macro: "&Macro"
+triggers: "&Disparadores"
+channels: "&Canales"
+notepad: Editor
+notepad_world: "Para este &mundo..."
+notepad_character: "Para el &personage..."
+character: Configurar este personage...
+sounds: Reproducir sonidos de disparadores
+clear_output: Limpiar ventana de salida
+connection: "&Conexión"
+disconnect: "&Desconectar de este mundo"
+reconnect: "&Volver a conectarse al mundo"
+help: "Ay&uda"
+help_index: "&Características básicas"
+new: "&Qué hay de nuevo"
+updates: "Buscar actuali&zaciones"
