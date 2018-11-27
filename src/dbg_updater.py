@@ -38,14 +38,14 @@ from autoupdate import AutoUpdate
 from version import BUILD
 
 autoupdate = AutoUpdate(BUILD, None)
-print "Checking for updates..."
+print("Checking for updates...")
 build = autoupdate.check()
 if build is not None:
-    print "A new update is available: {}.\n".format(build)
+    print("A new update is available: {}.\n".format(build))
     autoupdate.download(stdout=True)
     autoupdate.update(stdout=True)
 else:
-    print "No update is available, but download anyway."
+    print("No update is available, but download anyway.")
     autoupdate.download(stdout=True)
     autoupdate.update(stdout=True)
 

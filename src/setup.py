@@ -38,7 +38,7 @@ client = Executable(
 
 updater = Executable(
     script="updater.py",
-    #base="Win32GUI",
+    base="Win32GUI",
 )
 
 dbg_updater = Executable(
@@ -77,9 +77,9 @@ setup(
             "excludes": ["_gtkagg", "_tkagg", "bsddb", "curses",
                     "pywin.debugger", "pywin.debugger.dbgcon",
                     "pywin.dialogs", "tcl", "Tkconstants", "Tkinter"],
-            "packages": ["accesspanel", "redminelib.resources", "_cffi_backend"],
+            "packages": ["accesspanel", "redminelib.resources", "_cffi_backend", "idna.idnadata", "pubsub.pub"],
     }},
     executables = [client, updater, dbg_updater]
 )
 
-shutil.move("build/exe.win32-2.7", "build/CocoMUD")
+shutil.move("build/exe.win32-3.6", "build/CocoMUD")
