@@ -1,0 +1,5 @@
+﻿default: Establecer este personage como la opción por defecto
+missing_name: Tiene que especificar un nombre para este personage.
+password: Contraseña, si tiene
+post_login: Comandos, para enviar luego de la contraseña
+username: Nombre de usuario o comandos para enviar antes de la contraseña

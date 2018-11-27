@@ -1,0 +1,3 @@
+﻿confirmation: ¿Quiere cancelar esta descarga?
+downloading: Descargando... {percent}%
+title: Descargando {url}

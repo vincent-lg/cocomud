@@ -207,6 +207,7 @@ class Settings(Configuration):
 
     LANGUAGES = (
         ("en", "English"),
+        ("es", "Spanish"),
         ("fr", "French"),
     )
 

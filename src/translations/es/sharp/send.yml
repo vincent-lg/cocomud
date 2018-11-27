@@ -1,0 +1,4 @@
+﻿command: Comandos a enviar al servidor
+description: Envía uno o mas comandos al servidor.
+empty_commands: >
+    El campo de comandos está vacío. ¿Qué comandos quiere enviar?

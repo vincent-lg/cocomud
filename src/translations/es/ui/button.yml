@@ -1,0 +1,13 @@
+﻿add: "&Agregar"
+add_action: Agregar acción
+browse: Explorar...
+choose_file: Buscar un archivo
+close: Cerrar
+connect: Conectar
+edit: "&Editar"
+help: Ayuda
+remove: "&Quitar"
+restart: Reiniciar
+test: Probar
+what:
+    command_stacking: ¿Qué es el apilado de comandos?

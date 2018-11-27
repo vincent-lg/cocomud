@@ -1,0 +1,31 @@
+﻿action: Acción
+alias:
+    1: Alias
+    2+: Aliases
+channel:
+    1: Canal
+    2+: Canales
+character:
+    1: Personage
+    2+: Personages
+connection: Conexión
+description: Descripción
+function: Función
+hostname: Nombre de host
+macro:
+    1: Macro
+    2+: Macros
+message: Message
+name: Nombre
+port: Puerto
+protocol: Protocolo
+script: Script
+shortcut: Acceso directo
+SSL: Secure telnet (SSL)
+telnet: Telnet
+trigger:
+    1: Disparador
+    2+: Disparadores
+world:
+    1: Mundo
+    2+: Mundos
