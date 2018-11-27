@@ -1,5 +1,5 @@
-﻿command: Comando a repetir (dejar en blanco para enviar el último comando en el historial):
+﻿command: "Comando a repetir (dejar en blanco para enviar el último comando en el historial):"
 description: Repite un comando x veces
 empty_times: No se especificó el número de repeticiones.
 invalid_times: El valor no es un número válido.
-times: Número de veces que el comando se repetirá:
+times: "Número de veces que el comando se repetirá:"
