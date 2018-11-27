@@ -1,0 +1,12 @@
+﻿add: Agregar una nueva macro
+edit: Editar una macro
+missing_action: >
+    El campo 'acción' está vacío. Especifique una acción para esta macro.
+missing_macro: >
+    El campo 'acceso directo' está vacío. Por favor enfoque el campo apropiado y pulse una combinación de teclas para esta macro.
+remove: >
+    ¿Quiere eliminar esta macro?  {action} by {shortcut}.
+unknown: >
+    No se puede encontrar la macro seleccionada.
+unsaved: >
+    Una o mas macros no se modificaron. Si continúa, las modificaciones se perderán. ¿Quiere cerrar y descargar los cambios?

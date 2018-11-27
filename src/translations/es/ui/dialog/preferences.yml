@@ -1,0 +1,17 @@
+﻿general: General
+display: Mostrar
+encodings: Codificaciones
+input: Entrada
+command_stacking: Apilado de comandos
+auto_send_paste: Enviar el texto cuando se pegue desde el portapapeles
+accessibility: Accesibilidad
+screenreader: Activar el soporte de lector de pantallas
+TTS:
+    "on": Habilitar TTS (Text-To Speech)
+    outside: Habilitar TTS cuando se está en una ventana distinta
+    interrupt: Interrumpir tts cuando llega un nuevo mensaje.
+richtext: Mostrar texto coloreado
+update_language: >
+    Se cambió el idioma de CocoMUD. Para aplicar los cambios tiene que reiniciar el programa.
+update_richtext: >
+    Se cambió el formato de salida. Para aplicar la configuración tiene que reiniciar el cliente.
