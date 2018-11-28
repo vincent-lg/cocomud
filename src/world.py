@@ -195,7 +195,6 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         file = open(path, "w")
-        content = content.encode("utf-8")
         file.write(content)
         file.close()
 

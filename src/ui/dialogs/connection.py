@@ -335,8 +335,6 @@ class EditWorldDialog(wx.Dialog):
                     t("ui.alert.invalid"), wx.OK | wx.ICON_ERROR)
             self.port.SetFocus()
         else:
-            name = name.encode("utf-8", "replace")
-            hostname = hostname.encode("utf-8", "replace")
             port = int(port)
             if not self.world.location:
                 self.world.location = name.lower()

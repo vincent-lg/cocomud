@@ -234,7 +234,6 @@ class ExportWorldDialog(wx.Dialog):
                     lines.append(trigger.sharp_script)
 
             configuration = "\n".join(lines) + "\n"
-            configuration = configuration.encode("utf-8")
 
             # Ready files to copy
             to_copy = []
