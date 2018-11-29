@@ -26,9 +26,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mock import MagicMock, call
+from unittest.mock import MagicMock, call
 
-from models import MockClient
+from .models import MockClient
 from scripting.alias import Alias
 
 class TestCommandStacking(MockClient):
@@ -37,9 +37,9 @@ class TestCommandStacking(MockClient):
 
     def test_without(self):
         """Test without any command stacking."""
-        self.client.write(u"say 1;say 2")
+        self.client.write("say 1;say 2")
         self.client.transport.write.assert_called_once_with(
-                "say 1;say 2\r\n")
+                b"say 1;say 2\r\n")
 
     def test_simple(self):
         """Test simple command stacking with a ; sign."""
@@ -53,8 +53,8 @@ class TestCommandStacking(MockClient):
 
         self.client.factory.engine.settings.__getitem__ = MagicMock(
                 side_effect=get_setting)
-        self.client.write(u"say 1;say 2")
-        calls = [call("say 1\r\n"), call("say 2\r\n")]
+        self.client.write("say 1;say 2")
+        calls = [call(b"say 1\r\n"), call(b"say 2\r\n")]
         self.client.transport.write.assert_has_calls(calls)
 
     def test_special(self):
@@ -69,6 +69,6 @@ class TestCommandStacking(MockClient):
 
         self.client.factory.engine.settings.__getitem__ = MagicMock(
                 side_effect=get_setting)
-        self.client.write(u"say 1\x82say 2")
-        calls = [call("say 1\r\n"), call("say 2\r\n")]
+        self.client.write("say 1\x82say 2")
+        calls = [call(b"say 1\r\n"), call(b"say 2\r\n")]
         self.client.transport.write.assert_has_calls(calls)

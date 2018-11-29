@@ -69,7 +69,7 @@ class Send(Function):
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        commands = dialog.commands.GetValue().encode("utf-8", "replace")
+        commands = dialog.commands.GetValue()
         try:
             empty_commands = t("sharp.send.empty_commands")
         except ValueError:

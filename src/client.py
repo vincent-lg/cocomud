@@ -215,6 +215,7 @@ class Client(Telnet):
         settings = self.factory.engine.settings
         stacking = settings["options.input.command_stacking"]
         encoding = settings["options.general.encoding"]
+        chunks = [text]
         if stacking:
             delimiter = re.escape(stacking)
             re_stacking = u"(?<!{s}){s}(?!{s})".format(s=delimiter)

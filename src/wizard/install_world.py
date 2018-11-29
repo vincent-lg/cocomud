@@ -152,7 +152,6 @@ class InstallWorld:
         if "world/install.py" in self.files:
             logger.debug("Executing the installation file")
             install = self.files["world/install.py"]
-            install = install.decode("utf-8").replace("\r", "")
             globals = sharp.globals
             locals = sharp.locals
             locals.update(data)
@@ -162,7 +161,6 @@ class InstallWorld:
         config = self.files.get("world/config.set")
         if config:
             logger.debug("Executing the config.set script")
-            config = config.decode("utf-8")
             destination.sharp_engine.execute(config, variables=False)
 
         # Replace the allow_creation for channels

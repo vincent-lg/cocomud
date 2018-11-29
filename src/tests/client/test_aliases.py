@@ -26,9 +26,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mock import MagicMock
+from unittest.mock import MagicMock
 
-from models import MockClient
+from .models import MockClient
 from scripting.alias import Alias
 
 class TestAliases(MockClient):
@@ -39,7 +39,7 @@ class TestAliases(MockClient):
         """Test without any aliases."""
         self.client.write(u"some command")
         self.client.transport.write.assert_called_once_with(
-                "some command\r\n")
+                b"some command\r\n")
 
     def test_simple(self):
         """Test a simple alias without any replacement."""
@@ -47,25 +47,25 @@ class TestAliases(MockClient):
         self.assertEqual(alias.sharp_script, "#alias l look")
         self.client.factory.world.aliases = [alias]
         self.client.write(u"l")
-        self.client.transport.write.assert_called_once_with("look\r\n")
+        self.client.transport.write.assert_called_once_with(b"look\r\n")
 
     def test_variable(self):
         """Test a simple alias with one variable."""
         alias = Alias(self.client.factory.sharp_engine, "s*", "say $1")
         self.assertEqual(alias.sharp_script, "#alias s* {say $1}")
         self.client.factory.world.aliases = [alias]
-        self.client.write(u"l")
-        self.client.transport.write.assert_called_once_with("l\r\n")
+        self.client.write("l")
+        self.client.transport.write.assert_called_once_with(b"l\r\n")
         self.client.transport.write = MagicMock()
-        self.client.write(u"syes!")
-        self.client.transport.write.assert_called_once_with("say yes!\r\n")
+        self.client.write("syes!")
+        self.client.transport.write.assert_called_once_with(b"say yes!\r\n")
 
     def test_variable_special(self):
         """Test an alias with one variable containing special characters."""
         alias = Alias(self.client.factory.sharp_engine, "s*", "say $1")
         self.client.factory.world.aliases = [alias]
         self.client.write(u"s\x82lite")
-        self.client.transport.write.assert_called_once_with("say \x82lite\r\n")
+        self.client.transport.write.assert_called_once_with(b"say \x82lite\r\n")
 
     def test_variables(self):
         """Test a simple alias with several variables."""
@@ -76,7 +76,7 @@ class TestAliases(MockClient):
         self.client.factory.world.aliases = [alias]
         self.client.write(u"wman=good")
         self.client.transport.write.assert_called_once_with(
-                "whisper good to man\r\n")
+                b"whisper good to man\r\n")
 
     def test_sharp(self):
         """Try to send more complex SharpScript through an alias."""

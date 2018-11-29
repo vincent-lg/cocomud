@@ -35,7 +35,7 @@ from log import logger
 from sharp import FUNCTIONS
 
 # Constants
-RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?", re.UNICODE)
+RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
 
 class SharpScript(object):
 
@@ -288,11 +288,6 @@ class SharpScript(object):
             "You can earn \$$sum if you move quickly."
 
         """
-        if self.engine:
-            encoding = self.engine.settings["options.general.encoding"]
-        else:
-            encoding = "utf-8"
-
         def spot(match):
             """A variable has been found and should be replaced."""
             variable = match.group(1)
@@ -303,14 +298,9 @@ class SharpScript(object):
             else:
                 value = self.locals.get(variable, "")
 
-            if isinstance(value, str):
-                value = value.decode(encoding, errors="replace")
-            else:
-                value = unicode(value)
-
             self.logger.debug("#{} requests variable {}, value={}".format(
                     self.id, repr(variable), repr(value)))
-            return value
+            return str(value)
 
         # Replace the variables
         line = RE_VAR.sub(spot, line)
@@ -346,9 +336,6 @@ class SharpScript(object):
                 arguments[i] = self.escape_argument(argument)
 
             line = function + " " + " ".join(arguments)
-            if isinstance(line, str):
-                line = line.decode("utf-8", errors="replace")
-
             lines.append(line.rstrip(" "))
 
         if return_str:

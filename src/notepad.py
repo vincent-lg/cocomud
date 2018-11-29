@@ -76,11 +76,10 @@ class Notepad:
                 logger.warning("CocoMUD doesn't have the right to " \
                         "write in {}".format(parentdir))
             else:
-                if isinstance(empty_string, unicode):
-                    content = empty_string.encode("latin-1", errors="replace")
+                content = empty_string
 
-                    with open(location, "w") as file:
-                        file.write(content)
+                with open(location, "w", encoding="utf-8") as file:
+                    file.write(content)
 
             self.content = empty_string
         else:
@@ -88,10 +87,9 @@ class Notepad:
                 logger.warning("CocoMUD doesn't have the right to " \
                         "read {}".format(location))
             else:
-                with open(location, "r") as file:
+                with open(location, "r", encoding="utf-8") as file:
                     content = file.read()
 
-                content = content.decode("latin-1", errors="replace")
                 self.content = content
 
     def save(self):
@@ -105,8 +103,5 @@ class Notepad:
                     "in {}".format(location))
         else:
             content = self.content
-            if isinstance(content, unicode):
-                content = content.encode("latin-1", errors="replace")
-
-            with open(location, "w") as file:
+            with open(location, "w", encoding="utf-8") as file:
                 file.write(content)

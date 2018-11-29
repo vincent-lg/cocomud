@@ -73,7 +73,7 @@ class Channel(Function):
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        name = dialog.name.GetValue().encode("utf-8", errors="replace")
+        name = dialog.name.GetValue()
         empty_name = self.t("empty_name",
                 "The channel name is empty.  How do you want to call it?")
 

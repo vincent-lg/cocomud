@@ -81,7 +81,7 @@ class Say(Function):
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        text = dialog.text.GetValue().encode("utf-8", "replace")
+        text = dialog.text.GetValue()
         empty_text = self.t("empty_text",
                 "The text field is empty.  What should I say?")
         if not text:

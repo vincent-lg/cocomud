@@ -111,11 +111,10 @@ class CharacterDialog(wx.Dialog):
         """Save the character."""
         world = self.session.world
         character = self.session.character
-        name = self.name.GetValue().encode("utf-8", errors="replace")
-        username = self.username.GetValue().encode("utf-8", errors="replace")
-        password = self.password.GetValue().encode("utf-8", errors="replace")
-        post_login = self.post_login.GetValue().encode("utf-8",
-                errors="replace")
+        name = self.name.GetValue()
+        username = self.username.GetValue()
+        password = self.password.GetValue()
+        post_login = self.post_login.GetValue())
         default = self.default.GetValue()
         if not name:
             wx.MessageBox(t("ui.message.character.missing_name"),

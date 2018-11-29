@@ -90,7 +90,7 @@ class Repeat(Function):
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        times = dialog.times.GetValue().encode("utf-8", errors="replace")
+        times = dialog.times.GetValue()
         empty_times = self.t("empty_times",
                 "You didn't specify the number of times you want " \
                 "this command to repeat. Specify 1 at least.")
@@ -109,7 +109,7 @@ class Repeat(Function):
             dialog.times.SetFocus()
             return None
 
-        command = dialog.command.GetValue().encode("utf-8", errors="replace")
+        command = dialog.command.GetValue()
 
         arguments = [times]
         if command:

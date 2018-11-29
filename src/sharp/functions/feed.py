@@ -68,7 +68,7 @@ class Feed(Function):
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        channel = dialog.channel.GetValue().encode("utf-8", errors="replace")
+        channel = dialog.channel.GetValue()
         empty_channel = self.t("empty_channel",
                 "The channel name is empty.  Where to send the message?")
 
@@ -78,7 +78,7 @@ class Feed(Function):
             dialog.channel.SetFocus()
             return None
 
-        message = dialog.message.GetValue().encode("utf-8", errors="replace")
+        message = dialog.message.GetValue()
         empty_message = self.t("empty_message",
                 "The message is empty.  What to send to the channel?")
 
