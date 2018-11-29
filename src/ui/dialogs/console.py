@@ -88,9 +88,6 @@ class CocoIC(InteractiveConsole):
                     if line is None:
                         time.sleep(0.2)
                         continue
-
-                    encoding = "utf-8"
-                    line = line.decode(encoding, errors="replace")
                 except EOFError:
                     self.write("\n")
                     break
@@ -134,8 +131,7 @@ class CocoIC(InteractiveConsole):
 
     def write(self, message):
         """Write the text to the interface."""
-        message = message.decode("utf-8", errors="replace")
-        logger.debug(u"Received in answer {}".format(repr(message)))
+        logger.debug("Received in answer {}".format(repr(message)))
         self.panel.Send(message)
 
 
@@ -180,8 +176,7 @@ class ConsolePanel(AccessPanel):
     def OnInput(self, message):
         """Some text has been sent from the input."""
         # Converts the text back to 'str'
-        message = message.encode("utf-8", errors="replace")
-        logger.debug(u"Received {}".format(repr(message)))
+        logger.debug("Received {}".format(repr(message)))
         self.thread.console.to_exec = message
 
     def OnPaste(self, e):
