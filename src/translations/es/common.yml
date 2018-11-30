@@ -1,7 +1,7 @@
 ﻿action: Acción
 alias:
-    1: Alias
-    2+: Aliases
+    1: Abreviatura
+    2+: Abreviaturas
 channel:
     1: Canal
     2+: Canales
