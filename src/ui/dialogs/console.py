@@ -63,7 +63,7 @@ class CocoIC(InteractiveConsole):
         except AttributeError:
             sys.ps2 = "... "
         cprt = 'Type "help", "copyright", "credits" or "license" for more information.'
-        logger.debug(u"Sending the welcome prompt")
+        logger.debug("Sending the welcome prompt")
         if banner is None:
             self.write("Python %s on %s\n%s\n" %
                        (sys.version, sys.platform, cprt))
@@ -96,7 +96,7 @@ class CocoIC(InteractiveConsole):
                     stderr = sys.stderr
                     sys.stdout = self
                     sys.stderr = self
-                    logger.debug(u"Executing {}".format(repr(line)))
+                    logger.debug("Executing {}".format(repr(line)))
                     more = self.push(line)
                     sys.stdout = stdout
                     sys.stderr = stderr
@@ -147,7 +147,7 @@ class GUIThread(threading.Thread):
     def run(self):
         self.panel.Send(t("ui.dialog.console.warning"))
         self.console.interact()
-        logger.debug(u"Begin interacting with the Python console")
+        logger.debug("Begin interacting with the Python console")
 
 
 class ConsolePanel(AccessPanel):
@@ -171,7 +171,7 @@ class ConsolePanel(AccessPanel):
         # Launch the console
         self.thread.console.locals = self.locals
         self.thread.start()
-        logger.debug(u"Starting the Python console thread")
+        logger.debug("Starting the Python console thread")
 
     def OnInput(self, message):
         """Some text has been sent from the input."""

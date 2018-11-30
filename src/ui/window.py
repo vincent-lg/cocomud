@@ -584,7 +584,7 @@ class MUDPanel(AccessPanel):
         session = self.session
         name = session.world and session.world.name or "unknown"
         character = session.character and session.character.name or "any"
-        log.info(u"Selecting world {}, character {}".format(name, character))
+        log.info("Selecting world {}, character {}".format(name, character))
 
         if self.client:
             self.client.disconnect()
@@ -624,7 +624,7 @@ class MUDPanel(AccessPanel):
     # Methods to handle client's events
     def handle_disconnection(self, reason=None):
         """The client has been disconnected for any reason."""
-        message = u"--- {} ---".format(t("ui.client.disconnected"))
+        message = "--- {} ---".format(t("ui.client.disconnected"))
         if self:
             self.Send(message)
         ScreenReader.talk(message, interrupt=False)

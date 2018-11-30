@@ -62,7 +62,7 @@ class TestCommandStacking(MockClient):
         def get_setting(address):
             """Private function to return a set of default settings."""
             default = {
-                    "options.input.command_stacking": u"\x82",
+                    "options.input.command_stacking": "\x82",
                     "options.general.encoding": "utf-8",
             }
             return default[address]

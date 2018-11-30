@@ -84,7 +84,7 @@ class TaskDialog(wx.Dialog):
         """Update the progress level."""
         if self:
             text = self.text.GetValue()
-            ScreenReader.talk(u"{}% {}".format(value, text), speech=False)
+            ScreenReader.talk("{}% {}".format(value, text), speech=False)
             self.gauge.SetValue(value)
 
     def OnUpdateText(self, text):

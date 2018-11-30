@@ -74,7 +74,7 @@ class PreInstallDialog(wx.Dialog):
                         choice.hostname, choice.port)
 
             if i == 0:
-                text += u" ({})".format(t("wizard.install_world.recommended"))
+                text += " ({})".format(t("wizard.install_world.recommended"))
 
             choices.Append((text, ))
 

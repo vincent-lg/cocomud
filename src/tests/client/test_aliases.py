@@ -37,7 +37,7 @@ class TestAliases(MockClient):
 
     def test_without(self):
         """Test without any aliases."""
-        self.client.write(u"some command")
+        self.client.write("some command")
         self.client.transport.write.assert_called_once_with(
                 b"some command\r\n")
 
@@ -46,7 +46,7 @@ class TestAliases(MockClient):
         alias = Alias(self.client.factory.sharp_engine, "l", "look")
         self.assertEqual(alias.sharp_script, "#alias l look")
         self.client.factory.world.aliases = [alias]
-        self.client.write(u"l")
+        self.client.write("l")
         self.client.transport.write.assert_called_once_with(b"look\r\n")
 
     def test_variable(self):
@@ -64,7 +64,7 @@ class TestAliases(MockClient):
         """Test an alias with one variable containing special characters."""
         alias = Alias(self.client.factory.sharp_engine, "s*", "say $1")
         self.client.factory.world.aliases = [alias]
-        self.client.write(u"s\x82lite")
+        self.client.write("s\x82lite")
         self.client.transport.write.assert_called_once_with(b"say \x82lite\r\n")
 
     def test_variables(self):
@@ -74,7 +74,7 @@ class TestAliases(MockClient):
         self.assertEqual(alias.sharp_script,
                 "#alias w*=* {whisper $2 to $1}")
         self.client.factory.world.aliases = [alias]
-        self.client.write(u"wman=good")
+        self.client.write("wman=good")
         self.client.transport.write.assert_called_once_with(
                 b"whisper good to man\r\n")
 
@@ -86,7 +86,7 @@ class TestAliases(MockClient):
                 "#alias hp {#say {HP = 8}}")
         self.client.factory.world.aliases = [alias]
         self.client.handle_message = MagicMock()
-        self.client.write(u"hp")
+        self.client.write("hp")
         self.client.transport.write.assert_not_called()
         kwargs = {
                 "screen": True,
