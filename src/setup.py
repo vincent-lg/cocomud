@@ -26,6 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import distutils
+import opcode
 import os
 import shutil
 
@@ -45,7 +47,9 @@ dbg_updater = Executable(
     script="dbg_updater.py",
 )
 
+distutils_path = os.path.join(os.path.dirname(opcode.__file__), 'distutils')
 includefiles = [
+    (distutils_path, 'lib/distutils'),
     "translations",
     "worlds",
     "../doc",
@@ -74,10 +78,11 @@ setup(
     description = "The CocoMUD client.",
     options = {'build_exe': {
             "include_files": includefiles,
-            "excludes": ["_gtkagg", "_tkagg", "bsddb", "curses",
+            "excludes": ["_gtkagg", "_tkagg", "bsddb", "distutils", "curses",
                     "pywin.debugger", "pywin.debugger.dbgcon",
                     "pywin.dialogs", "tcl", "Tkconstants", "Tkinter"],
             "packages": ["accesspanel", "redminelib.resources", "_cffi_backend", "idna.idnadata", "pubsub.pub"],
+            "namespace_packages": ["zope.interface"],
     }},
     executables = [client, updater, dbg_updater]
 )
