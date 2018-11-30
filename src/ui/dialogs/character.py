@@ -114,7 +114,7 @@ class CharacterDialog(wx.Dialog):
         name = self.name.GetValue()
         username = self.username.GetValue()
         password = self.password.GetValue()
-        post_login = self.post_login.GetValue())
+        post_login = self.post_login.GetValue()
         default = self.default.GetValue()
         if not name:
             wx.MessageBox(t("ui.message.character.missing_name"),
