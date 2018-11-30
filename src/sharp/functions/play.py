@@ -30,20 +30,18 @@
 
 import os
 
-#from pygame import mixer
 import wx
 from ytranslate import t
 
 from log import logger
 from sharp import Function
-
-#mixer.init(buffer=1024)
+import simpleaudio as sa
 
 class Play(Function):
 
     """Function SharpScript 'play'.
 
-    This function play a sound or music using the Pygame mixer.
+    This plays an audio file using simpleaudio.
 
     """
 
@@ -65,7 +63,7 @@ class Play(Function):
             log.warning("#play cannot find the file at {}".format(
                     repr(filename)))
 
-        sound = mixer.Sound(filename)
+        sound = sa.WaveObject.from_wave_file(filename)
         sound.play()
 
     def find_abs_filename(self, filename):
@@ -136,7 +134,7 @@ class Play(Function):
         extensions = "Audio file (*.wav,*.ogg)|*.wav;*.ogg"
         dialog = wx.FileDialog(parent, choose_file,
                 parent.default_directory, "", extensions,
-                wx.OPEN)
+                wx.FD_OPEN)
         result = dialog.ShowModal()
         if result == wx.ID_OK:
             filename = self.find_rel_filename(dialog.GetPath())
@@ -147,5 +145,5 @@ class Play(Function):
         """Test the audio file."""
         parent = self.dialog
         filename = self.find_abs_filename(parent.default_file)
-        sound = mixer.Sound(filename)
+        sound = sa.WaveObject.from_wave_file(filename)
         sound.play()
