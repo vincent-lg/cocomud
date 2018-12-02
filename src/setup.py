@@ -59,16 +59,6 @@ includefiles = [
     "cacert.pem",
 ]
 
-if os.name == "nt":
-    includefiles += [
-        # UniversalSpeech DLLs
-        "../dolapi.dll",
-        "../jfwapi.dll",
-        "../nvdaControllerClient.dll",
-        "../SAAPI32.dll",
-        "../UniversalSpeech.dll",
-    ]
-
 if os.path.exists("build/CocoMUD"):
     shutil.rmtree("build/CocoMUD")
 
@@ -88,3 +78,6 @@ setup(
 )
 
 shutil.move("build/exe.win32-3.6", "build/CocoMUD")
+if os.name == "nt":
+    for library in os.listdir("../lib/windows"):
+        shutil.copyfile("../lib/windows/" + library, "build/CocoMUD/" + library)
