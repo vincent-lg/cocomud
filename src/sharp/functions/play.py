@@ -41,7 +41,7 @@ class Play(Function):
 
     """Function SharpScript 'play'.
 
-    This function play a sound or music using the Pygame mixer.
+    This plays an audio file using simpleaudio.
 
     """
 
@@ -133,7 +133,7 @@ class Play(Function):
         extensions = "Audio file (*.wav,*.ogg)|*.wav;*.ogg"
         dialog = wx.FileDialog(parent, choose_file,
                 parent.default_directory, "", extensions,
-                wx.OPEN)
+                wx.FD_OPEN)
         result = dialog.ShowModal()
         if result == wx.ID_OK:
             filename = self.find_rel_filename(dialog.GetPath())
