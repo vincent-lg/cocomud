@@ -30,14 +30,12 @@
 
 import os
 
-#from pygame import mixer
 import wx
 from ytranslate import t
 
+from audio import audiolib
 from log import logger
 from sharp import Function
-
-#mixer.init(buffer=1024)
 
 class Play(Function):
 
@@ -65,8 +63,7 @@ class Play(Function):
             log.warning("#play cannot find the file at {}".format(
                     repr(filename)))
 
-        sound = mixer.Sound(filename)
-        sound.play()
+        audiolib.play(filename)
 
     def find_abs_filename(self, filename):
         """Return the absolute path of the file.
@@ -147,5 +144,4 @@ class Play(Function):
         """Test the audio file."""
         parent = self.dialog
         filename = self.find_abs_filename(parent.default_file)
-        sound = mixer.Sound(filename)
-        sound.play()
+        audiolib.play(filename)
