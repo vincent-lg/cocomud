@@ -40,6 +40,7 @@ you can.  It's more likely you will import a single, preset instance of
 """
 
 from audio import pybass
+from audio.sound import Sound
 
 class AudioLib:
 
@@ -87,14 +88,6 @@ class AudioLib:
 
         """
         self._init()
-
-        try:
-            path = path.encode("utf-8")
-        except UnicodeError:
-            return
-
-        # Get a handle on the file
-        handle = pybass.BASS_StreamCreateFile(False, path, 0, 0, 0)
-
-        # Start playing the sound
-        return pybass.BASS_ChannelPlay(handle, False)
+        sound = Sound(path)
+        sound.play()
+        return sound
