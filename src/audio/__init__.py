@@ -29,7 +29,7 @@
 """Audio library, to play sounds in various formats.
 
 This package includes:
--  The `pybass` library, to play sounds using `BASS`, a rhitd-party library
+-  The `pybass` library, to play sounds using `BASS`, a thitd-party library
    with its own license.
 -  A wrapper around the `pybass` library to make it easy to use `BASS` from
    CocoMUD.

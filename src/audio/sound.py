@@ -75,18 +75,56 @@ class Sound:
         return self.status == PlayingStatus.PAUSED
 
     def play(self):
-        """Start playing this sound."""
-        filename = self.filename
-        try:
-            filename = filename.encode("utf-8")
-        except UnicodeError:
+        """
+        Start playing or unpause this sound.
+
+        Returns:
+            playing (bool): whether this sound now is playing.
+
+        """
+        if self.stopped:
+            filename = self.filename
+            try:
+                filename = filename.encode("utf-8")
+            except UnicodeError:
+                return False
+
+            # Get a handle on the file
+            self.bass_handle = pybass.BASS_StreamCreateFile(False, filename, 0, 0, 0)
+        elif not self.paused:
             return False
 
-        # Get a handle on the file
-        self.bass_handle = pybass.BASS_StreamCreateFile(False, filename, 0, 0, 0)
-
         # Start playing the sound
-        return pybass.BASS_ChannelPlay(self.bass_handle, False)
+        pybass.BASS_ChannelPlay(self.bass_handle, False)
+        return self.playing
+
+    def pause(self):
+        """
+        Pause the sound, if it's currently playing.
+
+        Returns:
+            paused (bool): whether this sound has been paused or not.
+
+        """
+        if not self.playing:
+            return False
+
+        pybass.BASS_ChannelPause(self.bass_handle)
+        return self.paused
+
+    def stop(self):
+        """
+        Stop the playing audio file.
+
+        Returns:
+            stopped (bool): has this sound stopped?
+
+        """
+        if not self.playing:
+            return False
+
+        pybass.BASS_ChannelStop(self.bass_handle)
+        return self.stopped
 
 
 class PlayingStatus(Enum):
