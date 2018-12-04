@@ -70,10 +70,14 @@ class GameEngine:
 
     """
 
-    def __init__(self):
+    def __init__(self, config_dir="."):
         self.logger = logger("")
         begin()
-        self.settings = Settings(self)
+        self.config_dir = config_dir
+        if config_dir != ".":
+            self.logger.info(f"Using an alternative config directory: {config_dir}")
+
+        self.settings = Settings(self, config_dir)
         self.sounds = True
         self.worlds = {}
         self.default_world = None
@@ -123,7 +127,7 @@ class GameEngine:
         """
         lang = self.settings.get_language()
         filename = name + ".html"
-        path = os.path.join("doc", lang, filename)
+        path = os.path.join(self.config_dir, "doc", lang, filename)
         if os.path.exists(path):
             self.logger.debug("Open the help file for {} (lang={})".format(
                     name, lang))
@@ -131,7 +135,7 @@ class GameEngine:
             return
 
         # Try English
-        path = os.path.join("doc", "en", filename)
+        path = os.path.join(self.config_dir, "doc", "en", filename)
         if os.path.exists(path):
             self.logger.debug("Open the help file for {} (lang=en)".format(
                     name))

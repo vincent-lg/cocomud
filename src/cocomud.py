@@ -28,6 +28,7 @@
 
 """This demo file creates a simple client with TTS support."""
 
+import argparse
 import wx
 from twisted.internet import wxreactor
 wxreactor.install()
@@ -41,8 +42,14 @@ from log import end
 from ui.window import ClientWindow
 
 app = wx.App(False)
+
+# Parse command line options
+parser = argparse.ArgumentParser()
+parser.add_argument("--config-dir", help="An alternative configuration directory", default=".")
+args = parser.parse_args()
+
 # Load the user configuration
-engine = GameEngine()
+engine = GameEngine(args.config_dir)
 engine.load()
 
 # Select the configured language

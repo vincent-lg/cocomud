@@ -40,7 +40,7 @@ from validate import Validator
 from log import main as logger
 from world import World
 
-class Configuration(object):
+class Configuration:
 
     """Class describing CocoMUD's configuration.
 
@@ -48,7 +48,8 @@ class Configuration(object):
     be either YAML or respecting the ConfigObj syntax (that is,
     basically a .ini file).  If everything goes smoothly, the ConfigObj
     objects can be found in __getitem__-ing these values, specifying
-    the directory structure.
+    the directory structure.  Additionally, results from the argument parser
+    can also be found there.
 
     Example:
 
@@ -211,8 +212,9 @@ class Settings(Configuration):
         ("fr", "French"),
     )
 
-    def __init__(self, engine):
-        Configuration.__init__(self, "settings", engine)
+    def __init__(self, engine, config_dir):
+        Configuration.__init__(self, os.path.join(config_dir, "settings"), engine)
+        self.config_dir = config_dir
 
     def get_language(self):
         """Return the configured language.
@@ -236,8 +238,9 @@ class Settings(Configuration):
         self.load_options()
 
         # Load the world configuration
-        for directory in os.listdir("worlds"):
+        for directory in os.listdir(os.path.join(self.engine.config_dir, "worlds")):
             world = World(location=directory)
+            world.engine = self.engine
             settings = GameSettings(self.engine, world)
             settings.load()
             self.engine.worlds[world.name] = world

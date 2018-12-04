@@ -125,7 +125,7 @@ class Trigger:
         created, if the expression matches.
 
         """
-        if isinstance(match, basestring):
+        if isinstance(match, str):
             match = self.re_reaction.search(match)
             if not match:
                 return False
@@ -141,7 +141,7 @@ class Trigger:
         i = 0
         for group in match.groups():
             i += 1
-            args[unicode(i)] = group
+            args[str(i)] = group
 
         # Copy the named groups
         for name, group in match.groupdict().items():

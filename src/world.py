@@ -95,7 +95,7 @@ class World:
     @property
     def path(self):
         """Return the path to the world."""
-        return os.path.join("worlds", self.location)
+        return os.path.join(self.engine.config_dir, "worlds", self.location)
 
     def load(self):
         """Load the config.set script."""
