@@ -96,7 +96,7 @@ class Safe:
             self.passphrase = base64.b64encode(os.urandom(
                     self.passphrase_size))
             if file:
-                with open(file, "w") as pass_file:
+                with open(file, "wb") as pass_file:
                     pass_file.write(self.passphrase)
 
         # Load the secret file
@@ -182,9 +182,9 @@ class Safe:
             raise KeyError(key)
 
         value = self.data[key]
-        if isinstance(value, str):
+        if isinstance(value, tuple) and value[0] == "str":
             salt = self.get_salt_from_key(key)
-            return self.decrypt(value, salt)
+            return self.decrypt(value[1], salt)
 
         return value
 
@@ -199,7 +199,7 @@ class Safe:
         if isinstance(value, str):
             salt = self.get_salt_from_key(key)
             crypted = self.encrypt(value, salt)
-            self.data[key] = crypted
+            self.data[key] = ("str", crypted)
         else:
             self.data[key] = value
 
