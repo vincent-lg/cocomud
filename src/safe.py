@@ -149,18 +149,9 @@ class Safe:
     def load(self):
         """Load the data from the 'secret' file if exists."""
         if os.path.exists(self.secret):
-            try:
-                with open(self.secret, "rb") as file:
-                    upic = pickle.Unpickler(file, encoding="utf-8")
-                    print("Load as UTF8")
-                    self.data = upic.load()
-            except UnicodeDecodeError:
-                with open(self.secret, "rb") as file:
-                    upic = pickle.Unpickler(file, encoding="latin-1")
-                    print("Load at latin-1")
-                    self.data = upic.load()
-
-                self.save()
+            with open(self.secret, "rb") as file:
+                upic = pickle.Unpickler(file, encoding="utf-8")
+                self.data = upic.load()
 
             if not isinstance(self.data, dict):
                 raise ValueError("the data contained in the file " \
@@ -182,9 +173,9 @@ class Safe:
             raise KeyError(key)
 
         value = self.data[key]
-        if isinstance(value, tuple) and value[0] == "str":
+        if isinstance(value, (bytes, str)):
             salt = self.get_salt_from_key(key)
-            return self.decrypt(value[1], salt)
+            return self.decrypt(value, salt)
 
         return value
 
@@ -199,7 +190,7 @@ class Safe:
         if isinstance(value, str):
             salt = self.get_salt_from_key(key)
             crypted = self.encrypt(value, salt)
-            self.data[key] = ("str", crypted)
+            self.data[key] = crypted
         else:
             self.data[key] = value
 
