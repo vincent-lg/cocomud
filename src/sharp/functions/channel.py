@@ -33,6 +33,7 @@ import wx
 from scripting.channel import Channel as ObjChannel
 from sharp import Function
 from ui.dialogs.channel import ChannelsDialog
+from screenreader import ScreenReader
 
 class Channel(Function):
 
@@ -68,7 +69,7 @@ class Channel(Function):
         options = wx.BoxSizer(wx.HORIZONTAL)
         dialog.cb_show = wx.CheckBox(dialog, label=l_show)
         dialog.cb_show.SetValue(show)
-        options.Add(dialog.cb_screen)
+        options.Add(dialog.cb_show)
         dialog.top.Add(options)
 
     def complete(self, dialog):
