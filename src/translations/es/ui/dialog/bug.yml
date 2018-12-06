@@ -1,30 +1,23 @@
 ﻿message: |
-    An error occurred while trying to perform this operation.  You
-    can either report this bug to the developers, or close this dialog
-    box.  To report it, you have to create a new issue on CocoMUD's website,
-    at: https://cocomud.plan.io/projects/cocomud-client/issues/new
+    Ocurrió un error al realizar esta operación. Usted puede o bien reportar el problema
+    o bien simplemente cerrar este cuadro de diálogo. Para reportar, ingrese a la siguiente URL:
 
-    If you don't have an account on this website yet, you can create
-    one and report this issue.  Here is the step-ty-step process to
-    report this bug:
+    https://cocomud.plan.io/projects/es/issues/new?issue[tracker_id]=3
 
-    1. Click on the "report" button on this dialog box. It will open
-       your favorite web browser with the address given above.
-    2. Choose a brief but explicit title:
-       Example: Error when trying to import the world XY
-       (Keep the subject as short and explicit as possible).
-    3. In the description of the issue, you can indicate more
-       information about how to reproduce this bug.  You should also
-       paste the following information to help developers solve
-       this bug (include the <pre> </pre> as follows):
+    Si todavía no tiene una cuenta en el sitio, deberá crear una para poder reportar el problema.
+    Estos son los pasos que debe realizar para conseguirlo.
+
+    1. Presione el botón reportar este problema. Esto abrirá la URL mensionada arriba en su navegador web predeterminado.
+    2. Elija un título breve pero explícito. Por ejemplo: Error al importar el mundo XY.
+    3. En el campo de descripción, detalle todo el problema, incluyendo la información de abajo (incluyendo las etiquetas <pre> y </pre>).
 
     <pre>
     {traceback}
     </pre>
 
-    4. Click on the "Create" button.
+    4. Haga click en el botón "Crear".
 
-    We thank you for your help in creating a more stable MUD client.
+    Le agradecemos que nos ayude a crear un cliente de MUD mas estable.
 report: Reportar este problema
 title: Reporte de problema
-url: "https://cocomud.plan.io/projects/cocomud-client/issues/new?issue[tracker_id]=3"
+url: "https://cocomud.plan.io/projects/es/issues/new?issue[tracker_id]=3"
