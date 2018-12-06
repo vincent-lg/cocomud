@@ -6,8 +6,8 @@ channel:
     1: Canal
     2+: Canales
 character:
-    1: Personage
-    2+: Personages
+    1: Personaje
+    2+: Personajes
 connection: Conexión
 description: Descripción
 function: Función
