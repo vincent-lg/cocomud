@@ -29,11 +29,11 @@
 
 """This file contains the ConsoleDialog."""
 
-from __future__ import absolute_import
 from code import InteractiveConsole
 import sys
 import threading
 import time
+import traceback
 
 from accesspanel import AccessPanel
 import wx
@@ -51,6 +51,16 @@ class CocoIC(InteractiveConsole):
         self.to_exec = None
         self.panel = panel
         self.interrupt = False
+
+    def showtraceback(self):
+        """Show a traceback in the panel."""
+        sys.last_type, sys.last_value, last_tb = ei = sys.exc_info()
+        sys.last_traceback = last_tb
+        try:
+            lines = traceback.format_exception(ei[0], ei[1], last_tb.tb_next)
+            self.write(''.join(lines))
+        finally:
+            last_tb = ei = None
 
     def interact(self, banner=None):
         """Interact and redirect to self.write."""
@@ -84,7 +94,7 @@ class CocoIC(InteractiveConsole):
                 else:
                     prompt = sys.ps1
                 try:
-                    line = self.raw_input()
+                    line = self.input()
                     if line is None:
                         time.sleep(0.2)
                         continue
@@ -114,7 +124,7 @@ class CocoIC(InteractiveConsole):
                 self.resetbuffer()
                 more = 0
 
-    def raw_input(self):
+    def input(self):
         """Write a prompt and read a line."""
         if self.to_exec is not None:
             lines = self.to_exec.splitlines()
