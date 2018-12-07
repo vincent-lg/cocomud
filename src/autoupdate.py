@@ -35,7 +35,7 @@ import shutil
 from subprocess import Popen
 import sys
 from threading import Thread
-from urllib.request import urlopen
+import urllib
 from zipfile import ZipFile, BadZipfile
 
 class AutoUpdate(Thread):
@@ -82,7 +82,11 @@ class AutoUpdate(Thread):
             self.object.UpdateGauge(0)
 
         url = "https://cocomud.plan.io/projects/cocomud-client.json"
-        response = urlopen(url)
+        try:
+            response = urllib.request.urlopen(url)
+        except urllib.error.URLError:
+            return
+
         try:
             info = json.loads(response.read())
         except ValueError:
@@ -125,8 +129,6 @@ class AutoUpdate(Thread):
                 return new_build
             else:
                 raise UknownPlatformUpdateError
-
-        return None
 
     def download(self, stdout=False):
         """Download the build."""
