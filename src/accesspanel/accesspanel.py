@@ -273,7 +273,8 @@ class AccessPanel(wx.Panel):
         input = self.input
 
         # Clears the output field and pastes the text back in
-        self.output.ChangeValue(output + message)
+        self.ClearInput()
+        self.output.AppendText(message)
 
         # If the cursor is beyond the editing position
         if pos >= self.editing_pos:
