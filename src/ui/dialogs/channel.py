@@ -89,7 +89,7 @@ class ChannelsDialog(wx.Dialog):
 
     def OnAdd(self, e):
         """Add a new channel."""
-        dialog = wx.TextEntryDialog(self, t("ui.message.channels.name"), defaultValue="")
+        dialog = wx.TextEntryDialog(self, t("ui.message.channels.name"), t("ui.message.channels.title"))
         dialog.ShowModal()
         name = dialog.GetValue()
         dialog.Destroy()

@@ -130,7 +130,7 @@ class Play(Function):
         """Browse for a file."""
         choose_file = t("ui.button.choose_file")
         parent = self.dialog
-        extensions = "Audio file (*.wav,*.ogg)|*.wav;*.ogg"
+        extensions = "Audio file (*.wav,*.ogg,*.mp3)|*.wav;*.ogg;*.mp3"
         dialog = wx.FileDialog(parent, choose_file,
                 parent.default_directory, "", extensions,
                 wx.FD_OPEN)
