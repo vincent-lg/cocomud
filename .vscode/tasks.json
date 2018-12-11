@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "prepare-exec-dir",
+            "windows": {
+                "command": "${workspaceFolder}\\prepare.bat",
+            },
+            "type": "shell",
+            "options": {
+                "env": {
+                    "BASE_PATH": "${workspaceFolder}"
+                }
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        }
+    ]
+}

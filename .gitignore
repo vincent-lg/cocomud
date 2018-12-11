@@ -69,3 +69,7 @@ cacert.pem
 # User settings
 src/settings
 src/worlds
+
+# VSCode support
+client/
+.vscode/settings.json

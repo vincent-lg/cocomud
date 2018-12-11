@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch CocoMUD (internal terminal)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/cocomud.py",
+            "cwd": "${workspaceFolder}/client/",
+            "windows": {
+                "env": {
+                    "PATH": "${workspaceFolder}\\lib\\windows\\;${env:PATH}"
+                }
+            },
+            "preLaunchTask": "prepare-exec-dir"
+        }
+    ]
+}
