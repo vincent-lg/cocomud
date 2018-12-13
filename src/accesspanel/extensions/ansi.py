@@ -26,16 +26,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import re
+import re, string
 
 import wx
 import wx.lib.colourdb
 
-from accesspanel.extensions.base import BaseExtension
+from .base import BaseExtension
 
 ## Constants
 # Regular expressions to capture ANSI codes
-RE_ANSI = re.compile(r'\x1b\[([^m]*)m', re.UNICODE)
 RE_CODE = re.compile(r"^(?:(\d+)(?:\;(\d+)(?:\;(\d+))?)?)?$", re.UNICODE)
 
 # Brightness
@@ -80,7 +79,7 @@ class ANSI(BaseExtension):
     """
 
     def __init__(self, panel):
-        BaseExtension.__init__(self, panel)
+        super().__init__(panel)
         wx.lib.colourdb.updateColourDB()
         self.brightness = NORMAL
         self.foreground = wx.BLACK
@@ -129,97 +128,142 @@ class ANSI(BaseExtension):
 
     def OnMessage(self, message):
         """Interpret the ANSI codes."""
+
+        # Variables
         point = self.panel.editing_pos
-        pos = []
+        ansi_stage = 1
+        ansi_buffer = ""
+        clean_buffer = ""
+        char_index = 0
 
-        # Browse through the ANSI codes
-        for match in reversed(list(RE_ANSI.finditer(message))):
-            code = match.group(1)
+        def select_colors(code):
+            """
+            Transforms ANSI sequences in a format specifier
+            """
 
-            # Extract the brightness, foreground and background
-            codes = RE_CODE.search(code)
-            if codes:
-                brightness, foreground, background = codes.groups()
+            match = RE_CODE.match(code)
 
-                # All 3 variables can be None
-                if brightness == 1:
-                    brightness = BRIGHT
-                elif brightness == 4:
-                    brightness = UNDERLINE
-                else:
-                    brightness = NORMAL
+            # ANSI style sequences have tree parts
+            p1, p2, p3 = match.groups()
+            brightness, foreground, background = (None, None, None)
 
-                # Extract the foreground color
-                if foreground:
-                    foreground = int(foreground)
-                    if brightness == NORMAL:
-                        foreground = self.normal_colors.get(foreground + 10)
-                    elif brightness == BRIGHT:
-                        foreground = self.bright_colors.get(foreground + 10)
-                    elif brightness == UNDERLINE:
-                        foreground = self.dark_colors.get(foreground + 10)
+            if p1:
+                p1 = int(p1.strip())
 
-                # Extract the background color
-                if background:
-                    background = int(background)
-                    if brightness == NORMAL:
-                        background = self.normal_colors.get(background)
-                    elif brightness == BRIGHT:
-                        background = self.bright_colors.get(background)
-                    elif brightness == UNDERLINE:
-                        background = self.dark_colors.get(background)
+                if p1 in (0, 1, 4, 7):
+                    brightness = p1
+                elif p1 in range(30, 38):
+                    foreground = p1
+                elif p1 in range(40, 48):
+                    background = p1
 
-                if foreground is None:
-                    foreground = self.default_foreground
+            if p2:
+                p2 = int(p2.strip())
 
-                if brightness:
-                    self.brightness = brightness
+                if p2 in range(30, 40):
+                    foreground = p2
+                elif p2 in range(40, 50):
+                    background = p2
 
-                if background is None:
-                    if self.brightness == BRIGHT:
-                        background = wx.BLACK
-                    elif self.brightness == UNDERLINE:
-                        background = wx.YELLOW
-                    else:
-                        background = self.default_background
+            if p3:
+                p3 = int(p3.strip())
 
-                start = match.start()
-                end = match.end()
-                pos.append((start, end, foreground, background))
+                if p3 in range(40, 50):
+                    background = p3
 
-        begin_tag = True
-        updated_pos = 0
-        last_mod = None
-        for start, end, foreground, background in reversed(pos):
-            if begin_tag:
-                begin_tag = False
+            if brightness == 1:
+                brightness = BRIGHT
+            elif brightness == 4:
+                brightness = UNDERLINE
             else:
-                eol = message.count("\r", 0, start - 1)
-                begin_tag = True
-                real_start, m_foreground, m_background = last_mod
-                real_start += point
-                real_start -= eol
-                real_end = start - updated_pos + point
-                real_end -= eol
-                self.modifiers.append((real_start, real_end, m_foreground,
-                        m_background))
+                brightness = NORMAL
 
-                # If it's not the default color, mark an open tag
-                if foreground != self.default_foreground or \
-                        background != self.default_background:
-                    begin_tag = False
 
-            last_mod = (start - updated_pos, foreground, background)
-            updated_pos += end - start
+            # Now the colors
+            colorlist = None
 
-        # Remove the ANSI codes from the message
-        for start, end, foreground, background in pos:
-            message = message[:start] + message[end:]
+            if brightness == BRIGHT:
+                colorlist = self.bright_colors
+            elif brightness == UNDERLINE:
+                colorlist = self.dark_colors
+            else:
+                colorlist = self.normal_colors
 
-        return message
+            if foreground:
+                foreground = colorlist[foreground+10]
+            else:
+                foreground = self.default_foreground
+
+            if background:
+                background = colorlist[background]
+            else:
+
+                if brightness == BRIGHT:
+                    background = wx.BLACK
+                elif brightness == UNDERLINE:
+                    background = wx.YELLOW
+                else:
+                    background = self.default_background
+
+            return (foreground, background)
+
+        # We must iterate over the entire message string
+        while char_index < len(message):
+
+            # First stage: look for a 0x1B character and switch to second stage
+            if ansi_stage == 1:
+                if message[char_index] == "\x1B":
+                    ansi_stage = 2
+                else:
+                    clean_buffer += message[char_index]
+
+            # Second stage: look for a validation character (an '[')
+            elif ansi_stage == 2:
+                if message[char_index] == "[":
+                    ansi_stage = 3
+                    ansi_buffer = ""
+                else:
+                    ansi_stage = 1
+
+                    # Just add the two last characters
+                    clean_buffer += message[char_index-1:char_index]
+
+            # Last stage: process ANSI command with arguments
+            elif ansi_stage == 3:
+                if message[char_index] in string.digits+";":
+                    ansi_buffer += message[char_index]
+
+                # Now we have all arguments and the command (too generic detection for now...)
+                else:
+                    ansi_stage = 1
+                    self.modifiers.append((point+len(clean_buffer), select_colors(ansi_buffer)))
+
+                    ansi_buffer = ""
+
+            char_index += 1
+
+
+        return clean_buffer
 
     def PostMessage(self, message):
-        for start, end, foreground, background in self.modifiers:
-            range = self.panel.output.GetRange(start, end)
-            self.panel.output.SetStyle(start, end, wx.TextAttr(
+        """Applies ANSI style to text"""
+
+        start = None
+        last_mark = None
+
+        for point, style in self.modifiers:
+            if not last_mark:
+                last_mark = style
+                start = point
+                continue
+
+            # Unpack foreground and background from style tuple
+            foreground, background = style
+
+            self.panel.output.SetStyle(start, point, wx.TextAttr(
                     foreground, background))
+
+            start = point
+            last_mark = style
+
+        self.modifiers = []
