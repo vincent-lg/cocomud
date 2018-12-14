@@ -2,3 +2,4 @@
 name: Escriba el nombre del canal que se agregará a este mundo.
 remove: Seleccione el nombre del canal que se eliminará.
 unknown: Este canal no se puede encontrar en este mundo.
+title: Agregar un canal
