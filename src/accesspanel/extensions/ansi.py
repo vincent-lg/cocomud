@@ -122,9 +122,17 @@ class ANSI(BaseExtension):
             47: wx.WHITE,
         }
 
+        # Position mark and style
+        self.last_mark = None
+        self.start_mark = None
+
     def OnClearOutput(self):
         """The output has been cleared."""
+
+        # We must clear all data for styles
         self.modifiers = []
+        self.start_mark = None
+        self.last_mark = None
 
     def OnMessage(self, message):
         """Interpret the ANSI codes."""
@@ -215,7 +223,10 @@ class ANSI(BaseExtension):
                 if message[char_index] == "\x1B":
                     ansi_stage = 2
                 else:
-                    clean_buffer += message[char_index]
+
+                    # We must discard \r characters because it causes problems at formatting time
+                    if message[char_index] != "\r":
+                        clean_buffer += message[char_index]
 
             # Second stage: look for a validation character (an '[')
             elif ansi_stage == 2:
@@ -248,22 +259,19 @@ class ANSI(BaseExtension):
     def PostMessage(self, message):
         """Applies ANSI style to text"""
 
-        start = None
-        last_mark = None
-
         for point, style in self.modifiers:
-            if not last_mark:
-                last_mark = style
-                start = point
+            if not self.last_mark:
+                self.last_mark = style
+                self.start_mark = point
                 continue
 
             # Unpack foreground and background from style tuple
-            foreground, background = style
+            foreground, background = self.last_mark
 
-            self.panel.output.SetStyle(start, point, wx.TextAttr(
+            self.panel.output.SetStyle(self.start_mark, point, wx.TextAttr(
                     foreground, background))
 
-            start = point
-            last_mark = style
+            self.start_mark = point
+            self.last_mark = style
 
         self.modifiers = []
