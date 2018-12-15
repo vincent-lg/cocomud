@@ -7,7 +7,6 @@ import_on_disk: Depuis un fichier...
 import_online: En ligne...
 export: "&Exporter cet univers..."
 preferences: "&Options\tAlt+Enter"
-console: Ouvrir la console Python...
 quit: "&Quitter"
 game: "&Jeu"
 aliases: "&Alias"
@@ -23,6 +22,8 @@ clear_output: Nettoyer la fenêtre de contenu
 connection: "&Connexion"
 disconnect: "Se &déconnecter de cet univers"
 reconnect: "Se &reconnecter à cet univers"
+tools: "&Outils"
+python_console: Ouvrir la console Python...
 help: "&Aide"
 help_index: "&Fonctionnalités basiques"
 new: "&Quoi de neuf"

@@ -119,6 +119,7 @@ class ClientWindow(DummyUpdater):
         fileMenu = wx.Menu()
         gameMenu = wx.Menu()
         connectionMenu = wx.Menu()
+        toolsMenu = wx.Menu()
         helpMenu = wx.Menu()
 
         ## File menu
@@ -157,11 +158,6 @@ class ClientWindow(DummyUpdater):
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
         fileMenu.AppendItem(preferences)
-
-        # Console
-        console = wx.MenuItem(fileMenu, -1, t("ui.menu.console"))
-        self.Bind(wx.EVT_MENU, self.OnConsole, console)
-        fileMenu.AppendItem(console)
 
         # Quit
         quit = wx.MenuItem(fileMenu, -1, t("ui.menu.quit"))
@@ -227,6 +223,12 @@ class ClientWindow(DummyUpdater):
         self.Bind(wx.EVT_MENU, self.OnReconnect, reconnect)
         connectionMenu.AppendItem(reconnect)
 
+        ## Tools menu
+        # Python console
+        pyconsole = wx.MenuItem(toolsMenu, -1, t("ui.menu.python_console"))
+        self.Bind(wx.EVT_MENU, self.OnPythonConsole, pyconsole)
+        toolsMenu.AppendItem(pyconsole)
+
         ## Help menu
         # Basics
         basics = wx.MenuItem(helpMenu, -1, t("ui.menu.help_index"))
@@ -246,6 +248,7 @@ class ClientWindow(DummyUpdater):
         menubar.Append(fileMenu, t("ui.menu.file"))
         menubar.Append(gameMenu, t("ui.menu.game"))
         menubar.Append(connectionMenu, t("ui.menu.connection"))
+        menubar.Append(toolsMenu, t("ui.menu.tools"))
         menubar.Append(helpMenu, t("ui.menu.help"))
 
         self.SetMenuBar(menubar)
@@ -359,8 +362,8 @@ class ClientWindow(DummyUpdater):
         dialog.ShowModal()
         dialog.Destroy()
 
-    def OnConsole(self, e):
-        """Open the console dialog box."""
+    def OnPythonConsole(self, e):
+        """Open the Python console dialog box."""
         dialog = ConsoleDialog(self.engine, self.world, self.panel)
         dialog.ShowModal()
 

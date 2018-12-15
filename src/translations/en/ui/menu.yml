@@ -7,7 +7,6 @@ import_on_disk: On disk...
 import_online: Online...
 export: "&Export this world..."
 preferences: "&Preferences\tAlt+Enter"
-console: Open the python console...
 quit: "&Quit"
 game: "&Game"
 aliases: "&Aliases"
@@ -23,6 +22,8 @@ clear_output: Clear the output window
 connection: "&Connection"
 disconnect: "&Disconnect from this world"
 reconnect: "&Reconnect to this world"
+tools: "&Tools"
+python_console: Open the python console...
 help: "&Help"
 help_index: "&Basic features"
 new: "&What's new"

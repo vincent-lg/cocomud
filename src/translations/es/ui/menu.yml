@@ -7,7 +7,6 @@ import_on_disk: En disco...
 import_online: En línea...
 export: "&Exportar este mundo..."
 preferences: "&Preferencias\tAlt+Enter"
-console: Abrir la consola Python...
 quit: "&Salir"
 game: "&Juego"
 aliases: "&Abreviaturas"
@@ -23,6 +22,8 @@ clear_output: Limpiar ventana de salida
 connection: "&Conexión"
 disconnect: "&Desconectar de este mundo"
 reconnect: "&Volver a conectarse al mundo"
+tools: "&Instrumentos"
+python_console: Abrir la consola Python...
 help: "Ay&uda"
 help_index: "&Características básicas"
 new: "&Qué hay de nuevo"
