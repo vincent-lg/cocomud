@@ -23,6 +23,7 @@ connection: "&Connection"
 disconnect: "&Disconnect from this world"
 reconnect: "&Reconnect to this world"
 tools: "&Tools"
+sharp_script_console: Open the SharpScript console...
 python_console: Open the python console...
 help: "&Help"
 help_index: "&Basic features"

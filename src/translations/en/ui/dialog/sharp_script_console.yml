@@ -1,0 +1,21 @@
+﻿banner: |
+    This console allows you to enter SharScript instructions directly.  It is a very
+    handy tool to quickly configure aliases, macros, triggers and so forth, as long
+    as you know the SharpScript syntax in CocoMUD.  Here's an example you can enter
+    here:
+        #say Hi!
+    Or:
+        #say {{Here's a longer message.}}
+    Or even:
+        #say {{This message shouldn't appear on the screen.}} -screen
+    You can also enter instructions on several lines, which is necessary if you need
+    to use the SharpScript syntax to include Python code.  This advanced syntax is
+    useful for complex triggers.  To do so, end your first line with {{+ to tell the
+    engine this line isn't the end of the instruction:
+        #trigger {{HP: }} {{+
+    ... then on the next lines, write the Python code by indenting it slightly to the
+    right.  When your block is over, add an empty line with the }} symbol, with no
+    indentation.  Only then, your lines will be sent to the SharpScript engine.
+        }}
+error: "An error occurred.  Here's the full traceback:"
+title: SharpScript console

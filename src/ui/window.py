@@ -56,6 +56,7 @@ from ui.dialogs.loading import LoadingDialog
 from ui.dialogs.macro import MacroDialog
 from ui.dialogs.notepad import NotepadDialog
 from ui.dialogs.preferences import PreferencesDialog
+from ui.dialogs.sharp_script_console import SharpScriptConsoleDialog
 from ui.dialogs.trigger import TriggerDialog
 from ui.dialogs.worlds import WorldsDialog, ExportWorldDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
@@ -224,6 +225,11 @@ class ClientWindow(DummyUpdater):
         connectionMenu.AppendItem(reconnect)
 
         ## Tools menu
+        # SharpScript console
+        ssconsole = wx.MenuItem(toolsMenu, -1, t("ui.menu.sharp_script_console"))
+        self.Bind(wx.EVT_MENU, self.OnSharpScriptConsole, ssconsole)
+        toolsMenu.AppendItem(ssconsole)
+
         # Python console
         pyconsole = wx.MenuItem(toolsMenu, -1, t("ui.menu.python_console"))
         self.Bind(wx.EVT_MENU, self.OnPythonConsole, pyconsole)
@@ -365,6 +371,11 @@ class ClientWindow(DummyUpdater):
     def OnPythonConsole(self, e):
         """Open the Python console dialog box."""
         dialog = ConsoleDialog(self.engine, self.world, self.panel)
+        dialog.ShowModal()
+
+    def OnSharpScriptConsole(self, e):
+        """Open the Python console dialog box."""
+        dialog = SharpScriptConsoleDialog(self.engine, self.world, self.panel)
         dialog.ShowModal()
 
     def OnAlias(self, e):

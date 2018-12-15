@@ -1,0 +1,38 @@
+﻿banner: |
+    Cette console vous permet d'entrer des instructions SharpScript directement. C'est
+    un raccourci très pratique pour configurer vos alias, macros et triggers, si vous
+    connaissez la syntaxe du SharpScript dans CocoMUD. Par exemple, entrez :
+        #say Coucou!
+    Ou :
+        #say {{Et un message plus long.}}
+    Ou encore :
+        #say {{Ce message ne devrait pas apparaître sur l'écran.}} -screen
+    Vous pouvez entrer des instructions sur plusieurs lignes, ce qui est utile pour
+    entrer du code Python directement. Pour ce faire, écrivez une ligne finissant par
+    l'un des marqueurs reconnus du moteur SharpScript :
+        #trigger {{Vie : }} {{+
+    ... écrivez le code Python en l'indentant convenablement. Sur la dernière ligne,
+    entrez :
+        }}
+    ... sans aucune indentation pour indiquer au moteur que votre instruction est
+    finie, et que vous souhaitez l'envoyer.
+error: "Une erreur s'est produite lors de l'exécution de votre code SharpScript. Voici le traceback complet :"
+title: Console SharpScript
+banner: |
+    Cette console vous permet d'entrer des instructions SharpScript directement. C'est
+    un raccourci très pratique pour configurer vos alias, macros et triggers, si vous
+    connaissez la syntaxe du SharpScript dans CocoMUD. Par exemple, entrez :
+        #say Coucou!
+    Ou :
+        #say {Et un message plus long.}
+    Ou encore :
+        #say {Ce message ne devrait pas apparaître sur l'écran.} -screen
+    Vous pouvez entrer des instructions sur plusieurs lignes, ce qui est utile pour
+    entrer du code Python directement. Pour ce faire, écrivez une ligne finissant par
+    l'un des marqueurs reconnus du moteur SharpScript :
+        #trigger {Vie : } {+
+    ... écrivez le code Python en l'indentant convenablement. Sur la dernière ligne,
+    entrez :
+        }
+    ... sans aucune indentation pour indiquer au moteur que votre instruction est
+    finie, et que vous souhaitez l'envoyer.
