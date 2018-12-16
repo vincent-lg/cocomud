@@ -35,7 +35,7 @@ import shutil
 from subprocess import Popen
 import sys
 from threading import Thread
-import urllib
+import urllib.error, urllib.request
 from zipfile import ZipFile, BadZipfile
 
 class AutoUpdate(Thread):
@@ -145,9 +145,9 @@ class AutoUpdate(Thread):
             print("Downloading the build at", self.location)
 
         # Get the build
-        response = urlopen(self.location)
+        response = urllib.request.urlopen(self.location)
         meta = response.info()
-        size = int(meta.getheaders("Content-Length")[0])
+        size = int(meta["Content-Length"])
         chunk_size = 4096
         path_archive = os.path.join("updating", "build.zip")
         with open(path_archive, "wb") as file:
