@@ -74,16 +74,25 @@ class SharpScriptConsolePanel(AccessPanel):
         if execute:
             buffer = "\n".join(self.lines)
             if self.world and self.world.sharp_engine:
+                self.Send("+ " + "+ ".join(self.lines))
+
+                # Save the TTS_on and TTS_outside, turn them on temporarily
+                TTS_on = self.engine.TTS_on
+                TTS_outside = self.engine.TTS_outside
+                self.engine.TTS_on = True
+                self.engine.TTS_outside = True
+                self.engine.redirect_message = self.Send
                 try:
                     self.world.sharp_engine.execute(buffer)
                 except Exception:
                     error = t("ui.dialog.sharp_script_console.error") + "\n"
                     error += traceback.format_exc().strip()
                     self.Send(error)
-                else:
-                    self.Send("+ " + "+ ".join(self.lines))
                 finally:
                     self.lines[:] = []
+                    self.engine.TTS_on = TTS_on
+                    self.engine.TTS_outside = TTS_outside
+                    self.engine.redirect_message = None
 
     def OnPaste(self, e):
         """Paste several lines in the input field.

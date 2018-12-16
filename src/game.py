@@ -90,6 +90,7 @@ class GameEngine:
         self.settings.load()
         self.TTS_on = self.settings["options.TTS.on"]
         self.TTS_outside = self.settings["options.TTS.outside"]
+        self.redirect_message = None
 
         # For each world, set the game engine
         for world in self.worlds.values():

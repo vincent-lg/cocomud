@@ -160,7 +160,7 @@ class Client(Telnet):
 
         # Handle the remaining text
         try:
-            liens = [l for l in lines if l]
+            lines = [l for l in lines if l]
             self.handle_message("\r\n".join(lines), mark=mark)
         except Exception:
             log = logger("client")
@@ -176,7 +176,7 @@ class Client(Telnet):
             speech=True, braille=True, mark=None):
         """When the client receives a message.
 
-        Parameters
+        Args:
             msg: the text to be displayed (str)
             force_TTS: should the text be spoken regardless?
             screen: should the text appear on screen?
@@ -186,7 +186,10 @@ class Client(Telnet):
 
         """
         if screen:
-            wx.CallAfter(pub.sendMessage, "message", client=self,
+            if self.factory.engine.redirect_message:
+                self.factory.engine.redirect_message(msg)
+            else:
+                wx.CallAfter(pub.sendMessage, "message", client=self,
                     message=msg, mark=mark)
 
         # In any case, tries to find the TTS
@@ -199,8 +202,7 @@ class Client(Telnet):
                 tts = True
             elif panel.inside and panel.focus:
                 tts = True
-            elif not panel.inside and self.factory.engine.settings[
-                    "options.TTS.outside"]:
+            elif not panel.inside and panel.engine.TTS_outside:
                 tts = True
 
             if tts:
