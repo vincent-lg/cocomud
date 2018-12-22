@@ -117,9 +117,13 @@ class World:
         path = self.path
         path = os.path.join(path, "config.set")
         if os.path.exists(path):
-            file = open(path, "r", encoding="utf-8")
-            content = file.read()
-            file.close()
+            try:
+                with open(path, "r", encoding="utf-8") as file:
+                    content = file.read()
+            except UnicodeDecodeError:
+                with open(path, "r", encoding="latin-1") as file:
+                    content = file.read()
+                    to_save = True
 
             # Execute the script
             self.sharp_engine.execute(content, variables=False)
@@ -199,9 +203,8 @@ class World:
         content = "\n".join(lines) + "\n"
         path = self.path
         path = os.path.join(path, "config.set")
-        file = open(path, "w")
-        file.write(content)
-        file.close()
+        with open(path, "w", encoding="utf-8") as file:
+            file.write(content)
 
     def remove(self):
         """Remove the world."""
