@@ -131,17 +131,17 @@ class ClientWindow(DummyUpdater):
         # New
         create = wx.MenuItem(fileMenu, -1, t("ui.menu.create"))
         self.Bind(wx.EVT_MENU, self.OnCreate, create)
-        fileMenu.AppendItem(create)
+        fileMenu.Append(create)
 
         # Open
         open = wx.MenuItem(fileMenu, -1, t("ui.menu.open"))
         self.Bind(wx.EVT_MENU, self.OnOpen, open)
-        fileMenu.AppendItem(open)
+        fileMenu.Append(open)
 
         # Close
         close_tab = wx.MenuItem(fileMenu, -1, t("ui.menu.close_tab"))
         self.Bind(wx.EVT_MENU, self.OnCloseTab, close_tab)
-        fileMenu.AppendItem(close_tab)
+        fileMenu.Append(close_tab)
 
         # Import
         import_world = wx.Menu()
@@ -152,43 +152,43 @@ class ClientWindow(DummyUpdater):
         wx.MenuItem(fileMenu, -1, t("ui.menu.import"))
         self.Bind(wx.EVT_MENU, self.OnImportOndisk, import_ondisk)
         self.Bind(wx.EVT_MENU, self.OnImportOnline, import_online)
-        fileMenu.AppendMenu(wx.ID_ANY, t("ui.menu.import"), import_world)
+        fileMenu.Append(wx.ID_ANY, t("ui.menu.import"), import_world)
 
         # Export
         export = wx.MenuItem(fileMenu, -1, t("ui.menu.export"))
         self.Bind(wx.EVT_MENU, self.OnExportWorld, export)
-        fileMenu.AppendItem(export)
+        fileMenu.Append(export)
 
         # Preferences
         preferences = wx.MenuItem(fileMenu, -1, t("ui.menu.preferences"))
         self.Bind(wx.EVT_MENU, self.OnPreferences, preferences)
-        fileMenu.AppendItem(preferences)
+        fileMenu.Append(preferences)
 
         # Quit
         quit = wx.MenuItem(fileMenu, -1, t("ui.menu.quit"))
         self.Bind(wx.EVT_MENU, self.OnQuit, quit)
-        fileMenu.AppendItem(quit)
+        fileMenu.Append(quit)
 
         ## Game menu
         # Aliases
         alias = wx.MenuItem(gameMenu, -1, t("ui.menu.aliases"))
         self.Bind(wx.EVT_MENU, self.OnAlias, alias)
-        gameMenu.AppendItem(alias)
+        gameMenu.Append(alias)
 
         # Macros
         macro = wx.MenuItem(gameMenu, -1, t("ui.menu.macro"))
         self.Bind(wx.EVT_MENU, self.OnMacro, macro)
-        gameMenu.AppendItem(macro)
+        gameMenu.Append(macro)
 
         # Triggers
         triggers = wx.MenuItem(gameMenu, -1, t("ui.menu.triggers"))
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
-        gameMenu.AppendItem(triggers)
+        gameMenu.Append(triggers)
 
         # Channels
         channels = wx.MenuItem(gameMenu, -1, t("ui.menu.channels"))
         self.Bind(wx.EVT_MENU, self.OnChannels, channels)
-        gameMenu.AppendItem(channels)
+        gameMenu.Append(channels)
 
         # Notepad
         notepad = wx.Menu()
@@ -199,12 +199,12 @@ class ClientWindow(DummyUpdater):
         wx.MenuItem(gameMenu, -1, t("ui.menu.notepad"))
         self.Bind(wx.EVT_MENU, self.OnNotepadWorld, notepad_world)
         self.Bind(wx.EVT_MENU, self.OnNotepadCharacter, notepad_character)
-        gameMenu.AppendMenu(wx.ID_ANY, t("ui.menu.notepad"), notepad)
+        gameMenu.Append(wx.ID_ANY, t("ui.menu.notepad"), notepad)
 
         # Character
         character = wx.MenuItem(gameMenu, -1, t("ui.menu.character"))
         self.Bind(wx.EVT_MENU, self.OnCharacter, character)
-        gameMenu.AppendItem(character)
+        gameMenu.Append(character)
 
         # Play sounds
         self.chk_sounds = gameMenu.Append(wx.ID_ANY, t("ui.menu.sounds"),
@@ -215,45 +215,45 @@ class ClientWindow(DummyUpdater):
         # Clear
         clear = wx.MenuItem(gameMenu, -1, t("ui.menu.clear_output"))
         self.Bind(wx.EVT_MENU, self.OnClear, clear)
-        gameMenu.AppendItem(clear)
+        gameMenu.Append(clear)
 
         ## Connection menu
         # Disconnect
         disconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.disconnect"))
         self.Bind(wx.EVT_MENU, self.OnDisconnect, disconnect)
-        connectionMenu.AppendItem(disconnect)
+        connectionMenu.Append(disconnect)
 
         # Reconnect
         reconnect = wx.MenuItem(connectionMenu, -1, t("ui.menu.reconnect"))
         self.Bind(wx.EVT_MENU, self.OnReconnect, reconnect)
-        connectionMenu.AppendItem(reconnect)
+        connectionMenu.Append(reconnect)
 
         ## Tools menu
         # SharpScript console
         ssconsole = wx.MenuItem(toolsMenu, -1, t("ui.menu.sharp_script_console"))
         self.Bind(wx.EVT_MENU, self.OnSharpScriptConsole, ssconsole)
-        toolsMenu.AppendItem(ssconsole)
+        toolsMenu.Append(ssconsole)
 
         # Python console
         pyconsole = wx.MenuItem(toolsMenu, -1, t("ui.menu.python_console"))
         self.Bind(wx.EVT_MENU, self.OnPythonConsole, pyconsole)
-        toolsMenu.AppendItem(pyconsole)
+        toolsMenu.Append(pyconsole)
 
         ## Help menu
         # Basics
         basics = wx.MenuItem(helpMenu, -1, t("ui.menu.help_index"))
         self.Bind(wx.EVT_MENU, self.OnBasics, basics)
-        helpMenu.AppendItem(basics)
+        helpMenu.Append(basics)
 
         # News
         new = wx.MenuItem(helpMenu, -1, t("ui.menu.new"))
         self.Bind(wx.EVT_MENU, self.OnNew, new)
-        helpMenu.AppendItem(new)
+        helpMenu.Append(new)
 
         # Check for updates
         updates = wx.MenuItem(helpMenu, -1, t("ui.menu.updates"))
         self.Bind(wx.EVT_MENU, self.OnCheckForUpdates, updates)
-        helpMenu.AppendItem(updates)
+        helpMenu.Append(updates)
 
         menubar.Append(fileMenu, t("ui.menu.file"))
         menubar.Append(gameMenu, t("ui.menu.game"))

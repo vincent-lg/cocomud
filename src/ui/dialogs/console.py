@@ -169,10 +169,16 @@ class ConsolePanel(AccessPanel):
         self.world = world
         self.panel = panel
         self.thread = GUIThread(self)
+        session = self.panel and self.panel.session or None
+        sharp_engine = session and session.sharp_engine or None
+        client = sharp_engine and sharp_engine.client or None
         self.locals = {
             "engine": self.engine,
             "world": self.world,
             "panel": self.panel,
+            "session": session,
+            "sharp_engine": sharp_engine,
+            "client": client,
         }
 
         # Event binding

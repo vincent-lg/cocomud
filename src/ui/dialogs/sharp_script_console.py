@@ -77,8 +77,6 @@ class SharpScriptConsolePanel(AccessPanel):
                 self.Send("+ " + "+ ".join(self.lines))
 
                 # Save the TTS_on and TTS_outside, turn them on temporarily
-                TTS_on = engine.TTS_on
-                TTS_outside = engine.TTS_outside
                 engine.TTS_on = True
                 engine.TTS_outside = True
                 engine.redirect_message = self.Send
@@ -90,9 +88,6 @@ class SharpScriptConsolePanel(AccessPanel):
                     self.Send(error)
                 finally:
                     self.lines[:] = []
-                    engine.TTS_on = TTS_on
-                    engine.TTS_outside = TTS_outside
-                    engine.redirect_message = None
 
     def OnPaste(self, e):
         """Paste several lines in the input field.
@@ -126,6 +121,8 @@ class SharpScriptConsoleDialog(wx.Dialog):
 
         # Add in the panel
         self.panel = SharpScriptConsolePanel(self, session)
+        self.TTS_on = session.engine.TTS_on
+        self.TTS_outside = session.engine.TTS_outside
 
         # Finish designing the window
         sizer.Add(self.panel)
@@ -136,8 +133,10 @@ class SharpScriptConsoleDialog(wx.Dialog):
 
     def OnClose(self, e):
         """Close the console."""
+        self.session.engine.TTS_on = self.TTS_on
+        self.session.engine.TTS_outside = self.TTS_outside
+        self.session.engine.redirect_message = None
         if self.session and self.session.world:
-            print("Saving this world.")
             self.session.world.save()
 
         self.Destroy()
