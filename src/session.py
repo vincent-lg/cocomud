@@ -28,6 +28,9 @@
 
 """This file contains the Session class."""
 
+from log import client as log
+from sharp.engine import SharpScript
+
 class Session:
 
     """A class representing a session.
@@ -38,13 +41,25 @@ class Session:
 
     """
 
+    current_sid = 0
+
     def __init__(self, client, world):
+        self.sid = self.current_sid
+        type(self).current_sid += 1
         self.client = client
         self.world = world
         self.character = None
         self.engine = None
-        self.sharp_engine = None
+        self._sharp_engine = None
 
     def __repr__(self):
-        return "<Session to the world {}>".format(
-                self.world and self.world.name or "unknown")
+        return f"<Session {self.sid} to the world {self.world and self.world.name or 'unknown'}>"
+
+    @property
+    def sharp_engine(self):
+        if self._sharp_engine:
+            return self._sharp_engine
+
+        log.debug(f"Creating a SharpEngine for session {self.sid} (world: {'yes' if self.world else 'no'}, client: {'yes' if self.client else 'no'}, character: {'yes' if self.character else 'no'}, engine: {'yes' if self.engine else 'no'})")
+        self._sharp_engine = SharpScript(self.engine, self.client, self.world)
+        return self._sharp_engine

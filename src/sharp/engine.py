@@ -37,7 +37,7 @@ from sharp import FUNCTIONS
 # Constants
 RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
 
-class SharpScript(object):
+class SharpScript:
 
     """Class representing a SharpScript engine.
 

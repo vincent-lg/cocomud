@@ -71,6 +71,7 @@ class World:
         self.characters = {}
         self.settings = None
         self.lock = RLock()
+        self.loaded = False
 
         # World's access to general data
         self.engine = None
@@ -99,6 +100,9 @@ class World:
 
     def load(self):
         """Load the config.set script."""
+        if self.loaded: # The world has already been loaded, don't duplicate
+            return
+
         from game import Level
         level = self.engine.level
         self.engine.level = Level.world
@@ -122,6 +126,7 @@ class World:
 
         # Put the engine level back
         self.engine.level = level
+        self.loaded = True
 
         if to_save:
             self.save()
@@ -321,7 +326,6 @@ class World:
         """Create a session attached to this world."""
         session = Session(client, self)
         session.engine = self.engine
-        session.sharp_engine = self.sharp_engine
         return session
 
     def open_notepad(self):

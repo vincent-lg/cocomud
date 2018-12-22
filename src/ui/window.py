@@ -96,6 +96,10 @@ class ClientWindow(DummyUpdater):
         """Return the currently selected tab (a MUDPanel0."""
         return self.tabs.GetCurrentPage()
 
+    @property
+    def session(self):
+        return self.panel and self.panel.session or None
+
     def _get_client(self):
         return self.panel.client
     def _set_client(self, client):
@@ -260,6 +264,7 @@ class ClientWindow(DummyUpdater):
         self.SetMenuBar(menubar)
 
     def InitUI(self, world=None):
+        """Initializes the window, connect to a first world."""
         self.create_updater(just_checking=True)
         session = Session(None, None)
         if world is None:
@@ -272,6 +277,7 @@ class ClientWindow(DummyUpdater):
 
             world = session.world
             character = session.character
+            session.engine = self.engine
 
         self.connection = None
         self.tabs.AddPage(MUDPanel(self.tabs, self, self.engine, world,
@@ -310,6 +316,7 @@ class ClientWindow(DummyUpdater):
             return
 
         world = session.world
+        session.engine = self.engine
         self.SetTitle("{} [CocoMUD]".format(world.name))
         panel = MUDPanel(self.tabs, self, self.engine, world, session)
         panel.CreateClient()
@@ -375,7 +382,7 @@ class ClientWindow(DummyUpdater):
 
     def OnSharpScriptConsole(self, e):
         """Open the Python console dialog box."""
-        dialog = SharpScriptConsoleDialog(self.engine, self.world, self.panel)
+        dialog = SharpScriptConsoleDialog(self.session)
         dialog.ShowModal()
 
     def OnAlias(self, e):
@@ -607,11 +614,10 @@ class MUDPanel(AccessPanel):
         world = self.world
         hostname = world.hostname
         port = world.port
-        client = engine.open(hostname, port, world, self)
+        client = engine.open(hostname, port, world, session, self)
         client.strip_ansi = not self.rich
         world.load()
         client.commands = self.login()
-        self.session.client = client
         return client
 
     def login(self):

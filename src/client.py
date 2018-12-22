@@ -264,11 +264,12 @@ class CocoFactory(ReconnectingClientFactory):
 
     """Factory used by CocoMUD client to generate Telnet clients."""
 
-    def __init__(self, world, panel):
+    def __init__(self, world, session, panel):
         self.world = world
+        self.session = session
         self.panel = panel
         self.engine = world.engine
-        self.sharp_engine = world.sharp_engine
+        self.sharp_engine = session.sharp_engine
         self.commands = []
         self.strip_ansi = False
 

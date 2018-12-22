@@ -96,7 +96,7 @@ class GameEngine:
         for world in self.worlds.values():
             world.engine = self
 
-    def open(self, host, port, world, panel=None):
+    def open(self, host, port, world, session, panel=None):
         """Connect to the specified host and port.
 
         This method creates and returns a 'Factory' class initialized
@@ -108,7 +108,7 @@ class GameEngine:
                 host=host, port=port))
 
         self.prepare_world(world)
-        factory = CocoFactory(world, panel)
+        factory = CocoFactory(world, session, panel)
 
         if world.protocol.lower() == "ssl":
             reactor.connectSSL(host, port, factory,

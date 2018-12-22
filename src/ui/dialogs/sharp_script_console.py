@@ -43,12 +43,10 @@ from screenreader import ScreenReader
 
 class SharpScriptConsolePanel(AccessPanel):
 
-    def __init__(self, parent, engine, world=None, panel=None):
+    def __init__(self, parent, session):
         AccessPanel.__init__(self, parent, history=True, lock_input=True)
         self.output.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
-        self.engine = engine
-        self.world = world
-        self.panel = panel
+        self.session = session
         self.lines = []
 
         # Event binding
@@ -73,26 +71,28 @@ class SharpScriptConsolePanel(AccessPanel):
 
         if execute:
             buffer = "\n".join(self.lines)
-            if self.world and self.world.sharp_engine:
+            if self.session and self.session.engine:
+                engine = self.session.engine
+                sharp_engine = self.session.sharp_engine
                 self.Send("+ " + "+ ".join(self.lines))
 
                 # Save the TTS_on and TTS_outside, turn them on temporarily
-                TTS_on = self.engine.TTS_on
-                TTS_outside = self.engine.TTS_outside
-                self.engine.TTS_on = True
-                self.engine.TTS_outside = True
-                self.engine.redirect_message = self.Send
+                TTS_on = engine.TTS_on
+                TTS_outside = engine.TTS_outside
+                engine.TTS_on = True
+                engine.TTS_outside = True
+                engine.redirect_message = self.Send
                 try:
-                    self.world.sharp_engine.execute(buffer)
+                    sharp_engine.execute(buffer)
                 except Exception:
                     error = t("ui.dialog.sharp_script_console.error") + "\n"
                     error += traceback.format_exc().strip()
                     self.Send(error)
                 finally:
                     self.lines[:] = []
-                    self.engine.TTS_on = TTS_on
-                    self.engine.TTS_outside = TTS_outside
-                    self.engine.redirect_message = None
+                    engine.TTS_on = TTS_on
+                    engine.TTS_outside = TTS_outside
+                    engine.redirect_message = None
 
     def OnPaste(self, e):
         """Paste several lines in the input field.
@@ -116,17 +116,16 @@ class SharpScriptConsolePanel(AccessPanel):
 
 class SharpScriptConsoleDialog(wx.Dialog):
 
-    def __init__(self, engine, world=None, panel=None):
+    def __init__(self, session):
         wx.Dialog.__init__(self, None, title=t("ui.dialog.sharp_script_console.title"))
-        self.engine = engine
-        self.world = world
+        self.session = session
 
         # Build the dialog
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(sizer)
 
         # Add in the panel
-        self.panel = SharpScriptConsolePanel(self, engine, world, panel)
+        self.panel = SharpScriptConsolePanel(self, session)
 
         # Finish designing the window
         sizer.Add(self.panel)
@@ -137,4 +136,8 @@ class SharpScriptConsoleDialog(wx.Dialog):
 
     def OnClose(self, e):
         """Close the console."""
+        if self.session and self.session.world:
+            print("Saving this world.")
+            self.session.world.save()
+
         self.Destroy()
