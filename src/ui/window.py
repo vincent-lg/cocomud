@@ -674,8 +674,10 @@ class MUDPanel(AccessPanel):
 
         # Change the window title if not focused
         if self.focus and not self.inside:
-            self.nb_unread += 1
-            self.window.SetTitle("({}) {} [CocoMUD]".format(
+            if message.strip():
+                self.nb_unread += 1
+            if self.nb_unread > 0:
+                self.window.SetTitle("({}) {} [CocoMUD]".format(
                     self.nb_unread, world.name))
 
     def OnInput(self, message):
