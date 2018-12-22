@@ -6,5 +6,9 @@ warning: |
     l'utiliser.
 
     Variables définies :
-        engine: le GameEngine
+        client: le client connecté au serveur du MUD
+        engine: le moteur du jeu (GameEngine)
+        panel: l'objet MUDPanel pour cette session
+        session: la session active
+        sharp_engine: le moteur SharpScript pour cette session
         world: l'univers courant

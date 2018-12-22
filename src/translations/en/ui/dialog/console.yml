@@ -6,5 +6,9 @@ warning: |
     the code.
 
     Defined variables:
+        client: the client that is connected to the MUD server
         engine: the game engine
+        panel: the MUD panel for this session
+        session: the session specific to this connection
+        sharp_engine: the sharp engine for this session
         world: the current world

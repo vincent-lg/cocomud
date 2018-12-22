@@ -3,5 +3,9 @@ warning: |
     Atención: esta consola es estrictamente para desarrolladores. Se puede causar mucho daño a través de ella.
 
     Variables disponibles:
+        client: the client that is connected to the MUD server
         engine: el motor de juego
+        panel: the MUD panel for this session
+        session: the session specific to this connection
+        sharp_engine: the sharp engine for this session
         world: el mundo abierto actualmente
