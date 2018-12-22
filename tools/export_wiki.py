@@ -14,16 +14,16 @@ Requirements:
 import argparse
 import os
 import sys
-import urllib2
+from urllib import request
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from redminelib import Redmine
 
 # Create an argument parser
 parser = argparse.ArgumentParser(
         description="export wiki pages in various formats")
 parser.add_argument("lang", help="the language code (en, fr, es...)",
-        nargs='?', choices=["en", "fr"], default="en")
+        nargs='?', choices=["en", "es", "fr"], default="en")
 args = parser.parse_args()
 
 # Configure the system
@@ -48,8 +48,8 @@ pages = redmine.wiki_page.filter(project_id=project_id)
 for page in pages:
     url = "https://cocomud.plan.io/projects/{id}/wiki/{title}.html".format(
             id=project_id, title=page.title)
-    response = urllib2.urlopen(url)
-    content = response.read()
+    response = request.urlopen(url)
+    content = response.read().decode("utf-8")
     soup = BeautifulSoup(content)
 
     # Find the links
@@ -69,20 +69,18 @@ for page in pages:
     # Write the exported file
     path = os.path.join(doc, page.title + "." + format)
 
-    print "Writing", page.title, "in", path
+    print("Writing", page.title, "in", path)
     exported = exported.replace("\r", "")
-    file = open(path, "w")
-    file.write(exported)
-    file.close()
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(exported)
 
 # Export the full wiki
-print "Downloading the complete HTML export."
+print("Downloading the complete HTML export.")
 url = "https://cocomud.plan.io/projects/{id}/wiki/export.html".format(
         id=project_id)
-response = urllib2.urlopen(url)
-content = response.read()
-content = content.replace("\r", "")
+response = request.urlopen(url)
+content = response.read().decode("utf-8")
+#content = content.replace("\r", "")
 path = os.path.join(doc, "index.html")
-file = open(path, "w")
-file.write(content)
-file.close()
+with open(path, "w", encoding="utf-8") as file:
+    file.write(content)
