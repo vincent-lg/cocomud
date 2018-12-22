@@ -13,7 +13,7 @@ from json import dumps
 import os
 import re
 import sys
-import urllib2
+from urllib import request
 
 from redminelib import Redmine
 from redminelib.exceptions import ResourceNotFoundError
@@ -33,23 +33,23 @@ redmine = Redmine("https://cocomud.plan.io", key=key)
 # Check that the file exists
 path = os.path.abspath("../src/build/CocoMUD.zip")
 if not os.path.exists(path):
-    print "The file {} cannot be found.".format(path)
+    print("The file {} cannot be found.".format(path))
     sys.exit(1)
 
 # Then upload this file
-print "Retrieving the Download wiki page on 'cocomud-client'..."
+print("Retrieving the Download wiki page on 'cocomud-client'...")
 page = redmine.wiki_page.get("Download", project_id="cocomud-client")
-print "Uploading {}...".format(path)
+print("Uploading {}...".format(path))
 text = page.text
 page.uploads = [{"path": path, "filename": "CocoMUD.zip"}]
 page.text = text
-print "Saving the page...", page.save()
+print("Saving the page...", page.save())
 
 # Get the new resource URL
 url = list(page.attachments)[-1].content_url
 
 # Retrieve the version number
-with open("../src/version.py") as file:
+with open("../src/version.py", encoding="utf-8") as file:
     content = file.read()
 
 version = content.partition("=")[2].strip()
@@ -64,8 +64,8 @@ for project in redmine.project.all():
     except ResourceNotFoundError:
         pass
     else:
-        print "Updating the Download page for the {} project...".format(
-                identifier)
+        print("Updating the Download page for the {} project...".format(
+                identifier))
         text = page.text
         text = re.sub(r"https\://cocomud\.plan\.io/attachments/" \
                 r"download/\d+/CocoMUD\.zip", url, text)
@@ -73,13 +73,13 @@ for project in redmine.project.all():
         page.text = text
         success = page.save()
         if success:
-            print "Correctly saved the wiki page."
+            print("Correctly saved the wiki page.")
         else:
-            print "Error while saving the wiki page."
+            print("Error while saving the wiki page.")
 
 # Update the build information in the custom field
 build = dumps({version: {"windows": url}})
-print "Updating the custom field"
+print("Updating the custom field")
 redmine.project.update(resource_id=2,
         custom_fields=[{"id": 3, "value": build}])
-print "URL", url
+print("URL", url)
