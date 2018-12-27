@@ -1,21 +1,17 @@
 ﻿banner: |
-    This console allows you to enter SharScript instructions directly.  It is a very
-    handy tool to quickly configure aliases, macros, triggers and so forth, as long
-    as you know the SharpScript syntax in CocoMUD.  Here's an example you can enter
-    here:
-        #say Hi!
-    Or:
-        #say {{Here's a longer message.}}
-    Or even:
-        #say {{This message shouldn't appear on the screen.}} -screen
-    You can also enter instructions on several lines, which is necessary if you need
-    to use the SharpScript syntax to include Python code.  This advanced syntax is
-    useful for complex triggers.  To do so, end your first line with {{+ to tell the
-    engine this line isn't the end of the instruction:
+    Esta es una consola SharpScript. Puede ser una herramienta muy útil para agregar alias, disparadores y abreviaturas.
+
+    Puede escribir instruciones SharpScript directamente. Por ejemplo:
+        #say Hola!
+    O:
+        #say {{Aquí hay un mensage mas largo.}}
+    O incluso:
+        #say {{Este mensage no se debería mostrar en la pantalla}} -screen
+    Incluso puede escribir instrucciones SharpScript en varias líneas, lo que es útil para instrucciones con código python. Esta
+    sintaxis avanzada se puede usar para diseñar disparadores mas complejos. Para ello, termine la línea con un '{{+'. Por ejemplo:
         #trigger {{HP: }} {{+
-    ... then on the next lines, write the Python code by indenting it slightly to the
-    right.  When your block is over, add an empty line with the }} symbol, with no
-    indentation.  Only then, your lines will be sent to the SharpScript engine.
+    En las líneas siguientes, escriba el código Python indentando las líneas. Para terminar, añada una línea vacía con el símbolo }}. Cuando haya
+    escrito esa línea el fragmento completo se enviará al motor.
         }}
-error: "An error occurred.  Here's the full traceback:"
-title: SharpScript console
+error: "Ocurrió un error. Aquí está la traza completa:"
+title: Consola SharpScript
