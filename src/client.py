@@ -1,6 +1,6 @@
-﻿# Copyright (c) 2016, LE GOFF Vincent
-# Copyright (c) 2016, LE GOFF Vincent
-# Copyright (c) 2016, LE GOFF Vincent
+﻿# Copyright (c) 2016-2020, LE GOFF Vincent
+# Copyright (c) 2016-2020, LE GOFF Vincent
+# Copyright (c) 2016-2020, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
