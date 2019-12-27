@@ -32,21 +32,35 @@ It's a console updater that plans on updating CocoMUD client.
 
 """
 
+import argparse
 import os
 
 from autoupdate import AutoUpdate
 from version import BUILD
 
-autoupdate = AutoUpdate(BUILD, None)
-print("Checking for updates...")
-build = autoupdate.check()
-if build is not None:
-    print("A new update is available: {}.\n".format(build))
-    autoupdate.download(stdout=True)
-    autoupdate.update(stdout=True)
-else:
-    print("No update is available, but download anyway.")
-    autoupdate.download(stdout=True)
-    autoupdate.update(stdout=True)
+parser = argparse.ArgumentParser()
+parser.add_argument("-z", "--zip", action="store_true",
+        help="Update from a build.zip file instead of downloading the update")
+args = parser.parse_args()
 
-os.system("pause")
+autoupdate = AutoUpdate(BUILD, None)
+if args.zip:
+    archive = "updating/build.zip"
+    if not os.path.exists(archive):
+        print(f"The archived build {archive!r} couldn't be found.")
+    else:
+        autoupdate.path_archive = archive
+        autoupdate.update(stdout=True)
+else:
+    print("Checking for updates...")
+    build = autoupdate.check()
+    if build is not None:
+        print("A new update is available: {}.\n".format(build))
+        autoupdate.download(stdout=True)
+        autoupdate.update(stdout=True)
+    else:
+        print("No update is available, but download anyway.")
+        autoupdate.download(stdout=True)
+        autoupdate.update(stdout=True)
+
+    os.system("pause")

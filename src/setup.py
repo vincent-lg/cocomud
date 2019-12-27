@@ -50,6 +50,8 @@ dbg_updater = Executable(
 distutils_path = os.path.join(os.path.dirname(opcode.__file__), 'distutils')
 includefiles = [
     (distutils_path, 'lib/distutils'),
+    # The 'pubsub' package has to be copied from the virtual environment
+    (os.path.join(os.environ["VIRTUAL_ENV"], 'lib', 'site-packages', 'pubsub', 'utils'), 'lib/pubsub/utils'),
     "translations",
     "worlds",
     "../doc",

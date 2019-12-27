@@ -12,6 +12,6 @@ for path in files:
         content = file.read()
 
     content = HEADER.sub("Copyright (c) 2016-2020,", content)
-    with path.open("w", encoding="utf-8") as file:
-        file.write(content)
+    with path.open("wb") as file:
+        file.write(content.encode("utf-8"))
     print(f"Writing in {path}...")
