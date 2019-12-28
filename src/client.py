@@ -1,6 +1,4 @@
 ﻿# Copyright (c) 2016-2020, LE GOFF Vincent
-# Copyright (c) 2016-2020, LE GOFF Vincent
-# Copyright (c) 2016-2020, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -39,10 +37,11 @@ already handles a great deal of the Telnet protocol.
 import os
 import re
 import socket
-from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC
+from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC, GA
 import threading
 import time
 
+from twisted.internet import reactor
 from twisted.internet.error import ConnectionDone
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.conch.telnet import Telnet
@@ -69,11 +68,17 @@ class Client(Telnet):
 
     def connectionMade(self):
         """Established connection, send the differed commands."""
+        self.has_GA = False
+        self.queue = b""
+        self.defer = None
         host = self.transport.getPeer().host
         port = self.transport.getPeer().port
         log = logger("client")
         log.info("Connected to {host}:{port}".format(
                 host=host, port=port))
+        # Record commands
+        self.commandMap[GA] = self.handle_GA
+
         self.factory.resetDelay()
         for command in self.factory.commands:
             self.transport.write(command.encode() + b"\r\n")
@@ -92,10 +97,44 @@ class Client(Telnet):
 
     def applicationDataReceived(self, data):
         """Receive something."""
-        encoding = self.factory.engine.settings["options.general.encoding"]
-        msg = data.decode(encoding, errors="replace")
-        with self.factory.world.lock:
-            self.handle_lines(msg)
+        if self.has_GA:
+            self.queue += data
+            if self.defer:
+                self.defer.cancel()
+            self.defer = reactor.callLater(0.2, self.send_queue)
+        else:
+            if self.queue:
+                data = self.queue + b"\r\n" + data
+                self.queue = b""
+
+            # Cancel the deferred, if exists
+            if self.defer:
+                self.defer.cancel()
+                self.defer = None
+
+            encoding = self.factory.engine.settings["options.general.encoding"]
+            msg = data.decode(encoding, errors="replace")
+            with self.factory.world.lock:
+                self.handle_lines(msg)
+
+    def send_queue(self):
+        old_GA = self.has_GA
+        self.has_GA = False
+        self.defer = None
+        if self.queue:
+            queue = self.queue
+            self.queue = b""
+            self.applicationDataReceived(queue)
+        self.has_GA = old_GA
+
+    def handle_GA(self, *args, **kwargs):
+        """Handle the Telnet Go-Ahead."""
+        self.has_GA = False
+        if self.queue:
+            queue = self.queue
+            self.queue = b""
+            self.applicationDataReceived(queue)
+        self.has_GA = True
 
     def run(self):
         """Run the thread."""
