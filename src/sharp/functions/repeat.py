@@ -55,12 +55,11 @@ class Repeat(Function):
             return
 
         client = self.client
-        panel = client.window
-        if command is None:
-            for last in reversed(panel.extensions["history"].commands):
+        panel = client.factory.panel
+        if not command:
+            for last in reversed(panel.extensions["history"].commands[:-1]):
                 if not last.startswith("#") or last.startswith("##"):
                     command = last
-                    break
 
         times = int(times)
         if command:
