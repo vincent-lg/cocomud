@@ -31,6 +31,8 @@
 import re
 from textwrap import dedent
 
+from twisted.internet import reactor
+
 from log import logger
 from sharp import FUNCTIONS
 
@@ -78,17 +80,27 @@ class SharpScript:
         """Execute the SharpScript code given as an argument."""
         if isinstance(code, str):
             instructions = self.feed(code, variables=variables)
-        else:
-            instructions = [code]
+            instructions = "\n".join(instructions).splitlines()
+            pycode = "def script():\n    " + "\n    ".join(instructions) + "\n    yield None"
+            print(instructions, pycode)
+            globals = self.globals
+            globals["vars"] = self.locals
+            locals = {}
 
-        globals = self.globals
-        locals = self.locals
-
-        for instruction in instructions:
             if debug:
                 self.logger.debug("Executing SharpScript\n{}".format(
-                        instruction))
-            exec(instruction, globals, locals)
+                        pycode))
+            exec(pycode, globals, locals)
+            script = locals["script"]
+            code = script()
+
+        # code is a generator, consume it little by little
+        value = next(code)
+        if value is None:
+            pass
+        elif isinstance(value, (int, float)):
+            # Pause here, create a task
+            reactor.callLater(value, self.execute, code, debug, variables)
 
     def feed(self, content, variables=False):
         """Feed the SharpScript engine with a string content.
