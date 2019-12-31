@@ -82,7 +82,6 @@ class SharpScript:
             instructions = self.feed(code, variables=variables)
             instructions = "\n".join(instructions).splitlines()
             pycode = "def script():\n    " + "\n    ".join(instructions) + "\n    yield None"
-            print(instructions, pycode)
             globals = self.globals
             globals["vars"] = self.locals
             locals = {}

@@ -341,7 +341,7 @@ class ClientWindow(DummyUpdater):
         choose_file = t("ui.button.choose_file")
         extensions = "Zip archive (*.zip)|*.zip"
         dialog = wx.FileDialog(None, choose_file,
-                "", "", extensions, wx.OPEN)
+                "", "", extensions, wx.FD_OPEN)
         result = dialog.ShowModal()
         if result == wx.ID_OK:
             filename = dialog.GetPath()
