@@ -414,7 +414,7 @@ class ClientWindow(DummyUpdater):
         world = panel.world
         notepad = world.open_notepad()
         dialog = NotepadDialog(notepad)
-        dialog.ShowModal()
+        dialog.Show()
 
     def OnNotepadCharacter(self, e):
         """The user selected the Notepad -> Character... menu."""
@@ -426,7 +426,7 @@ class ClientWindow(DummyUpdater):
         else:
             notepad = character.open_notepad()
             dialog = NotepadDialog(notepad)
-            dialog.ShowModal()
+            dialog.Show()
 
     def OnCharacter(self, e):
         """Open the character dialog box."""

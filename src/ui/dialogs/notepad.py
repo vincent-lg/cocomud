@@ -32,12 +32,12 @@ import wx
 
 from ytranslate import t
 
-class NotepadDialog(wx.Dialog):
+class NotepadDialog(wx.Frame):
 
     """Dialog for world and character notepad."""
 
     def __init__(self, notepad):
-        wx.Dialog.__init__(self, None,
+        wx.Frame.__init__(self, None,
                 title=t("ui.message.notepad.title"))
         self.notepad = notepad
         self.InitUI()
