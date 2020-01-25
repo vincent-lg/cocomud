@@ -96,7 +96,8 @@ class CharacterDialog(wx.Dialog):
         # Create the 'default character' checkbox
         self.default = wx.CheckBox(self,
                 label=t("ui.message.character.default"))
-        self.default.SetValue(character and character.default or True)
+        any_default = any(character.default for character in self.session.world.characters.values())
+        self.default.SetValue(character and character.default or not any_default)
 
         # Buttons
         sizer.Add(buttons)
