@@ -1,0 +1,8 @@
+﻿description: Play a random audio file in a list of choices
+empty_path: >
+    You haven't set the path of the audio file.  What file should I play?
+files: >
+    Audio files to be played (like sound.wav or hit*.ogg).  One of the
+    specified files will be searched in the world directory and its
+    sub-folders.  You can also specify multiple files, separated with
+    a semicolon: hit*.wav;pain*.ogg

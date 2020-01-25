@@ -1,0 +1,10 @@
+﻿description: Joue un son aléatoire choisi dans une liste de fichiers
+empty_path: >
+    Vous n'avez pas sélectionné le fichier audio. Quel fichier dois-je
+    jouer ?
+files: >
+    Liste des fichiers à jouer. Vous pouvez ici préciser un nom complet
+    (comme sound.wav) ou partiel (comme hit*.ogg), le fichier sera recherché
+    dans le dossier de l'univers ainsi que ses sous-dossiers. Vous pouvez
+    également préciser plusieurs choix séparés par un point virgule:
+    hit*.wav;pain*.ogg
