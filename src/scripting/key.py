@@ -71,7 +71,6 @@ CODE_TO_KEY = {
     390: "PavNum-",
     391: "PavNum.",
     392: "PavNum/",
-    398: "PavNum-",
 }
 
 KEY_TO_CODE = {}
