@@ -35,6 +35,7 @@ already handles a great deal of the Telnet protocol.
 """
 
 import os
+from random import randint
 import re
 import socket
 from telnetlib import Telnet, WONT, WILL, ECHO, NOP, AYT, IAC, GA
@@ -71,6 +72,7 @@ class Client(Telnet):
         self.has_GA = False
         self.queue = b""
         self.defer = None
+        self.anti_idle = None
         host = self.transport.getPeer().host
         port = self.transport.getPeer().port
         log = logger("client")
@@ -83,8 +85,11 @@ class Client(Telnet):
         for command in self.factory.commands:
             self.transport.write(command.encode() + b"\r\n")
 
+        self.factory.stopTrying()
+
     def connectionLost(self, reason):
         """The connection was lost."""
+        self.send_queue()
         host = self.transport.getPeer().host
         port = self.transport.getPeer().port
         log = logger("client")
@@ -135,6 +140,33 @@ class Client(Telnet):
             self.queue = b""
             self.applicationDataReceived(queue)
         self.has_GA = True
+
+    def reverse_anti_idle(self, verbose=False, to_panel=False):
+        """Reverse anti-idle."""
+        if self.anti_idle:
+            # Terminate
+            if verbose:
+                self.handle_message("Anti idle off.")
+            self.anti_idle.cancel()
+            self.anti_idle = None
+            if to_panel:
+                self.factory.panel.window.gameMenu.Check(
+                        self.factory.panel.window.chk_anti_idle.GetId(), False)
+        else:
+            # Begin anti idle
+            if verbose:
+                self.handle_message("Anti idle on.")
+            self.anti_idle = reactor.callLater(1, self.keep_anti_idle)
+            if to_panel:
+                self.factory.panel.window.gameMenu.Check(
+                        self.factory.panel.window.chk_anti_idle.GetId(), True)
+
+    def keep_anti_idle(self):
+        """Keep the anti-idle active."""
+        self.transport.write(b"\r\n")
+        next_time = randint(30, 60)
+        next_time += randint(1, 100) / 100
+        self.anti_idle = reactor.callLater(next_time, self.keep_anti_idle)
 
     def run(self):
         """Run the thread."""

@@ -122,7 +122,7 @@ class ClientWindow(DummyUpdater):
 
         # Differemtn menus
         fileMenu = wx.Menu()
-        gameMenu = wx.Menu()
+        self.gameMenu = gameMenu = wx.Menu()
         connectionMenu = wx.Menu()
         toolsMenu = wx.Menu()
         helpMenu = wx.Menu()
@@ -211,6 +211,12 @@ class ClientWindow(DummyUpdater):
                 t("ui.menu.sounds"), kind=wx.ITEM_CHECK)
         gameMenu.Check(self.chk_sounds.GetId(), True)
         self.Bind(wx.EVT_MENU, self.ToggleSounds, self.chk_sounds)
+
+        # Anti-idle
+        self.chk_anti_idle = gameMenu.Append(wx.ID_ANY, t("ui.menu.anti_idle"),
+                t("ui.menu.anti_idle"), kind=wx.ITEM_CHECK)
+        gameMenu.Check(self.chk_anti_idle.GetId(), False)
+        self.Bind(wx.EVT_MENU, self.ToggleAntiIdle, self.chk_anti_idle)
 
         # Clear
         clear = wx.MenuItem(gameMenu, -1, t("ui.menu.clear_output"))
@@ -438,6 +444,12 @@ class ClientWindow(DummyUpdater):
     def ToggleSounds(self, e):
         """Toggle the "play sounds" checkbox."""
         self.engine.sounds = self.chk_sounds.IsChecked()
+
+    def ToggleAntiIdle(self, e):
+        """Toggle the "play sounds" checkbox."""
+        panel = self.panel
+        if panel and panel.client:
+            panel.client.reverse_anti_idle(verbose=True)
 
     def OnClear(self, e):
         """Force clear the output."""
