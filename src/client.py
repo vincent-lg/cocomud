@@ -164,7 +164,7 @@ class Client(Telnet):
     def keep_anti_idle(self):
         """Keep the anti-idle active."""
         self.transport.write(b"\r\n")
-        next_time = randint(30, 60)
+        next_time = randint(900, 1200)
         next_time += randint(1, 100) / 100
         self.anti_idle = reactor.callLater(next_time, self.keep_anti_idle)
 

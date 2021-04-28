@@ -94,7 +94,11 @@ class SharpScript:
             code = script()
 
         # code is a generator, consume it little by little
+        code.gi_frame.f_locals.update(self.locals)
+        code.gi_frame.f_locals.update({"vars": self.locals})
         value = next(code)
+        self.locals.update(code.gi_frame.f_locals)
+        self.locals.pop("vars", None)
         if value is None:
             pass
         elif isinstance(value, (int, float)):
