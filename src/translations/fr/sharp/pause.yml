@@ -1,0 +1,14 @@
+﻿description: Met le script en pause pendant un temps déterminé
+empty_time: >
+    Le temps spécifié est vide. Combien de temps le script doit-il être
+    mis en pause ?
+time: >
+    Le temps en secondes pendant lequel mettre ce script en pause.
+    Vous pouvez spécifier le temps comme un nombre de secondes
+    (spéccifiez 3 pour mettre ce script en pause pendant 3 secondes,
+    par exemple. Vous pouvez également spécifier un nombre à virgule
+    en utilisant le point comme séparateur (0.5 signifie donc
+    une demie seconde). Vous pouvez enfin spécifier deux nombres séparés
+    par deux points, comme 1..2. Dans ce cas, le nombre sera choisi
+    aléatoirement entre 1 et 2. Le script reprendra son exécution
+    normale après le temps spécifié.

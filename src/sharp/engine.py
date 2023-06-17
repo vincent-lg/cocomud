@@ -170,6 +170,11 @@ class SharpScript:
 
             arguments.append(argument)
 
+        function = self.functions.get(function_name)
+        custom_code = getattr(function, "custom_code", None)
+        if custom_code:
+            return custom_code(*arguments, **kwargs)
+
         code = function_name + "(" + ", ".join(arguments)
         if arguments and kwargs:
             code += ", "

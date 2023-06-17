@@ -1,0 +1,10 @@
+﻿description: Pause the script for a specified time
+empty_time: The time to pause is empty.  How much to pause the script?
+time: >
+    The time in seconds to pause the script for.  The script will resume
+    after the specified time.  You can specify a number of seconds
+    (like 3, which will pause the script for 3 seconds) or a floating-point
+    number (like 0.5 to pause the script for half a second).  You can
+    also specify a range between two numbers using the .. as a separator,
+    like 1..2, which will pause the script between 1 and 2 seconds
+    (the number will be chosen at random).

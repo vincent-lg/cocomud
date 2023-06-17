@@ -7,6 +7,7 @@ from sharp.functions.checkvar import Checkvar
 from sharp.functions.feed import Feed
 from sharp.functions.idle import Idle
 from sharp.functions.macro import Macro
+from sharp.functions.pause import Pause
 from sharp.functions.play import Play
 from sharp.functions.randplay import RandPlay
 from sharp.functions.repeat import Repeat
@@ -23,6 +24,7 @@ FUNCTIONS = {
     "feed": Feed,
     "idle": Idle,
     "macro": Macro,
+    "pause": Pause,
     "play": Play,
     "randplay": RandPlay,
     "repeat": Repeat,
