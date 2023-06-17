@@ -40,8 +40,8 @@ class Writevar(Function):
 
     def run(self, variable, contents):
         """Write a variable."""
-        if self.world:
-            engine = self.world.sharp_engine
+        if self.sharp_engine:
+            engine = self.sharp_engine
             if contents:
                 contents = engine.replace_variables(contents)
                 engine.locals[variable] = contents

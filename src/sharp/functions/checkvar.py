@@ -42,8 +42,8 @@ class Checkvar(Function):
     def run(self, variable, error):
         """Say an error if the variable doesn't exist."""
         exists = False
-        if self.world:
-            engine = self.world.sharp_engine
+        if self.sharp_engine:
+            engine = self.sharp_engine
             exists = variable in engine.locals
 
         if self.client:
