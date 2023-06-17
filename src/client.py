@@ -185,7 +185,6 @@ class Client(Telnet):
         mark = None
         lines = []
         no_ansi_lines = []
-        triggers = []
 
         # Line breaks are different whether rich text is used or not
         if self.factory.panel and self.factory.panel.rich:
@@ -206,7 +205,14 @@ class Client(Telnet):
                             repr(trigger.readction)))
                 else:
                     if match:
-                        triggers.append((trigger, match, no_ansi_line))
+                        trigger.set_variables(match)
+                        try:
+                            trigger.execute()
+                        except Exception:
+                            log = logger("client")
+                            log.exception("The trigger {} failed execution".format(
+                                    repr(trigger.readction)))
+
                         if trigger.mute:
                             display = False
                         if trigger.mark and mark is None:
@@ -216,7 +222,6 @@ class Client(Telnet):
                         # Handle triggers with substitution
                         if trigger.substitution:
                             display = False
-                            trigger.set_variables(match)
                             replacement = trigger.replace()
                             lines.extend(replacement.splitlines())
 
@@ -237,11 +242,6 @@ class Client(Telnet):
             log = logger("client")
             log.exception(
                     "An error occurred when handling a message")
-
-        # Execute the triggers
-        for trigger, match, line in triggers:
-            trigger.set_variables(match)
-            trigger.execute()
 
     def handle_message(self, msg, force_TTS=False, screen=True,
             speech=True, braille=True, mark=None):

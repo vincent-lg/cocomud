@@ -107,6 +107,7 @@ class GameEngine:
         self.logger.info("Creating a client for {host}:{port}".format(
                 host=host, port=port))
 
+        world.sharp_engine = session.sharp_engine
         self.prepare_world(world)
         factory = CocoFactory(world, session, panel)
 

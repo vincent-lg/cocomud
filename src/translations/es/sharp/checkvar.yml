@@ -1,0 +1,8 @@
+﻿description: Check if a variable exists in memory
+empty_variable: The variable name is empty.  Which variable to check?
+error: >
+    The error message to display if the variable doesn't exist in memory,
+    before the script terminates.  If the variable does exist, the script
+    proceeds as usual.  If the error message is empty, no message
+    will be displayed, but the script will simply terminate.
+variable: Name of the variable to check

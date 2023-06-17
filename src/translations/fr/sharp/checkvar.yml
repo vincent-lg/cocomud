@@ -1,0 +1,11 @@
+﻿description: Vérifie si une variable existe en mémoire
+empty_variable: >
+    Le nom de la variable est vide. Quelle variable doit être vérifiée ?
+error: >
+    Le message d'erreur à afficher au client avant que le script ne
+    soit interrompu dans le cas où la variable n'existe pas en mémoire.
+    Si la variable existe, aucun message n'est affiché et le script
+    continue à s'exécuter. Si ce message d'erreur est vide mais
+    que la variable n'existe pas en mémoire, n'envoie aucun message
+    mais interrompt le script.
+variable: Le nom de la variable à vérifier

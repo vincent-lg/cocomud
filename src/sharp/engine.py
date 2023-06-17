@@ -35,6 +35,7 @@ from twisted.internet import reactor
 
 from log import logger
 from sharp import FUNCTIONS
+from sharp.exceptions import ScriptInterrupt
 
 # Constants
 RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
@@ -96,7 +97,11 @@ class SharpScript:
         # code is a generator, consume it little by little
         code.gi_frame.f_locals.update(self.locals)
         code.gi_frame.f_locals.update({"vars": self.locals})
-        value = next(code)
+        try:
+            value = next(code)
+        except ScriptInterrupt:
+            return
+
         self.locals.update(code.gi_frame.f_locals)
         self.locals.pop("vars", None)
         if value is None:

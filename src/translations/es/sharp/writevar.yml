@@ -1,0 +1,6 @@
+﻿contents: >
+    The variable contents (it can contain other variables
+    with the $variable syntax)
+description: Write a variable in memory
+empty_variable: The variable name is empty.  Where to write in memory?
+variable: Name of the variable to write in

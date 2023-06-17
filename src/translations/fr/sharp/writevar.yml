@@ -1,0 +1,8 @@
+﻿contents: >
+    Le contenu à placer en mémoire dans cette variable. Il est possible
+    de placer le contenu d'autres variables ici, en utilisant la syntaxe
+    $variable.
+description: Écrit une variable en mémoire
+empty_variable: >
+    Le nom de la variable est vide. Où écrire cette variable en mémoire ?
+variable: Le nom de la variable dans laquelle écrire
