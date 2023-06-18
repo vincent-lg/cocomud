@@ -60,6 +60,8 @@ class SharpScript:
         self.world = world
         self.globals = dict(globals())
         self.locals = {}
+        self.to_del = set()
+        self.to_set = {}
         self.functions = {}
         self.logger = logger("sharp")
         self.logger.debug("Creating SharpScript #{}".format(self.id))
@@ -95,6 +97,12 @@ class SharpScript:
             code = script()
 
         # code is a generator, consume it little by little
+        self.locals.update(self.to_set)
+        for name in self.to_del:
+            self.locals.pop(name, None)
+
+        self.to_del.clear()
+        self.to_set.clear()
         code.gi_frame.f_locals.update(self.locals)
         code.gi_frame.f_locals.update({"vars": self.locals})
         try:
@@ -104,6 +112,7 @@ class SharpScript:
 
         self.locals.update(code.gi_frame.f_locals)
         self.locals.pop("vars", None)
+
         if value is None:
             pass
         elif isinstance(value, (int, float)):

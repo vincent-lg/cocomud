@@ -47,8 +47,9 @@ class Checkvar(Function):
             exists = variable in engine.locals
 
         if self.client:
-            if not exists and error:
-                self.client.handle_message(error)
+            if not exists:
+                if error:
+                    self.client.handle_message(error)
                 raise ScriptInterrupt
 
     def display(self, dialog, variable="", error=""):

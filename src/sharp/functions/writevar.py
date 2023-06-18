@@ -44,9 +44,9 @@ class Writevar(Function):
             engine = self.sharp_engine
             if contents:
                 contents = engine.replace_variables(contents)
-                engine.locals[variable] = contents
+                engine.to_set[variable] = contents
             else:
-                engine.locals.pop(variable, None)
+                engine.to_del.add(variable)
 
     def display(self, dialog, variable="", contents=""):
         """Display the function's argument."""
