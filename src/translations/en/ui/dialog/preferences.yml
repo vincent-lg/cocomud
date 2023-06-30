@@ -4,8 +4,12 @@ encodings: Encodings
 input: Input
 command_stacking: Command stacking
 auto_send_paste: Send the text to the server when pasting from the clipboard
+logging: Logging
 accessibility: Accessibility
 screenreader: Enable screen reader support
+logger:
+    automatic: Start logging whenever a session is opened
+    commands: Also log the commands
 TTS:
     "on": Enable TTS (Text-To Speech)
     outside: Enable TTS when on a different window

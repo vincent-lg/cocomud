@@ -269,6 +269,39 @@ class InputTab(wx.Panel):
         self.engine.open_help("CommandStacking")
 
 
+class LoggingTab(wx.Panel):
+
+    """Logging tab."""
+
+    def __init__(self, parent, engine):
+        super().__init__(parent)
+        self.engine = engine
+
+        self.InitUI()
+        self.Fit()
+
+    def InitUI(self):
+        settings = self.engine.settings
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+
+        # Logging preferendces
+        s_logging = wx.BoxSizer(wx.HORIZONTAL)
+        self.automatic = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.logger.automatic"))
+        self.automatic.SetValue(settings["options.logging.automatic"])
+        self.commands = wx.CheckBox(self,
+                label=t("ui.dialog.preferences.logger.commands"))
+        self.commands.SetValue(settings["options.logging.commands"])
+
+        # Append to the sizer
+        s_logging.Add(self.automatic)
+        s_logging.Add(self.commands)
+
+        # Add to the main sizer
+        sizer.Add(s_logging)
+
+
 class AccessibilityTab(wx.Panel):
 
     """Accessibility tab."""
@@ -331,14 +364,17 @@ class PreferencesTabs(wx.Notebook):
         general_tab = GeneralTab(self, engine)
         display_tab = DisplayTab(self, engine)
         input_tab = InputTab(self, engine)
+        logging_tab = LoggingTab(self, engine)
         accessibility_tab = AccessibilityTab(self, engine)
         self.AddPage(general_tab, t("ui.dialog.preferences.general"))
         self.AddPage(display_tab, t("ui.dialog.preferences.display"))
         self.AddPage(input_tab, t("ui.dialog.preferences.input"))
+        self.AddPage(logging_tab, t("ui.dialog.preferences.logging"))
         self.AddPage(accessibility_tab, t("ui.dialog.preferences.accessibility"))
         self.general = general_tab
         self.display = display_tab
         self.input = input_tab
+        self.logging = logging_tab
         self.accessibility = accessibility_tab
 
 class PreferencesDialog(wx.Dialog):
@@ -378,6 +414,7 @@ class PreferencesDialog(wx.Dialog):
         general = self.tabs.general
         display = self.tabs.display
         input = self.tabs.input
+        logging = self.tabs.logging
         accessibility = self.tabs.accessibility
         new_language = general.get_selected_language()
         encoding = display.get_selected_encoding()
@@ -396,16 +433,20 @@ class PreferencesDialog(wx.Dialog):
         settings["options.TTS.on"] = accessibility.TTS_on.GetValue()
         settings["options.TTS.outside"] = accessibility.TTS_outside.GetValue()
         settings["options.TTS.interrupt"] = interrupt
+        settings["options.logging.automatic"] = logging.automatic.GetValue()
+        settings["options.logging.commands"] = logging.commands.GetValue()
         settings["options.output.richtext"] = richtext
-        print(repr(settings["options.input.command_stacking"]))
         settings["options"].write()
         self.engine.TTS_on = accessibility.TTS_on.GetValue()
-        self.engine.TTS_outside  = accessibility.TTS_outside.GetValue()
+        self.engine.TTS_outside = accessibility.TTS_outside.GetValue()
 
         # Repercute screen reader support
         for tab in self.window.tabs.GetChildren():
             tab.screenreader_support = srs
 
+        self.window.gameMenu.Check(
+            self.window.chk_log.GetId(), logging.automatic.GetValue()
+        )
         if old_language != new_language:
             wx.MessageBox(t("ui.dialog.preferences.update_language"),
                     t("ui.button.restart"), wx.OK | wx.ICON_INFORMATION)

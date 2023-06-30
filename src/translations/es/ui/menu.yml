@@ -18,6 +18,7 @@ notepad_world: "Para este &mundo..."
 notepad_character: "Para el &personage..."
 character: Configurar este personage...
 sounds: Reproducir sonidos de disparadores
+log: Log the current session in a file
 anti_idle: Anti idle
 clear_output: Limpiar ventana de salida
 connection: "&Conexión"

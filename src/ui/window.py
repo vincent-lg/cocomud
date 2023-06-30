@@ -218,6 +218,12 @@ class ClientWindow(DummyUpdater):
         gameMenu.Check(self.chk_anti_idle.GetId(), False)
         self.Bind(wx.EVT_MENU, self.ToggleAntiIdle, self.chk_anti_idle)
 
+        # Log session
+        self.chk_log = gameMenu.Append(wx.ID_ANY, t("ui.menu.log"),
+                t("ui.menu.log"), kind=wx.ITEM_CHECK)
+        gameMenu.Check(self.chk_log.GetId(), True)
+        self.Bind(wx.EVT_MENU, self.ToggleLog, self.chk_log)
+
         # Clear
         clear = wx.MenuItem(gameMenu, -1, t("ui.menu.clear_output"))
         self.Bind(wx.EVT_MENU, self.OnClear, clear)
@@ -445,6 +451,12 @@ class ClientWindow(DummyUpdater):
         """Toggle the "play sounds" checkbox."""
         self.engine.sounds = self.chk_sounds.IsChecked()
 
+    def ToggleLog(self, e):
+        """Toggle the "log session" checkbox."""
+        panel = self.panel
+        if panel and panel.session:
+            panel.session.should_log = not panel.session.should_log
+
     def ToggleAntiIdle(self, e):
         """Toggle the "play sounds" checkbox."""
         panel = self.panel
@@ -533,6 +545,12 @@ class ClientWindow(DummyUpdater):
         tab.output.SetInsertionPoint(pos)
         world = tab.world
         self.SetTitle("{} [CocoMUD]".format(world.name))
+
+        if tab.session:
+            self.gameMenu.Check(
+                self.chk_log.GetId(), tab.session.should_log
+            )
+
         e.Skip()
 
     def disconnectClient(self, client=None, reason=None):

@@ -262,6 +262,10 @@ class Settings(Configuration):
             [output]
                 richtext = boolean(default=True)
 
+            [logging]
+                automatic = boolean(default=True)
+                commands = boolean(default=True)
+
             [TTS]
                 on = boolean(default=True)
                 outside = boolean(default=True)

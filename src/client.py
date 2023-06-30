@@ -202,7 +202,7 @@ class Client(Telnet):
                 except Exception:
                     log = logger("client")
                     log.exception("The trigger {} failed".format(
-                            repr(trigger.readction)))
+                            repr(trigger.reaction)))
                 else:
                     if match:
                         trigger.set_variables(match)
@@ -256,6 +256,8 @@ class Client(Telnet):
             mark: the index where to move the cursor.
 
         """
+        no_ansi_msg = ANSI_ESCAPE.sub('', msg)
+        self.factory.session.log_message(no_ansi_msg)
         if screen:
             if self.factory.engine.redirect_message:
                 self.factory.engine.redirect_message(msg)
@@ -264,7 +266,6 @@ class Client(Telnet):
                     message=msg, mark=mark)
 
         # In any case, tries to find the TTS
-        msg = ANSI_ESCAPE.sub('', msg)
         panel = self.factory.panel
         if self.factory.engine.TTS_on or force_TTS:
             # If outside of the window
@@ -279,11 +280,12 @@ class Client(Telnet):
             if tts:
                 interrupt = self.factory.engine.settings[
                         "options.TTS.interrupt"]
-                ScreenReader.talk(msg, speech=speech, braille=braille,
+                ScreenReader.talk(no_ansi_msg, speech=speech, braille=braille,
                         interrupt=interrupt)
 
     def write(self, text, alias=True):
         """Write text to the client."""
+        self.factory.session.log_command(text)
         # Break in chunks based on the command stacking, if active
         settings = self.factory.engine.settings
         stacking = settings["options.input.command_stacking"]

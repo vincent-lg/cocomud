@@ -83,6 +83,7 @@ class GameEngine:
         self.default_world = None
         self.level = Level.engine
         self.logger.info("CocoMUD engine started")
+        self.sessions = set()
 
     def load(self):
         """Load the configuration."""
@@ -107,6 +108,8 @@ class GameEngine:
         self.logger.info("Creating a client for {host}:{port}".format(
                 host=host, port=port))
 
+        session.should_log = self.settings["options.logging.automatic"]
+        self.sessions.add(session)
         self.prepare_world(world)
         factory = CocoFactory(world, session, panel)
 

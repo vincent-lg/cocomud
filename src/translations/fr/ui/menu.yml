@@ -18,6 +18,7 @@ notepad_world: "Pour cet &univers..."
 notepad_character: "Pour ce &personnage..."
 character: Changer les options de ce personnage...
 sounds: Jouer les sons des triggers
+log: Log la session actuelle dans un fichier
 anti_idle: Anti idle
 clear_output: Nettoyer la fenêtre de contenu
 connection: "&Connexion"

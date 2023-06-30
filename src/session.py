@@ -28,6 +28,10 @@
 
 """This file contains the Session class."""
 
+from datetime import datetime
+import os
+from pathlib import Path
+
 from log import client as log
 from sharp.engine import SharpScript
 
@@ -50,6 +54,7 @@ class Session:
         self.world = world
         self.character = None
         self.engine = None
+        self.should_log = False
         self._sharp_engine = None
 
     def __repr__(self):
@@ -63,3 +68,32 @@ class Session:
         log.debug(f"Creating a SharpEngine for session {self.sid} (world: {'yes' if self.world else 'no'}, client: {'yes' if self.client else 'no'}, character: {'yes' if self.character else 'no'}, engine: {'yes' if self.engine else 'no'})")
         self._sharp_engine = SharpScript(self.engine, self.client, self.world)
         return self._sharp_engine
+
+    def log_message(self, message):
+        """Log a message, if set."""
+
+        if self.should_log and message:
+            directory = Path() / self.world.path
+            if self.character:
+                directory /= self.character.location
+            directory /= "logs"
+            if not directory.exists():
+                directory.mkdir(parents=True)
+
+            today = datetime.today()
+            filename = today.strftime("%Y-%m-%d.log")
+            filepath = directory / filename
+            encoding = self.engine.settings["options.general.encoding"]
+            message = message.rstrip("\n\r")
+            message = os.linesep.join(message.splitlines()) + os.linesep
+            message = message.encode(encoding, errors="replace")
+
+            with filepath.open("ab") as file:
+                file.write(message)
+
+    def log_command(self, command):
+        """Log a command."""
+        should = self.engine.settings["options.logging.commands"]
+        if should:
+            msg = "\n".join([f"> {l}" for l in command.splitlines()])
+            self.log_message(msg)

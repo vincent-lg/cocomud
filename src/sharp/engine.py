@@ -79,10 +79,15 @@ class SharpScript:
         for function in self.functions.values():
             function.client = client
 
-    def execute(self, code, debug=False, variables=False):
+    def execute(self, code, debug=False, variables=False, to_process=None):
         """Execute the SharpScript code given as an argument."""
+        if code is None and to_process:
+            code = to_process
+
         if isinstance(code, str):
-            instructions = self.feed(code, variables=variables)
+            instructions, to_process = self.feed(
+                code, variables=variables, first=True
+            )
             instructions = "\n".join(instructions).splitlines()
             pycode = "def script():\n    " + "\n    ".join(instructions) + "\n    yield None"
             globals = self.globals
@@ -105,21 +110,28 @@ class SharpScript:
         self.to_set.clear()
         code.gi_frame.f_locals.update(self.locals)
         code.gi_frame.f_locals.update({"vars": self.locals})
+
         try:
             value = next(code)
         except ScriptInterrupt:
             return
+        except Exception:
+            import traceback
+            print(traceback.format_exc())
 
         self.locals.update(code.gi_frame.f_locals)
         self.locals.pop("vars", None)
 
         if value is None:
-            pass
+            if to_process and to_process.strip():
+                self.execute(None, debug, variables, to_process)
         elif isinstance(value, (int, float)):
             # Pause here, create a task
-            reactor.callLater(value, self.execute, code, debug, variables)
+            reactor.callLater(
+                value, self.execute, code, debug, variables, to_process
+            )
 
-    def feed(self, content, variables=False):
+    def feed(self, content, variables=False, first=False):
         """Feed the SharpScript engine with a string content.
 
         The content is probably a file with several statements in
@@ -138,10 +150,16 @@ class SharpScript:
             content = content[end + 1:]
 
         # The remaining must be SharpScript, splits into statements
-        statements = self.split_statements(content)
+        statements, rest = self.split_statements(content, first=first)
         for statement in statements:
             pycode = self.convert_to_python(statement, variables=variables)
             codes.append(pycode)
+
+            if first:
+                return codes, rest
+
+        if first:
+            return codes, content
 
         return codes
 
@@ -193,7 +211,7 @@ class SharpScript:
 
         return code + ")"
 
-    def split_statements(self, content):
+    def split_statements(self, content, first=False):
         """Split the given string content into different statements.
 
         A statement is one-line short at the very least.  It can be
@@ -218,6 +236,10 @@ class SharpScript:
             if remaining[0] == "\n":
                 if function_name:
                     statements.append((function_name, ) + tuple(arguments))
+
+                    if first:
+                        break
+
                     function_name = ""
                     arguments = []
 
@@ -263,7 +285,7 @@ class SharpScript:
 
                 arguments.append(argument)
 
-        return statements
+        return statements, remaining
 
     def find_right_brace(self, text):
         """Find the right brace matching the opening one.
@@ -355,7 +377,7 @@ class SharpScript:
 
         """
         if isinstance(content, str):
-            instructions = self.split_statements(content)
+            instructions, _ = self.split_statements(content)
         else:
             instructions = content
 
@@ -402,7 +424,7 @@ class SharpScript:
         * A dictionary of flags (True or False as values)
 
         """
-        instructions = self.split_statements(line)
+        instructions, _ = self.split_statements(line)
         line = instructions[0]
         function = line[0]
         arguments = []

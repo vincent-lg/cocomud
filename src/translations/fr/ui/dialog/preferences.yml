@@ -6,6 +6,10 @@ command_stacking: Multiple commandes
 auto_send_paste: Envoyer le texte au serveur quand on colle depuis le presse-papier
 accessibility: Accessibilité
 screenreader: Activer le support pour lecteur d'écran
+logging: Logging
+logger:
+    automatic: Commence à écrire un fichier de log dès qu'une session est ouverte
+    commands: Log également les commandes
 TTS:
     "on": Activer le TTS (Text-To-Speech)
     outside: Activer le TTS hors de la fenêtre

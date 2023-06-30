@@ -121,7 +121,7 @@ class Alias:
     def execute(self):
         """Execute the alias."""
         try:
-            self.sharp_engine.execute(self.action, variables=True)
+            self.sharp_engine.execute(self.action, variables=True, debug=True)
         except Exception:
             log = logger("client")
             log.exception("An error occurred while executing the alias " \

@@ -18,6 +18,7 @@ notepad_world: "For this &world..."
 notepad_character: "For this &character..."
 character: Change this character's setting...
 sounds: Play trigger sounds
+log: Log the current session in a file
 anti_idle: Anti idle
 clear_output: Clear the output window
 connection: "&Connection"

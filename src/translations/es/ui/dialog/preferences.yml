@@ -6,6 +6,10 @@ command_stacking: Apilado de comandos
 auto_send_paste: Enviar el texto cuando se pegue desde el portapapeles
 accessibility: Accesibilidad
 screenreader: Activar el soporte de lector de pantallas
+logging: Logging
+logger:
+    automatic: Start logging whenever a session is opened
+    commands: Also log the commands
 TTS:
     "on": Habilitar TTS (Text-To Speech)
     outside: Habilitar TTS cuando se está en una ventana distinta
