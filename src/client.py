@@ -195,6 +195,7 @@ class Client(Telnet):
         for line in msg.splitlines():
             no_ansi_line = ANSI_ESCAPE.sub('', line)
             display = True
+            matches = []
             for trigger in self.factory.world.triggers:
                 trigger.sharp_engine = self.factory.sharp_engine
                 try:
@@ -205,25 +206,34 @@ class Client(Telnet):
                             repr(trigger.reaction)))
                 else:
                     if match:
-                        trigger.set_variables(match)
-                        try:
-                            trigger.execute()
-                        except Exception:
-                            log = logger("client")
-                            log.exception("The trigger {} failed execution".format(
-                                    repr(trigger.readction)))
+                        matches.append((trigger, match))
 
-                        if trigger.mute:
-                            display = False
-                        if trigger.mark and mark is None:
-                            before = nl.join([l for l in no_ansi_lines])
-                            mark = len(before) + len(nl)
+            if matches:
+                if len(matches) > 1:
+                    matches.sort(
+                        key=lambda c: len(c[0].reaction), reverse=True
+                    )
 
-                        # Handle triggers with substitution
-                        if trigger.substitution:
-                            display = False
-                            replacement = trigger.replace()
-                            lines.extend(replacement.splitlines())
+                trigger, match = matches[0]
+                trigger.set_variables(match)
+                try:
+                    trigger.execute()
+                except Exception:
+                    log = logger("client")
+                    log.exception("The trigger {} failed execution".format(
+                            repr(trigger.reaction)))
+
+                if trigger.mute:
+                    display = False
+                if trigger.mark and mark is None:
+                    before = nl.join([l for l in no_ansi_lines])
+                    mark = len(before) + len(nl)
+
+                # Handle triggers with substitution
+                if trigger.substitution:
+                    display = False
+                    replacement = trigger.replace()
+                    lines.extend(replacement.splitlines())
 
             if display:
                 if self.factory.strip_ansi:
