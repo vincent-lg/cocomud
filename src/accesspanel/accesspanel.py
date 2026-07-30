@@ -170,6 +170,7 @@ class AccessPanel(wx.Panel):
             style = wx.TE_MULTILINE | wx.TE_RICH
         else:
             style = wx.TE_MULTILINE
+        style |= wx.TE_DONTWRAP
 
         output = wx.TextCtrl(self, size=(600, 400), style=style)
         self.output = output
