@@ -102,25 +102,34 @@ class SharpScript:
             code = script()
 
         # code is a generator, consume it little by little
-        self.locals.update(self.to_set)
-        for name in self.to_del:
-            self.locals.pop(name, None)
+        self.apply_pending()
 
-        self.to_del.clear()
-        self.to_set.clear()
-        code.gi_frame.f_locals.update(self.locals)
-        code.gi_frame.f_locals.update({"vars": self.locals})
+        # Only synchronize the script's real local variables: the frame
+        # keeps a copy of whatever is pushed in it, and a paused script
+        # would otherwise restore stale (possibly deleted) variables
+        # when it resumes.
+        varnames = set(code.gi_code.co_varnames)
+        f_locals = code.gi_frame.f_locals
+        f_locals.update({name: val for name, val in self.locals.items()
+                if name in varnames})
 
+        value = None
         try:
             value = next(code)
-        except ScriptInterrupt:
+        except (ScriptInterrupt, StopIteration):
+            self.apply_pending()
             return
         except Exception:
             import traceback
             print(traceback.format_exc())
 
-        self.locals.update(code.gi_frame.f_locals)
-        self.locals.pop("vars", None)
+        if code.gi_frame is not None:
+            f_locals = code.gi_frame.f_locals
+            self.locals.update({name: val for name, val in
+                    f_locals.items() if name in varnames and name != "vars"})
+
+        # Apply '#writevar' changes now, not when the next script runs
+        self.apply_pending()
 
         if value is None:
             if to_process and to_process.strip():
@@ -130,6 +139,15 @@ class SharpScript:
             reactor.callLater(
                 value, self.execute, code, debug, variables, to_process
             )
+
+    def apply_pending(self):
+        """Apply the variables set or deleted by '#writevar'."""
+        self.locals.update(self.to_set)
+        for name in self.to_del:
+            self.locals.pop(name, None)
+
+        self.to_del.clear()
+        self.to_set.clear()
 
     def feed(self, content, variables=False, first=False):
         """Feed the SharpScript engine with a string content.
