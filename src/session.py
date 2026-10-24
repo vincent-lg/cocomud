@@ -34,6 +34,7 @@ from pathlib import Path
 
 from bus import Events, Hooks
 from log import client as log
+from scripts import Scripts
 from sharp.engine import SharpScript
 
 class Session:
@@ -59,6 +60,9 @@ class Session:
         self._sharp_engine = None
         self.hooks = Hooks()
         self.events = Events()
+        self.msdp_reports = []
+        self.gmcp_supports = []
+        self.scripts = Scripts(self)
 
     def __repr__(self):
         return f"<Session {self.sid} to the world {self.world and self.world.name or 'unknown'}>"
@@ -75,15 +79,21 @@ class Session:
     def bind_client(self, client):
         """Bind a newly-built client to the session.
 
-        The client's Telnet options fire the session's hooks.
+        The client's Telnet options fire the session's hooks.  Each
+        connection builds a new client, so the MSDP reports and GMCP
+        supports asked by the scripts are given to it again.
 
         """
         self.client = client
         hooks = self.hooks
-        client.protocols["msdp"].add_listener(lambda name, value:
+        msdp = client.protocols["msdp"]
+        gmcp = client.protocols["gmcp"]
+        msdp.add_listener(lambda name, value:
                 hooks.fire("msdp", name, value, key=name))
-        client.protocols["gmcp"].add_listener(lambda package, data:
+        gmcp.add_listener(lambda package, data:
                 hooks.fire("gmcp", package, data, key=package))
+        msdp.report(*self.msdp_reports)
+        gmcp.support(*self.gmcp_supports)
 
     def log_message(self, message):
         """Log a message, if set."""

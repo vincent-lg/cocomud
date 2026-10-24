@@ -3,3 +3,4 @@ disconnected: Déconnexion du serveur.
 input: "Entr\xE9e"
 output: Contenu
 password: Mot de passe
+script_error: "Erreur dans le script {script}, voir logs/scripts.log pour les détails."

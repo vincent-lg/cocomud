@@ -653,6 +653,10 @@ class MUDPanel(AccessPanel):
         client = engine.open(hostname, port, world, session, self)
         client.strip_ansi = not self.rich
         world.load()
+        if not session.scripts.loaded:
+            for filename, error in session.scripts.load(world):
+                self.Send(t("ui.client.script_error", script=filename))
+
         client.commands = self.login()
         return client
 

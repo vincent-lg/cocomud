@@ -3,3 +3,4 @@ disconnected: Disconnected from server.
 input: Input
 password: Pasword
 output: Output
+script_error: "Error in the script {script}, see logs/scripts.log for details."
