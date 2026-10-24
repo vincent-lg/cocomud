@@ -26,6 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import json
 import os
 import shutil
 import tempfile
@@ -33,8 +34,10 @@ from textwrap import dedent
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
+from twisted.internet.task import Clock
+
 from client import Client
-from scripts import ScriptAudio
+from scripts import ScriptAudio, ScriptSettings
 from session import Session
 
 class TestScripts(TestCase):
@@ -46,6 +49,9 @@ class TestScripts(TestCase):
         self.addCleanup(shutil.rmtree, self.directory, ignore_errors=True)
         self.world = MagicMock()
         self.world.path = self.directory
+        self.world.script_settings = ScriptSettings(
+                os.path.join(self.directory, "settings.json"))
+        self.world.script_settings.reactor = Clock()
         self.session = Session(None, self.world)
         self.session.scripts.logger = MagicMock()
 
@@ -205,6 +211,26 @@ class TestScripts(TestCase):
         self.session.scripts.unload()
         self.assertFalse(self.session.scripts.run_command("sound"))
 
+    def test_settings(self):
+        """Test that scripts share the world's settings."""
+        self.write("a.py", "settings['volume.music'] = 40")
+        self.write("b.py", "volume = settings.get('volume.music', 100)")
+        self.load()
+        self.assertEqual(self.session.scripts.modules["b"].volume, 40)
+        self.assertIs(self.session.scripts.modules["a"].settings,
+                self.world.script_settings)
+
+    def test_bad_settings(self):
+        """Test that unreadable settings are reported, scripts still load."""
+        with open(os.path.join(self.directory, "settings.json"), "w") as file:
+            file.write("{broken")
+        self.write("a.py", "loaded = True")
+        self.world.script_settings.logger = MagicMock()
+        errors = self.session.scripts.load(self.world)
+        self.assertEqual([filename for filename, _ in errors],
+                ["settings.json"])
+        self.assertTrue(self.session.scripts.modules["a"].loaded)
+
     def test_send(self):
         """Test sending commands, line by line, without aliases."""
         self.write("a.py", """
@@ -304,3 +330,109 @@ class TestScriptAudio(TestCase):
         """Test that other attributes are the library's."""
         self.audio.stop(category="music")
         self.library.stop.assert_called_once_with(category="music")
+
+
+class TestScriptSettings(TestCase):
+
+    """Test the persistent settings of world scripts."""
+
+    def setUp(self):
+        self.directory = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.directory, ignore_errors=True)
+        self.path = os.path.join(self.directory, "erion", "settings.json")
+        self.clock = Clock()
+        self.settings = self.create()
+
+    def create(self):
+        """Create settings on the same file, with a fake clock."""
+        settings = ScriptSettings(self.path)
+        settings.reactor = self.clock
+        settings.logger = MagicMock()
+        return settings
+
+    def read(self):
+        """Return the content of the file."""
+        with open(self.path, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    def test_missing(self):
+        """Test settings without file."""
+        self.assertIsNone(self.settings.load())
+        self.assertEqual(dict(self.settings), {})
+        self.assertEqual(self.settings.get("volume", 50), 50)
+
+    def test_save_later(self):
+        """Test that changes are saved once, after a delay."""
+        self.settings.load()
+        self.settings["volume.music"] = 40
+        self.settings["toggle.chop"] = False
+        self.settings.setdefault("homemusic", "default")
+        self.assertFalse(os.path.exists(self.path))
+        self.assertEqual(len(self.clock.getDelayedCalls()), 1)
+        self.clock.advance(0.5)
+        self.assertEqual(self.read(), {"volume.music": 40,
+                "toggle.chop": False, "homemusic": "default"})
+
+    def test_load(self):
+        """Test that saved settings are loaded again."""
+        self.settings["sounds"] = {"chop": {"volume": 80, "on": True}}
+        self.settings["name"] = "été"
+        self.settings.save()
+        settings = self.create()
+        self.assertIsNone(settings.load())
+        self.assertEqual(settings["sounds"]["chop"]["volume"], 80)
+        self.assertEqual(settings["name"], "été")
+
+    def test_delete(self):
+        """Test that deleting a key is saved too."""
+        self.settings["a"] = 1
+        self.settings.save()
+        del self.settings["a"]
+        self.clock.advance(0.5)
+        self.assertEqual(self.read(), {})
+
+    def test_invalid_values(self):
+        """Test that keys and values JSON can't save are refused."""
+        with self.assertRaises(TypeError):
+            self.settings[1] = True
+        with self.assertRaises(TypeError):
+            self.settings["sounds"] = {"chop", "hit"}
+        with self.assertRaises(TypeError):
+            self.settings["sound"] = object()
+        self.assertEqual(dict(self.settings), {})
+        self.assertEqual(self.clock.getDelayedCalls(), [])
+
+    def test_bad_file(self):
+        """Test that a broken file is kept aside, not overwritten."""
+        os.makedirs(os.path.dirname(self.path))
+        with open(self.path, "w", encoding="utf-8") as file:
+            file.write("{broken")
+        self.assertIn("JSONDecodeError", self.settings.load())
+        self.assertEqual(dict(self.settings), {})
+        self.assertFalse(os.path.exists(self.path))
+        with open(self.path + ".bad", "r", encoding="utf-8") as file:
+            self.assertEqual(file.read(), "{broken")
+
+    def test_not_object(self):
+        """Test that a file not containing an object is refused."""
+        os.makedirs(os.path.dirname(self.path))
+        with open(self.path, "w", encoding="utf-8") as file:
+            file.write("[1, 2]")
+        self.assertIsNotNone(self.settings.load())
+        self.assertEqual(dict(self.settings), {})
+
+    def test_flush(self):
+        """Test that flush saves only if a save is scheduled."""
+        self.settings.flush()
+        self.assertFalse(os.path.exists(self.path))
+        self.settings["a"] = 1
+        self.settings.flush()
+        self.assertEqual(self.read(), {"a": 1})
+        self.assertEqual(self.clock.getDelayedCalls(), [])
+
+    def test_load_once(self):
+        """Test that loading twice doesn't lose changes."""
+        self.settings.load()
+        self.settings["a"] = 1
+        self.assertIsNone(self.settings.load())
+        self.assertEqual(self.settings["a"], 1)

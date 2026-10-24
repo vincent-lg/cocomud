@@ -185,4 +185,10 @@ class GameEngine:
 
     def stop(self):
         """Stop the game engine and close the sessions."""
+        worlds = set(self.worlds.values())
+        worlds.update(session.world for session in self.sessions)
+        for world in worlds:
+            if world is not None and world._script_settings is not None:
+                world._script_settings.flush()
+
         reactor.stop()

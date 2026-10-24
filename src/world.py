@@ -43,6 +43,7 @@ from character import Character
 from log import sharp as logger
 from notepad import Notepad
 from screenreader import ScreenReader
+from scripts import ScriptSettings
 from session import Session
 
 class MergingMethod(Enum):
@@ -72,6 +73,7 @@ class World:
         self.settings = None
         self.lock = RLock()
         self.loaded = False
+        self._script_settings = None
 
         # World's access to general data
         self.engine = None
@@ -97,6 +99,15 @@ class World:
     def path(self):
         """Return the path to the world."""
         return os.path.join(self.engine.config_dir, "worlds", self.location)
+
+    @property
+    def script_settings(self):
+        """Return the persistent settings of the world's scripts."""
+        if self._script_settings is None:
+            path = os.path.join(self.path, "settings.json")
+            self._script_settings = ScriptSettings(path)
+
+        return self._script_settings
 
     def load(self):
         """Load the config.set script."""

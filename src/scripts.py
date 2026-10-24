@@ -51,6 +51,9 @@ Scripts don't import their API: these names are in their globals.
     msdp, gmcp              the Telnet options (`msdp.report(...)`,
                             `gmcp.send_message(...)`...).  Reports and
                             supports are kept across reconnections.
+    settings                persistent settings of the world, a
+                            dictionary saved in 'settings.json' and
+                            shared by all sessions (`ScriptSettings`).
     world, session          the world and the session.
 
 Example ('worlds/erion/scripts/music.py'):
@@ -67,9 +70,13 @@ Example ('worlds/erion/scripts/music.py'):
 
 """
 
+from collections.abc import MutableMapping
+import json
 import os
 import traceback
 from types import ModuleType
+
+from twisted.internet import reactor
 
 from log import logger
 from screenreader import ScreenReader
@@ -101,6 +108,11 @@ class Scripts:
             return []
 
         errors = []
+        settings = world.script_settings
+        error = settings.load()
+        if error:
+            errors.append((os.path.basename(settings.path), error))
+
         api = API(self, world)
         for filename in sorted(os.listdir(directory)):
             path = os.path.join(directory, filename)
@@ -201,6 +213,7 @@ class API:
                 "audio": self.audio,
                 "msdp": self.msdp,
                 "gmcp": self.gmcp,
+                "settings": self.world.script_settings,
                 "world": self.world,
                 "session": self.session,
         }
@@ -396,3 +409,123 @@ class GMCPProxy(ProtocolProxy):
         self.session.gmcp_supports.extend(added)
         if self.session.client is not None:
             self.session.client.protocols["gmcp"].support(*added)
+
+
+class ScriptSettings(MutableMapping):
+
+    """Persistent settings of a world, shared by its scripts.
+
+    It's a dictionary saved as JSON in 'worlds/<world>/settings.json'.
+    Keys are strings and values must be JSON values (None, booleans,
+    numbers, strings, lists and dictionaries of them): anything else
+    raises TypeError when it's set.
+
+    Each change schedules a save, half a second later, so that many
+    changes in a row are written once.  Changing a list or dictionary
+    stored as a value isn't noticed: set it again, or call `save`.
+
+    A file that can't be read is renamed to 'settings.json.bad' rather
+    than being overwritten, and the settings start empty.
+
+    """
+
+    delay = 0.5
+
+    def __init__(self, path):
+        self.path = path
+        self.data = {}
+        self.loaded = False
+        self.pending = None
+        self.reactor = reactor
+        self.logger = logger("scripts")
+
+    def __repr__(self):
+        return "<ScriptSettings {!r}>".format(self.data)
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError("setting keys must be strings, not {!r}".format(
+                    key))
+
+        try:
+            json.dumps(value)
+        except (TypeError, ValueError) as err:
+            raise TypeError("the setting {!r} can't be saved: {}".format(
+                    key, err)) from None
+
+        self.data[key] = value
+        self.schedule()
+
+    def __delitem__(self, key):
+        del self.data[key]
+        self.schedule()
+
+    def load(self):
+        """Load the settings, if not loaded yet.
+
+        Return None, or the traceback of the error if the file
+        couldn't be read.
+
+        """
+        if self.loaded:
+            return None
+
+        self.loaded = True
+        if not os.path.exists(self.path):
+            return None
+
+        try:
+            with open(self.path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            if not isinstance(data, dict):
+                raise ValueError("the settings aren't a JSON object")
+        except (OSError, ValueError):
+            self.logger.exception("Cannot read the settings {}".format(
+                    self.path))
+            error = traceback.format_exc()
+            try:
+                os.replace(self.path, self.path + ".bad")
+            except OSError:
+                self.logger.exception("Cannot rename {}".format(self.path))
+            return error
+
+        self.data = data
+        return None
+
+    def schedule(self):
+        """Schedule a save, unless one is already scheduled."""
+        if self.pending is None or not self.pending.active():
+            self.pending = self.reactor.callLater(self.delay, self.save)
+
+    def save(self):
+        """Save the settings now, cancelling a scheduled save."""
+        if self.pending is not None and self.pending.active():
+            self.pending.cancel()
+        self.pending = None
+
+        directory = os.path.dirname(self.path)
+        temporary = self.path + ".tmp"
+        try:
+            os.makedirs(directory, exist_ok=True)
+            with open(temporary, "w", encoding="utf-8") as file:
+                json.dump(self.data, file, indent=4, sort_keys=True,
+                        ensure_ascii=False)
+            os.replace(temporary, self.path)
+        except OSError:
+            self.logger.exception("Cannot save the settings {}".format(
+                    self.path))
+
+    def flush(self):
+        """Save the settings if a save is scheduled."""
+        if self.pending is not None and self.pending.active():
+            self.save()
