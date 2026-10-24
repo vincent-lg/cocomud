@@ -32,6 +32,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 
+from bus import Events, Hooks
 from log import client as log
 from sharp.engine import SharpScript
 
@@ -56,6 +57,8 @@ class Session:
         self.engine = None
         self.should_log = False
         self._sharp_engine = None
+        self.hooks = Hooks()
+        self.events = Events()
 
     def __repr__(self):
         return f"<Session {self.sid} to the world {self.world and self.world.name or 'unknown'}>"
@@ -68,6 +71,19 @@ class Session:
         log.debug(f"Creating a SharpEngine for session {self.sid} (world: {'yes' if self.world else 'no'}, client: {'yes' if self.client else 'no'}, character: {'yes' if self.character else 'no'}, engine: {'yes' if self.engine else 'no'})")
         self._sharp_engine = SharpScript(self.engine, self.client, self.world)
         return self._sharp_engine
+
+    def bind_client(self, client):
+        """Bind a newly-built client to the session.
+
+        The client's Telnet options fire the session's hooks.
+
+        """
+        self.client = client
+        hooks = self.hooks
+        client.protocols["msdp"].add_listener(lambda name, value:
+                hooks.fire("msdp", name, value, key=name))
+        client.protocols["gmcp"].add_listener(lambda package, data:
+                hooks.fire("gmcp", package, data, key=package))
 
     def log_message(self, message):
         """Log a message, if set."""

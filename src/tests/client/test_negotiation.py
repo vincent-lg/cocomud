@@ -32,6 +32,7 @@ from twisted.conch.telnet import IAC, DO, DONT, WILL, WONT, SB, SE
 
 from .models import MockClient
 from protocol import msdp
+from session import Session
 
 MSDP = bytes((69, ))
 GMCP = bytes((201, ))
@@ -144,3 +145,61 @@ class TestNegotiation(MockClient):
             self.client.connectionLost(MagicMock())
         self.assertFalse(self.msdp.enabled)
         self.msdp.disable.assert_called_once_with()
+
+
+class TestSessionHooks(MockClient):
+
+    """Test the hooks and events fired by the client in its session."""
+
+    def setUp(self):
+        super().setUp()
+        self.client.applicationDataReceived = MagicMock()
+        self.session = Session(self.client, None)
+        self.session.bind_client(self.client)
+        self.client.factory.session = self.session
+
+    def test_msdp(self):
+        """Test that an MSDP variable fires the hook, keyed by name."""
+        health = MagicMock()
+        room = MagicMock()
+        self.session.hooks.register("msdp", health, key="HEALTH")
+        self.session.hooks.register("msdp", room, key="ROOM_NAME")
+        self.client.dataReceived(IAC + WILL + MSDP)
+        payload = msdp.encode("ROOM_NAME", "A forest")
+        self.client.dataReceived(IAC + SB + MSDP + payload + IAC + SE)
+        room.assert_called_once_with("ROOM_NAME", "A forest")
+        health.assert_not_called()
+
+    def test_gmcp(self):
+        """Test that a GMCP message fires the hook, keyed by package."""
+        vitals = MagicMock()
+        self.session.hooks.register("gmcp", vitals, key="Char")
+        self.client.dataReceived(IAC + WILL + GMCP)
+        self.client.dataReceived(IAC + SB + GMCP +
+                b'Char.Vitals {"hp": 10}' + IAC + SE)
+        vitals.assert_called_once_with("Char.Vitals", {"hp": 10})
+
+    def test_connect(self):
+        """Test the connect hook and event."""
+        hook = MagicMock()
+        event = MagicMock()
+        self.client.factory.commands = []
+        self.session.hooks.register("connect", hook)
+        self.session.events.listen("connect", event)
+        self.client.connectionMade()
+        hook.assert_called_once_with()
+        event.assert_called_once_with()
+
+    def test_disconnect(self):
+        """Test the disconnect hook and event."""
+        hook = MagicMock()
+        event = MagicMock()
+        self.session.hooks.register("disconnect", hook)
+        self.session.events.listen("disconnect", event)
+        self.client.send_queue = MagicMock()
+        reason = MagicMock()
+        with patch("client.wx"):
+            self.client.connectionLost(reason)
+
+        hook.assert_called_once_with(reason)
+        event.assert_called_once_with()

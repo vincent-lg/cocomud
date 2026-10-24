@@ -509,12 +509,18 @@ class ClientWindow(DummyUpdater):
         if not self or not self.tabs:
             return
 
+        changed = self.focus != e.GetActive()
         self.focus = e.GetActive()
 
         # Set all tabs has unfocused
         for tab in self.tabs.GetChildren():
             tab.focus = False
             tab.inside = self.focus
+            session = getattr(tab, "session", None)
+            if changed and session:
+                session.hooks.fire("focus", self.focus)
+                key = "focus_gained" if self.focus else "focus_lost"
+                session.events.fire(key)
 
         # Change the focus for the currently selected tab
         panel = self.panel

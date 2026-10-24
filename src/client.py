@@ -171,6 +171,9 @@ class Client(Telnet):
             self.transport.write(command.encode() + b"\r\n")
 
         self.factory.stopTrying()
+        session = self.factory.session
+        session.hooks.fire("connect")
+        session.events.fire("connect")
 
     def connectionLost(self, reason):
         """The connection was lost."""
@@ -185,6 +188,9 @@ class Client(Telnet):
                 host=host, port=port, reason=reason.type))
         wx.CallAfter(pub.sendMessage, "disconnect", client=self,
                 reason=reason)
+        session = self.factory.session
+        session.hooks.fire("disconnect", reason)
+        session.events.fire("disconnect")
         if reason.type is ConnectionDone:
             self.factory.stopTrying()
 
@@ -450,4 +456,5 @@ class CocoFactory(ReconnectingClientFactory):
         client.run()
         self.panel.client = client
         self.sharp_engine.bind_client(client)
+        self.session.bind_client(client)
         return client
