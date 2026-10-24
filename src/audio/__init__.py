@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2020, LE GOFF Vincent
+# Copyright (c) 2016-2026, LE GOFF Vincent
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -55,21 +55,44 @@ Example:
 
     audiolib.play("path/of/my/file.ogg")
     # Or alternatively, to keep a handle on the played sound
-    import time
-    sound = audiolib.play("path/of/my/file.ogg")
-    time.sleep(2) # notice that the sound will keep on playing while Python pauses
+    sound = audiolib.play("path/of/my/file.ogg", volume=80, pan=-40)
     sound.pause()
-    sound.stop()
-    sound.volume = 80 # 80% of volume
-    sound.play() # unpause the sound
+    sound.volume = 50 # 50% of volume, even while playing
+    sound.resume()
+    sound.fade_out(2) # fade out in 2 seconds, then stop
+
+Volumes go from 0 to 100, pans from -100 (left) to 100 (right), and
+durations are in seconds.
+
+Categories are named groups of sounds sharing a volume, which the user
+can tune.  Any number of sounds of a category can play together:
+
+    audiolib.category("combat", volume=40)
+    audiolib.play("hit.ogg", category="combat", delay=0.2)
+    audiolib.play("parry.ogg", category="combat", pan=60)
+    audiolib.categories["combat"].muted = True # also mutes playing sounds
+
+Channels are named slots playing one sound at a time.  Playing a new
+file in a channel replaces the current one, fading it out if the
+channel has a fade duration.  Playing the same file does nothing:
+
+    music = audiolib.channel("music", category="music", fade=2)
+    music.play("area25.ogg", loop=True)
+    music.play("area25.ogg", loop=True) # already playing, no change
+    music.play("battle.ogg", loop=True) # area25.ogg fades out
+    music.stop(fade=3)
+
+The final volume of a sound is the master volume (`audiolib.volume`)
+x its category's volume x its own volume.
 
 Frequently used methods:
 
-- `AudioLib.play(str)`: play a sound, given the file path to access it.  `BASS` supports WAV, MP3, OGG and other formats (see the full documentation).
-- `AudioLib.stop()`: stop all sounds that are currently playing.
-- `Sound.play()`: start playing or unpause a sound.
-- `Sound.pause()`: pause a sound.
-- `Sound.stop()`: stop a sound.
+- `AudioLib.play(str, ...)`: play a sound, given the file path to access it.  `BASS` supports WAV, MP3, OGG and other formats (see the full documentation).
+- `AudioLib.stop(category=None, fade=0)`: stop all sounds, or the sounds of a category.
+- `AudioLib.category(name)`: get or create a category.
+- `AudioLib.channel(name)`: get or create a channel.
+- `Sound.play()`, `Sound.pause()`, `Sound.resume()`, `Sound.stop()`.
+- `Sound.fade(volume=None, pan=None, duration=1)`, `Sound.fade_out(duration=1)`.
 
 """
 
