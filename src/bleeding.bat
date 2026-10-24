@@ -1,1 +1,0 @@
-pipenv run python cocomud.py --config-dir=C:\Users\Vince\CocoMUD

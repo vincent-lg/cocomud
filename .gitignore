@@ -71,5 +71,8 @@ src/settings
 src/worlds
 
 # VSCode support
-client/
+/client/
 .vscode/settings.json
+
+# Local launcher with a preset configuration
+src/bleeding.bat
