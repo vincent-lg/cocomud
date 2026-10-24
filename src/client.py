@@ -34,6 +34,7 @@ already handles a great deal of the Telnet protocol.
 
 """
 
+from functools import partial
 import os
 from random import randint
 import re
@@ -50,6 +51,7 @@ import wx
 from wx.lib.pubsub import pub
 
 from log import logger
+from protocol import OPTIONS
 from screenreader import ScreenReader
 from screenreader import ScreenReader
 
@@ -58,7 +60,90 @@ ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
 
 class Client(Telnet):
 
-    """Class to receive data from the MUD using a Telnet protocol."""
+    """Class to receive data from the MUD using a Telnet protocol.
+
+    The supported Telnet options (MSDP, GMCP...) are in the 'protocol'
+    package.  They are accessible in `protocols`, by name:
+
+    >>> client.protocols["msdp"].report("HEALTH")
+
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.protocols = {}
+        for option_class in OPTIONS:
+            option = option_class(self)
+            self.protocols[option.name] = option
+            self.negotiationMap[option.code] = partial(
+                    self.receive_option, option)
+
+    def get_option(self, code):
+        """Return the supported option with this code, or None."""
+        for option in self.protocols.values():
+            if option.code == code:
+                return option
+
+        return None
+
+    def enableRemote(self, code):
+        """Return whether the server can enable this option."""
+        option = self.get_option(code)
+        if option is None:
+            return False
+
+        try:
+            return option.accept()
+        except Exception:
+            log = logger("client")
+            log.exception("Cannot accept {}".format(option.name))
+            return False
+
+    def disableRemote(self, code):
+        """The server disabled an option."""
+        option = self.get_option(code)
+        if option is not None:
+            self.disable_option(option)
+
+    def telnet_WILL(self, code):
+        """The server is willing to enable an option.
+
+        Twisted answers DO (or DONT) when it's needed.  The option
+        is enabled after the answer, so it can send subnegotiations.
+
+        """
+        super().telnet_WILL(code)
+        option = self.get_option(code)
+        if option is not None and not option.enabled and \
+                self.getOptionState(code).him.state == "yes":
+            option.enabled = True
+            try:
+                option.enable()
+            except Exception:
+                log = logger("client")
+                log.exception("Cannot enable {}".format(option.name))
+
+    def disable_option(self, option):
+        """Disable an option, if enabled."""
+        if option.enabled:
+            option.enabled = False
+            try:
+                option.disable()
+            except Exception:
+                log = logger("client")
+                log.exception("Cannot disable {}".format(option.name))
+
+    def receive_option(self, option, data):
+        """Receive a subnegotiation for an option.
+
+        Twisted sends the payload as a list of bytes of length 1.
+
+        """
+        try:
+            option.receive(b"".join(data))
+        except Exception:
+            log = logger("client")
+            log.exception("Cannot handle {} data".format(option.name))
 
     def disconnect(self):
         """Disconnect, close the client."""
@@ -90,6 +175,9 @@ class Client(Telnet):
     def connectionLost(self, reason):
         """The connection was lost."""
         self.send_queue()
+        for option in self.protocols.values():
+            self.disable_option(option)
+
         host = self.transport.getPeer().host
         port = self.transport.getPeer().port
         log = logger("client")
