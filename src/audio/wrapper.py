@@ -75,15 +75,12 @@ class AudioLib:
         """If not initialized, init the library."""
         if not self.has_init:
             self.has_init = pybass.BASS_Init(-1, 44100, 0, 0, 0)
+            # Format plugins shipped in lib/windows
             pybass.BASS_PluginLoad(b'bass_aac.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_ac3.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_aix.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_ape.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_mpc.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_ofr.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_spx.dll', 0)
-            pybass.BASS_PluginLoad(b'bass_tta.dll', 0)
-            pybass.BASS_PluginLoad(b'basscd.dll', 0)
+            pybass.BASS_PluginLoad(b'bass_alac.dll', 0)
+            pybass.BASS_PluginLoad(b'bassflac.dll', 0)
+            pybass.BASS_PluginLoad(b'bassopus.dll', 0)
+            pybass.BASS_PluginLoad(b'bassmidi.dll', 0)
 
             # Set channels to unicode mode (I don't know if it's necessary)
             pybass.BASS_CHANNELINFO._fields_.remove(('filename', pybass.ctypes.c_char_p))
