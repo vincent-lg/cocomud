@@ -159,6 +159,52 @@ class TestScripts(TestCase):
         self.session.hooks.fire("connect")
         self.assertEqual(self.session.calls, 1)
 
+    def test_command(self):
+        """Test a command and its arguments."""
+        self.write("commands.py", """
+            calls = []
+
+            @command("sound")
+            def sound(args):
+                calls.append(("sound", args))
+
+            @command("sound  Volume")
+            def volume(args):
+                calls.append(("volume", args))
+        """)
+        self.load()
+        scripts = self.session.scripts
+        self.assertTrue(scripts.run_command("sound"))
+        self.assertTrue(scripts.run_command("Sound VOLUME  Music 50 "))
+        self.assertTrue(scripts.run_command("sound volumes"))
+        self.assertFalse(scripts.run_command("soundtrack"))
+        self.assertFalse(scripts.run_command(""))
+        self.assertEqual(scripts.modules["commands"].calls, [
+                ("sound", ""), ("volume", "Music 50"),
+                ("sound", "volumes")])
+
+    def test_command_error(self):
+        """Test that a failing command is logged and consumed."""
+        self.write("a.py", """
+            @command("boom")
+            def boom(args):
+                1 / 0
+        """)
+        self.load()
+        self.assertTrue(self.session.scripts.run_command("boom now"))
+        self.session.scripts.logger.exception.assert_called_once()
+
+    def test_command_unload(self):
+        """Test that unloading removes the commands."""
+        self.write("a.py", """
+            @command("sound")
+            def sound(args):
+                pass
+        """)
+        self.load()
+        self.session.scripts.unload()
+        self.assertFalse(self.session.scripts.run_command("sound"))
+
     def test_send(self):
         """Test sending commands, line by line, without aliases."""
         self.write("a.py", """

@@ -410,8 +410,11 @@ class Client(Telnet):
 
         with self.factory.world.lock:
             for text in chunks:
-                # Test the aliases
+                # Test the script commands, then the aliases
                 if alias:
+                    if self.factory.session.scripts.run_command(text):
+                        continue
+
                     for alias in self.factory.world.aliases:
                         alias.sharp_engine = self.factory.sharp_engine
                         if alias.test(text):

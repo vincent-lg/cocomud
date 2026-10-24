@@ -95,3 +95,51 @@ class TestAliases(MockClient):
         }
 
         self.client.handle_message.assert_called_once_with("HP = 8", **kwargs)
+
+
+class TestScriptCommands(MockClient):
+
+    """Test the commands added by world scripts."""
+
+    def setUp(self):
+        super().setUp()
+        self.scripts = self.client.factory.session.scripts
+        self.command = MagicMock()
+        self.scripts.commands["sound volume"] = self.command
+
+    def test_command(self):
+        """Test that a command runs and isn't sent."""
+        self.client.write("sound volume music 50")
+        self.command.assert_called_once_with("music 50")
+        self.client.transport.write.assert_not_called()
+
+    def test_before_aliases(self):
+        """Test that a command wins over a matching alias."""
+        alias = Alias(self.client.factory.sharp_engine, "sound*", "say $1")
+        self.client.factory.world.aliases = [alias]
+        self.client.write("sound volume music 50")
+        self.command.assert_called_once_with("music 50")
+        self.client.transport.write.assert_not_called()
+
+    def test_stacking(self):
+        """Test a command among stacked commands."""
+        def get_setting(address):
+            """Private function to return a set of default settings."""
+            default = {
+                    "options.input.command_stacking": ";",
+                    "options.general.encoding": "utf-8",
+            }
+            return default[address]
+
+        self.client.factory.engine.settings.__getitem__ = MagicMock(
+                side_effect=get_setting)
+        self.client.write("sound volume music 50;look")
+        self.command.assert_called_once_with("music 50")
+        self.client.transport.write.assert_called_once_with(b"look\r\n")
+
+    def test_without_aliases(self):
+        """Test that text sent without aliases skips the commands."""
+        self.client.write("sound volume music 50", alias=False)
+        self.command.assert_not_called()
+        self.client.transport.write.assert_called_once_with(
+                b"sound volume music 50\r\n")

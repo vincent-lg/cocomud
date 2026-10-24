@@ -38,6 +38,9 @@ Scripts don't import their API: these names are in their globals.
     hook(name, key=None)    decorator registering a hook callback.
                             `@hook("msdp", "X")` also asks the server
                             to report the MSDP variable X.
+    command(name)           decorator adding a command typed by the
+                            player ("sound volume"), tested before
+                            the aliases and not sent to the server.
     events                  `events.fire(key, **kwargs)`, and
                             `@events.listen(key)` to listen to an event.
     send(text)              send commands to the server (not aliases).
@@ -81,6 +84,7 @@ class Scripts:
         self.modules = {}
         self.hooks = []
         self.listeners = []
+        self.commands = {}
         self.logger = logger("scripts")
 
     def load(self, world):
@@ -131,6 +135,7 @@ class Scripts:
 
         self.hooks.clear()
         self.listeners.clear()
+        self.commands.clear()
         self.modules.clear()
         self.loaded = False
 
@@ -138,6 +143,37 @@ class Scripts:
         """Unload, then load the scripts again."""
         self.unload()
         return self.load(world)
+
+    def run_command(self, text):
+        """Run the script command matching the typed text, if any.
+
+        A command matches the text if the text is the command's words,
+        or begins with them followed by a space (ignoring case).  The
+        longest matching command is called with the rest of the text.
+        Return whether a command matched: its text isn't sent to the
+        server, even if the command failed.
+
+        """
+        words = text.split()
+        for size in range(len(words), 0, -1):
+            name = " ".join(words[:size]).lower()
+            callback = self.commands.get(name)
+            if callback is None:
+                continue
+
+            args = text.strip()
+            for word in words[:size]:
+                args = args[len(word):].lstrip()
+
+            try:
+                callback(args)
+            except Exception:
+                self.logger.exception("The command {!r} failed".format(
+                        text))
+
+            return True
+
+        return False
 
 
 class API:
@@ -157,6 +193,7 @@ class API:
         """Return the globals of a script."""
         return {
                 "hook": self.hook,
+                "command": self.command,
                 "events": self.events,
                 "send": self.send,
                 "note": self.note,
@@ -175,6 +212,20 @@ class API:
             self.scripts.hooks.append((name, callback, key))
             if name == "msdp" and key is not None:
                 self.msdp.report(key)
+            return callback
+
+        return decorator
+
+    def command(self, name):
+        """Decorator adding a command typed by the player.
+
+        The name is one or more words ("sound volume").  The callback
+        receives the rest of the typed text as a string.  Commands are
+        tested before the aliases, and their text isn't sent.
+
+        """
+        def decorator(callback):
+            self.scripts.commands[" ".join(name.split()).lower()] = callback
             return callback
 
         return decorator

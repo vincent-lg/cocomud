@@ -30,6 +30,7 @@ from unittest.mock import MagicMock
 import unittest
 
 from client import Client
+from scripts import Scripts
 from sharp.engine import SharpScript
 
 class MockClient(unittest.TestCase):
@@ -45,6 +46,8 @@ class MockClient(unittest.TestCase):
         peer.port = 4000
         self.client.transport.getPeer = MagicMock(return_value=peer)
         self.client.factory = MagicMock()
+        session = self.client.factory.session
+        session.scripts = Scripts(session)
 
         # Create the sharp engine
         sharp = SharpScript(self.client.factory.engine, self.client,
