@@ -203,3 +203,13 @@ class TestSessionHooks(MockClient):
 
         hook.assert_called_once_with(reason)
         event.assert_called_once_with()
+
+    def test_line(self):
+        """Test the line hook, fired for each line without ANSI codes."""
+        hook = MagicMock()
+        self.session.hooks.register("line", hook)
+        self.client.factory.world.triggers = []
+        self.client.handle_message = MagicMock()
+        self.client.handle_lines("\x1b[31mWelcome\x1b[0m\r\nto Erion.")
+        self.assertEqual(hook.call_args_list, [call("Welcome"),
+                call("to Erion.")])

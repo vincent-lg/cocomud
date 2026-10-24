@@ -288,6 +288,7 @@ class Client(Telnet):
 
         for line in msg.splitlines():
             no_ansi_line = ANSI_ESCAPE.sub('', line)
+            self.factory.session.hooks.fire("line", no_ansi_line)
             display = True
             matches = []
             for trigger in self.factory.world.triggers:

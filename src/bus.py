@@ -36,6 +36,8 @@ listens to them.  They carry raw data, as it was received:
     focus (focused)          the window gained (True) or lost focus
     msdp (name, value)       an MSDP variable, filtered by name
     gmcp (package, data)     a GMCP message, filtered by package
+    line (line)              a received line, without ANSI codes, before
+                             the triggers
 
 Events are named and meaningful to the player ("chopvegetables",
 "fight").  World scripts fire them, and so does the engine for a few
