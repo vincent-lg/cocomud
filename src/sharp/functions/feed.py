@@ -39,11 +39,12 @@ class Feed(Function):
     description = "Feed a channel with a message"
 
     def run(self, channel, message):
-        """Feed a channel."""
-        if self.world:
+        """Feed a channel of the session."""
+        session = self.sharp_engine.session
+        if self.world and session:
             for t_channel in self.world.channels:
                 if t_channel.name == channel:
-                    t_channel.feed(message)
+                    session.history(channel).feed(message)
                     return
 
     def display(self, dialog, channel="", message=""):

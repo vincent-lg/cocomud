@@ -38,11 +38,12 @@ class ChannelsDialog(wx.Dialog):
 
     """Channels dialog to display channels."""
 
-    def __init__(self, engine, world, channels, name=None):
+    def __init__(self, engine, world, session, name=None):
         super(ChannelsDialog, self).__init__(None, title=t("common.channel", 2))
         self.engine = engine
         self.world = world
-        self.channels = channels
+        self.session = session
+        self.channels = world.channels
         self.name = name
         self.messages = {}
         self.InitUI()
@@ -58,8 +59,10 @@ class ChannelsDialog(wx.Dialog):
             messages = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
             messages.InsertColumn(0, t("common.message"))
             i = 0
-            for message in channel.messages[-50:]:
-                messages.Append((message, ))
+            history = self.session.history(channel.name) if self.session \
+                    else None
+            for message in history.messages[-50:] if history else ():
+                messages.Append((message.text, ))
                 i += 1
 
             messages.Select(i - 1)

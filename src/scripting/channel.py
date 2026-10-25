@@ -26,7 +26,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module containing the Channel class."""
+"""Module containing the Channel, History and Message classes."""
+
+import time
 
 from log import logger
 
@@ -34,27 +36,63 @@ class Channel:
 
     """A channel object.
 
-    A channel is a list that can contain various events in the client.
-    Typically, a channel just contains channel messages.  They can
-    be fed with triggers.  For instance, if an 'ooc' message is
-    received, then a channel can be fed to keep track of all 'ooc'
-    messages.  This makes browsing through history a lot easier.
+    A channel keeps track of messages of a kind, typically channel
+    messages.  They can be fed with triggers.  For instance, if an
+    'ooc' message is received, then a channel can be fed to keep track
+    of all 'ooc' messages.  This makes browsing through history a lot
+    easier.
 
     The channel must first be created through the #channel SharpScript
     action.  A world can have several channels, identified by a unique
     name.  To feed a channel, one should use the #feed action.
+
+    The channel belongs to the world, but its messages belong to each
+    session (see `History`): two characters connected to the same game
+    share channels, not their history.
 
     """
 
     def __init__(self, world, name):
         self.world = world
         self.name = name
-        self.messages = []
 
     def __repr__(self):
         return "<Channel {} for {}>".format(
                 repr(self.name), self.world and self.world.name or "unknown")
 
-    def feed(self, message):
-        """Append the message at the end of the list."""
+
+class History:
+
+    """The messages of a channel in a session.
+
+    The position is the index of the message being read, or None
+    if no message has been read yet.
+
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.messages = []
+        self.position = None
+
+    def __repr__(self):
+        return "<History of {} ({} messages)>".format(repr(self.name),
+                len(self.messages))
+
+    def feed(self, text):
+        """Append a message at the end of the history."""
+        message = Message(text)
         self.messages.append(message)
+        return message
+
+
+class Message:
+
+    """A message in a channel history, with the time it was received."""
+
+    def __init__(self, text, received=None):
+        self.text = text
+        self.time = time.time() if received is None else received
+
+    def __repr__(self):
+        return "<Message {}>".format(repr(self.text))

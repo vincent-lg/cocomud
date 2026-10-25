@@ -58,6 +58,7 @@ class SharpScript:
         self.engine = engine
         self.client = client
         self.world = world
+        self.session = None
         self.globals = dict(globals())
         self.locals = {}
         self.to_del = set()
