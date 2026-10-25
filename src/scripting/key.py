@@ -42,7 +42,15 @@ CODE_TO_KEY = {
     13: "Enter",
     27: "Escape",
     32: "Space",
+    127: "Delete",
     310: "Pause",
+    312: "End",
+    313: "Home",
+    314: "Left",
+    315: "Up",
+    316: "Right",
+    317: "Down",
+    322: "Insert",
     324: "PavNum0",
     325: "PavNum1",
     326: "PavNum2",
@@ -66,6 +74,8 @@ CODE_TO_KEY = {
     350: "F11",
     351: "F12",
     364: "NumLock",
+    366: "PageUp",
+    367: "PageDown",
     387: "PavNum*",
     388: "PavNum+",
     390: "PavNum-",
@@ -83,6 +93,9 @@ KEY_TO_CODE["back"] = 8
 KEY_TO_CODE["return"] = 13
 KEY_TO_CODE["pavnumlock"] = 364
 KEY_TO_CODE["pavlock"] = 364
+KEY_TO_CODE["del"] = 127
+KEY_TO_CODE["pgup"] = 366
+KEY_TO_CODE["pgdn"] = 367
 
 ## Functions
 def key_name(code, modifiers):
