@@ -195,7 +195,8 @@ class ChannelsDialog(wx.Dialog):
 
         index = (self.choices.GetSelection() + step) % len(self.channels)
         self.choices.SetSelection(index)
-        ScreenReader.talk(self.channels[index].name)
+        # The channel list shows the name on a Braille display already
+        ScreenReader.talk(self.channels[index].name, braille=False)
         self.show_channel()
 
     def show_channel(self):
