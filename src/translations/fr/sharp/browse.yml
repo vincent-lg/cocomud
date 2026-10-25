@@ -1,0 +1,22 @@
+﻿argument: Nombre ou canal (facultatif)
+bottom: "Fin : {message}"
+description: Parcourir les canaux
+empty: "{channel} : vide"
+no_channel: Aucun canal.
+no_message: Aucun message.
+no_such_channel: Ce canal n'existe pas encore.
+position: "{channel} : {position} sur {total}"
+top: "Début : {message}"
+unknown: "Action de navigation inconnue : {verb}."
+unknown_channel: "Canal inconnu : {channel}."
+verb: Action
+verb_channel: Aller à un canal (par numéro ou par nom)
+verb_first_message: Aller au premier message
+verb_last_message: Aller au dernier message
+verb_latest: Lire un message récent (1 est le dernier)
+verb_next_channel: Canal suivant
+verb_next_message: Message suivant (ou plusieurs)
+verb_previous_channel: Canal précédent
+verb_previous_message: Message précédent (ou plusieurs)
+verb_repeat: Relire le message actuel
+verb_show: Ouvrir la boîte de dialogue des canaux sur le message actuel

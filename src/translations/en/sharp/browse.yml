@@ -1,0 +1,22 @@
+﻿argument: Number or channel (optional)
+bottom: "Bottom: {message}"
+description: Browse channels
+empty: "{channel}: empty"
+no_channel: No channel.
+no_message: No message.
+no_such_channel: That channel doesn't exist yet.
+position: "{channel}: {position} of {total}"
+top: "Top: {message}"
+unknown: "Unknown browse action: {verb}."
+unknown_channel: "Unknown channel: {channel}."
+verb: Action
+verb_channel: Go to a channel (by number or name)
+verb_first_message: Go to the first message
+verb_last_message: Go to the last message
+verb_latest: Read a latest message (1 is the last one)
+verb_next_channel: Next channel
+verb_next_message: Next message (or several)
+verb_previous_channel: Previous channel
+verb_previous_message: Previous message (or several)
+verb_repeat: Read the current message again
+verb_show: Open the channels dialog on the current message

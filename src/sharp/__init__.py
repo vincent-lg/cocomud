@@ -2,6 +2,7 @@
 
 from sharp.function import Function
 from sharp.functions.alias import Alias
+from sharp.functions.browse import Browse
 from sharp.functions.channel import Channel
 from sharp.functions.event import Event
 from sharp.functions.checkvar import Checkvar
@@ -20,6 +21,7 @@ from sharp.functions.writevar import Writevar
 
 FUNCTIONS = {
     "alias": Alias,
+    "browse": Browse,
     "channel": Channel,
     "checkvar": Checkvar,
     "event": Event,

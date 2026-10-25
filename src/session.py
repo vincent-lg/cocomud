@@ -65,6 +65,7 @@ class Session:
         self.gmcp_supports = []
         self.scripts = Scripts(self)
         self.histories = {}
+        self.browsing = None
 
     def __repr__(self):
         return f"<Session {self.sid} to the world {self.world and self.world.name or 'unknown'}>"
