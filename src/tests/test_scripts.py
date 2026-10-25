@@ -291,6 +291,21 @@ class TestScripts(TestCase):
         with self.assertRaises(RuntimeError):
             self.session.scripts.modules["a"].request()
 
+    def test_channels(self):
+        """Test feeding channels from a script."""
+        self.world.channels = []
+        self.world.add_channel = self.world.channels.append
+        self.write("a.py", """
+            channels.add("all")
+            channels.feed("tells", "Aelyn tells you hi.")
+        """)
+        self.load()
+        names = [(c.name, c.visible, c.saved) for c in self.world.channels]
+        self.assertEqual(names, [("all", False, False),
+                ("tells", False, False)])
+        messages = self.session.history("tells").messages
+        self.assertEqual([m.text for m in messages], ["Aelyn tells you hi."])
+
 
 class TestScriptAudio(TestCase):
 
@@ -331,6 +346,7 @@ class TestScriptAudio(TestCase):
         """Test that other attributes are the library's."""
         self.audio.stop(category="music")
         self.library.stop.assert_called_once_with(category="music")
+
 
 
 class TestScriptSettings(TestCase):

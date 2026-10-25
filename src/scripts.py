@@ -47,6 +47,10 @@ Scripts don't import their API: these names are in their globals.
                             aliases and script commands.
     note(text)              display (and speak) text like received text.
     speak(text)             only speak text with the screen reader.
+    channels                the channels: `channels.feed(name, text)`
+                            adds a message to the session's history,
+                            creating the channel if needed (hidden, not
+                            saved in config.set).
     audio                   the audio library ('audio' package), whose
                             relative paths are relative to the world.
     msdp, gmcp              the Telnet options (`msdp.report(...)`,
@@ -81,6 +85,7 @@ from twisted.internet import reactor
 
 from log import logger
 from screenreader import ScreenReader
+from scripting.channel import Channel
 
 class Scripts:
 
@@ -198,6 +203,7 @@ class API:
         self.session = scripts.session
         self.world = world
         self.events = ScriptEvents(scripts)
+        self.channels = ScriptChannels(self.session, world)
         self.audio = ScriptAudio(world)
         self.msdp = MSDPProxy(self.session)
         self.gmcp = GMCPProxy(self.session)
@@ -211,6 +217,7 @@ class API:
                 "send": self.send,
                 "note": self.note,
                 "speak": self.speak,
+                "channels": self.channels,
                 "audio": self.audio,
                 "msdp": self.msdp,
                 "gmcp": self.gmcp,
@@ -267,6 +274,40 @@ class API:
     def speak(self, text, interrupt=False):
         """Speak text with the screen reader, without displaying it."""
         ScreenReader.talk(text, interrupt=interrupt)
+
+
+class ScriptChannels:
+
+    """The `channels` object of scripts.
+
+    Channels created here are hidden by default and aren't saved in
+    the world's config.set.  A channel the player created with
+    #channel is used as it is.
+
+    """
+
+    def __init__(self, session, world):
+        self.session = session
+        self.world = world
+
+    def add(self, name, visible=False):
+        """Return the channel of this name, created if needed."""
+        for channel in self.world.channels:
+            if channel.name == name:
+                return channel
+
+        channel = Channel(self.world, name, visible=visible, saved=False)
+        self.world.add_channel(channel)
+        return channel
+
+    def feed(self, name, text):
+        """Add a message to a channel of the session, return it."""
+        self.add(name)
+        return self.session.history(name).feed(text)
+
+    def history(self, name):
+        """Return the session's history of a channel."""
+        return self.session.history(name)
 
 
 class ScriptEvents:

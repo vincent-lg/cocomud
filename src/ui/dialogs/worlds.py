@@ -221,7 +221,8 @@ class ExportWorldDialog(wx.Dialog):
             # Channels
             if channels:
                 for channel in self.world.channels:
-                    lines.append(channel.sharp_script)
+                    if channel.saved:
+                        lines.append(channel.sharp_script)
 
             # Macros
             if macros:

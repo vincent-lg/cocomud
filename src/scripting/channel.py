@@ -51,14 +51,17 @@ class Channel:
     share channels, not their history.
 
     A hidden channel (`#channel name -visible`) isn't listed in the
-    channels dialog, unless it's opened by name.
+    channels dialog, unless it's opened by name.  A channel created by
+    a world script isn't saved in config.set (`saved` is False): the
+    script creates it again each time.
 
     """
 
-    def __init__(self, world, name, visible=True):
+    def __init__(self, world, name, visible=True, saved=True):
         self.world = world
         self.name = name
         self.visible = visible
+        self.saved = saved
 
     def __repr__(self):
         return "<Channel {} for {}>".format(
