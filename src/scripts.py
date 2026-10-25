@@ -43,7 +43,8 @@ Scripts don't import their API: these names are in their globals.
                             the aliases and not sent to the server.
     events                  `events.fire(key, **kwargs)`, and
                             `@events.listen(key)` to listen to an event.
-    send(text)              send commands to the server (not aliases).
+    send(text)              send commands to the server, skipping
+                            aliases and script commands.
     note(text)              display (and speak) text like received text.
     speak(text)             only speak text with the screen reader.
     audio                   the audio library ('audio' package), whose
@@ -252,7 +253,7 @@ class API:
             return
 
         for line in text.splitlines():
-            client.write(line, alias=False)
+            client.write(line, alias=False, commands=False)
 
     def note(self, text):
         """Display text like received text, speaking it if needed."""

@@ -390,8 +390,15 @@ class Client(Telnet):
                 ScreenReader.talk(no_ansi_msg, speech=speech, braille=braille,
                         interrupt=interrupt)
 
-    def write(self, text, alias=True):
-        """Write text to the client."""
+    def write(self, text, alias=True, commands=True):
+        """Write text to the client.
+
+        Script commands are tested first, then aliases.  `alias=False`
+        only skips the aliases, which can't call themselves this way:
+        a macro or `#send` can still run script commands.  Scripts send
+        with `commands=False` too, so their text reaches the server.
+
+        """
         self.factory.session.log_command(text)
         # Break in chunks based on the command stacking, if active
         settings = self.factory.engine.settings
@@ -414,10 +421,11 @@ class Client(Telnet):
         with self.factory.world.lock:
             for text in chunks:
                 # Test the script commands, then the aliases
-                if alias:
+                if commands:
                     if self.factory.session.scripts.run_command(text):
                         continue
 
+                if alias:
                     for alias in self.factory.world.aliases:
                         alias.sharp_engine = self.factory.sharp_engine
                         if alias.test(text):

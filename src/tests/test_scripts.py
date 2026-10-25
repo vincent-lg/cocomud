@@ -232,7 +232,7 @@ class TestScripts(TestCase):
         self.assertTrue(self.session.scripts.modules["a"].loaded)
 
     def test_send(self):
-        """Test sending commands, line by line, without aliases."""
+        """Test sending commands, line by line, without aliases or commands."""
         self.write("a.py", """
             @hook("connect")
             def connected():
@@ -242,7 +242,8 @@ class TestScripts(TestCase):
         self.session.client = MagicMock()
         self.session.hooks.fire("connect")
         self.assertEqual(self.session.client.write.call_args_list,
-                [call("look", alias=False), call("score", alias=False)])
+                [call("look", alias=False, commands=False),
+                call("score", alias=False, commands=False)])
 
     def test_send_disconnected(self):
         """Test that sending without client only logs a warning."""

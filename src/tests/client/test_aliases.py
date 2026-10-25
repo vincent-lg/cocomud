@@ -138,8 +138,24 @@ class TestScriptCommands(MockClient):
         self.client.transport.write.assert_called_once_with(b"look\r\n")
 
     def test_without_aliases(self):
-        """Test that text sent without aliases skips the commands."""
+        """Test that text sent without aliases (#send) runs the commands."""
+        alias = Alias(self.client.factory.sharp_engine, "sound*", "say $1")
+        self.client.factory.world.aliases = [alias]
         self.client.write("sound volume music 50", alias=False)
+        self.command.assert_called_once_with("music 50")
+        self.client.transport.write.assert_not_called()
+
+    def test_without_commands(self):
+        """Test that text sent by scripts skips the commands."""
+        self.client.write("sound volume music 50", alias=False,
+                commands=False)
         self.command.assert_not_called()
         self.client.transport.write.assert_called_once_with(
                 b"sound volume music 50\r\n")
+
+    def test_macro(self):
+        """Test that a macro's text runs a script command."""
+        engine = self.client.factory.sharp_engine
+        engine.execute("sound volume music 50", variables=True)
+        self.command.assert_called_once_with("music 50")
+        self.client.transport.write.assert_not_called()
