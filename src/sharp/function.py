@@ -59,20 +59,21 @@ class Function(object):
         """Complete the action."""
         return ()
 
-    def t(self, address, default):
+    def t(self, address, default, **kwargs):
         """Translates the given address, returning a string.
 
         If the translation isn't available in the catalog, return the
         default value (presumably in English).  The address to be
         given is relative to the function (the address
-        'sharp.function_name.{address}' will be sought).
+        'sharp.function_name.{address}' will be sought).  Keyword
+        arguments are formatted in the translation ("{category}").
 
         """
         address = "sharp.{name}.{address}".format(name=self.name,
                 address=address)
         try:
-            translation = t(address)
+            translation = t(address, **kwargs)
         except ValueError:
-            translation = default
+            translation = default.format(**kwargs)
 
         return translation

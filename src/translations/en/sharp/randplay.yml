@@ -6,3 +6,8 @@ files: >
     specified files will be searched in the world directory and its
     sub-folders.  You can also specify multiple files, separated with
     a semicolon: hit*.wav;pain*.ogg
+category: >
+    Sound category (optional: effects, music...), whose volume the
+    sound follows
+unknown_category: >
+    The category {category} doesn't exist yet.  Use it anyway?

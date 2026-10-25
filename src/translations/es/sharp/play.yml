@@ -1,3 +1,8 @@
 ﻿description: Reproduce un archivo de sonido
 empty_path: No se especificó el archivo de audio que se debe reproducir.
 file: Archivo de sonido a reproducir
+category: >
+    Categoría de sonido (opcional: effects, music...), cuyo volumen
+    sigue el sonido
+unknown_category: >
+    La categoría {category} todavía no existe. ¿Usarla de todos modos?

@@ -2,3 +2,8 @@
 empty_path: >
     You haven't set the path of the audio file.  What file should I play?
 file: Audio file to be played
+category: >
+    Sound category (optional: effects, music...), whose volume the
+    sound follows
+unknown_category: >
+    The category {category} doesn't exist yet.  Use it anyway?

@@ -3,3 +3,8 @@ empty_path: >
     Vous n'avez pas sélectionné le fichier audio. Quel fichier dois-je
     jouer ?
 file: Fichier audio à jouer
+category: >
+    Catégorie de son (facultatif : effects, music...), dont le son
+    suit le volume
+unknown_category: >
+    La catégorie {category} n'existe pas encore. L'utiliser quand même ?

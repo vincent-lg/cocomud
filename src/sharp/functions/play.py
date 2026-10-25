@@ -41,13 +41,19 @@ class Play(Function):
 
     """Function SharpScript 'play'.
 
-    This plays an audio file using simpleaudio.
+    This plays an audio file, optionally in a sound category:
+
+        #play sounds/crash.ogg
+        #play sounds/crash.ogg effects
+
+    A sound in a category follows the category's volume and mute
+    state.  Without a category, it only follows the master volume.
 
     """
 
     description = "Play an audio file"
 
-    def run(self, filename):
+    def run(self, filename, category=None):
         """Play the audio file."""
         log = logger("sharp")
         if self.engine.sounds:
@@ -63,7 +69,7 @@ class Play(Function):
             log.warning("#play cannot find the file at {}".format(
                     repr(filename)))
 
-        audiolib.play(filename)
+        audiolib.play(filename, category=category or None)
 
     def find_abs_filename(self, filename):
         """Return the absolute path of the file.
@@ -87,7 +93,7 @@ class Play(Function):
         location = os.path.abspath(self.world.path)
         return os.path.relpath(filename, location)
 
-    def display(self, dialog, filename=""):
+    def display(self, dialog, filename="", category=""):
         """Display the function's argument."""
         self.dialog = dialog
         directory = os.path.join(self.world.path, "sounds")
@@ -109,13 +115,15 @@ class Play(Function):
         dialog.top.Add(browse)
         dialog.top.Add(test)
 
+        display_category(self, dialog, category)
+
         # Event binding
         browse.Bind(wx.EVT_BUTTON, self.browse_file)
         test.Bind(wx.EVT_BUTTON, self.test_file)
 
     def complete(self, dialog):
         """The user pressed 'ok' in the dialog."""
-        file = dialog.default_file
+        file = dialog.file.GetValue()
         empty_path = self.t("empty_path",
                 "The path hasn't been set.  What file should I play?")
         if not file:
@@ -124,7 +132,11 @@ class Play(Function):
             dialog.file.SetFocus()
             return None
 
-        return (file, )
+        category = complete_category(self, dialog)
+        if category is None:
+            return None
+
+        return (file, category) if category else (file, )
 
     def browse_file(self, e):
         """Browse for a file."""
@@ -143,5 +155,40 @@ class Play(Function):
     def test_file(self, e):
         """Test the audio file."""
         parent = self.dialog
-        filename = self.find_abs_filename(parent.default_file)
-        audiolib.play(filename)
+        filename = self.find_abs_filename(parent.file.GetValue())
+        audiolib.play(filename,
+                category=parent.category.GetValue().strip() or None)
+
+
+def display_category(function, dialog, category=""):
+    """Add the category field to the dialog of a function."""
+    label = function.t("category", "Sound category (optional: effects, "
+            "music...), whose volume the sound follows")
+    l_category = wx.StaticText(dialog, label=label)
+    t_category = wx.TextCtrl(dialog, value=category)
+    dialog.category = t_category
+    dialog.top.Add(l_category)
+    dialog.top.Add(t_category)
+
+
+def complete_category(function, dialog):
+    """Return the category of the dialog, or None to stay in it.
+
+    An empty category is fine.  An unknown one (no script or sound
+    has created it yet) is confirmed by the user, as it might be a
+    typo.
+
+    """
+    category = dialog.category.GetValue().strip()
+    if not category or category in audiolib.categories:
+        return category
+
+    unknown = function.t("unknown_category", "The category {category} "
+            "doesn't exist yet.  Use it anyway?", category=category)
+    value = wx.MessageBox(unknown, t("ui.alert.confirm"),
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+    if value == wx.YES:
+        return category
+
+    dialog.category.SetFocus()
+    return None

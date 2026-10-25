@@ -8,3 +8,8 @@ files: >
     dans le dossier de l'univers ainsi que ses sous-dossiers. Vous pouvez
     également préciser plusieurs choix séparés par un point virgule:
     hit*.wav;pain*.ogg
+category: >
+    Catégorie de son (facultatif : effects, music...), dont le son
+    suit le volume
+unknown_category: >
+    La catégorie {category} n'existe pas encore. L'utiliser quand même ?

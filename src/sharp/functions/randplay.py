@@ -37,18 +37,22 @@ from ytranslate import t
 from audio import audiolib
 from log import logger
 from sharp import Function
+from sharp.functions.play import complete_category, display_category
 
 class RandPlay(Function):
 
     """Function SharpScript 'randplay'.
 
-    This function plays a random sound from a list.
+    This function plays a random sound from a list, optionally in a
+    sound category (see #play):
+
+        #randplay hit*.ogg;pain*.ogg combat
 
     """
 
     description = "Play a sound from a list at random"
 
-    def run(self, filenames):
+    def run(self, filenames, category=None):
         """Play the audio file."""
         log = logger("sharp")
         if not filenames:
@@ -66,7 +70,7 @@ class RandPlay(Function):
         if files:
             filename = choice(files)
             log.debug(f"#randplay playing {filename!r}")
-            audiolib.play(filename)
+            audiolib.play(filename, category=category or None)
         else:
             log.warning(f"#randplay cannot find any sound")
 
@@ -83,7 +87,7 @@ class RandPlay(Function):
         results = [path for path in results if path.is_file()]
         return [str(path) for path in results]
 
-    def display(self, dialog, filenames=""):
+    def display(self, dialog, filenames="", category=""):
         """Display the function's argument."""
         self.dialog = dialog
         l_files = self.t("files", "Audio files to be played")
@@ -96,6 +100,7 @@ class RandPlay(Function):
         dialog.top.Add(l_files)
         dialog.top.Add(t_files)
         dialog.top.Add(test)
+        display_category(self, dialog, category)
 
         # Event binding
         test.Bind(wx.EVT_BUTTON, self.test_files)
@@ -111,11 +116,16 @@ class RandPlay(Function):
             dialog.files.SetFocus()
             return None
 
-        return (files, )
+        category = complete_category(self, dialog)
+        if category is None:
+            return None
+
+        return (files, category) if category else (files, )
 
     def test_files(self, e):
         """Test the audio files."""
         parent = self.dialog
         names = parent.files.GetValue().split(";")
         filename = choice(self.find_files(choice(names)))
-        audiolib.play(filename)
+        audiolib.play(filename,
+                category=parent.category.GetValue().strip() or None)
