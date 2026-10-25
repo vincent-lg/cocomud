@@ -3,6 +3,7 @@
 from sharp.function import Function
 from sharp.functions.alias import Alias
 from sharp.functions.channel import Channel
+from sharp.functions.event import Event
 from sharp.functions.checkvar import Checkvar
 from sharp.functions.feed import Feed
 from sharp.functions.idle import Idle
@@ -21,6 +22,7 @@ FUNCTIONS = {
     "alias": Alias,
     "channel": Channel,
     "checkvar": Checkvar,
+    "event": Event,
     "feed": Feed,
     "idle": Idle,
     "macro": Macro,

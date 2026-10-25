@@ -59,7 +59,7 @@ class Session:
         self.should_log = False
         self._sharp_engine = None
         self.hooks = Hooks()
-        self.events = Events()
+        self.events = Events(handler=self.run_world_events)
         self.msdp_reports = []
         self.gmcp_supports = []
         self.scripts = Scripts(self)
@@ -75,6 +75,26 @@ class Session:
         log.debug(f"Creating a SharpEngine for session {self.sid} (world: {'yes' if self.world else 'no'}, client: {'yes' if self.client else 'no'}, character: {'yes' if self.character else 'no'}, engine: {'yes' if self.engine else 'no'})")
         self._sharp_engine = SharpScript(self.engine, self.client, self.world)
         return self._sharp_engine
+
+    def run_world_events(self, key, **kwargs):
+        """Run the world's `#event` handlers for this key.
+
+        Return whether one ran.  The arguments of the event become
+        variables of the actions.
+
+        """
+        world = self.world
+        if world is None:
+            return False
+
+        with world.lock:
+            events = [event for event in world.events if event.matches(key)]
+
+        for event in events:
+            event.sharp_engine = self.sharp_engine
+            event.execute(**kwargs)
+
+        return bool(events)
 
     def bind_client(self, client):
         """Bind a newly-built client to the session.

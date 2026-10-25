@@ -124,10 +124,15 @@ class Events:
     instance) when the player has defined something else.  A listener
     that only observes the event should return None.
 
+    The handler, if set, is called after the listeners with the key
+    and the arguments, and returns whether it handled the event.  The
+    session uses it for the `#event` handlers of its world.
+
     """
 
-    def __init__(self):
+    def __init__(self, handler=None):
         self.listeners = {}
+        self.handler = handler
         self.logger = logger("bus")
 
     def listen(self, key, callback):
@@ -153,6 +158,14 @@ class Events:
             except Exception:
                 self.logger.exception("The {} event listener failed: "
                         "{!r}".format(key, callback))
+
+        if self.handler is not None:
+            try:
+                if self.handler(key, **kwargs):
+                    handled = True
+            except Exception:
+                self.logger.exception("The {} event handler failed".format(
+                        key))
 
         return handled
 

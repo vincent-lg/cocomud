@@ -82,6 +82,7 @@ class World:
         # World's configuration
         self.aliases = []
         self.channels = []
+        self.events = []
         self.macros = []
         self.triggers = []
         self.notepad = None
@@ -122,6 +123,7 @@ class World:
         # Reset some of the world's configuration
         self.aliases = []
         self.channels = []
+        self.events = []
         self.macros = []
         self.triggers = []
 
@@ -211,6 +213,10 @@ class World:
         for trigger in self.triggers:
             lines.append(trigger.sharp_script)
 
+        # Events
+        for event in self.events:
+            lines.append(event.sharp_script)
+
         content = "\n".join(lines) + "\n"
         path = self.path
         path = os.path.join(path, "config.set")
@@ -258,6 +264,26 @@ class World:
 
         # Otherwise, just add it at the end
         self.channels.append(channel)
+
+    def add_event(self, event):
+        """Add the event handler, handling conflicts.
+
+        If another handler with the same key exists, either replace
+        it or ignore the second one.
+
+        """
+        for existing in self.events:
+            if existing.matches(event.key):
+                # There's a conflict, look at the 'merging' setting
+                if self.merging == MergingMethod.ignore:
+                    return
+                elif self.merging == MergingMethod.replace:
+                    existing.action = event.action
+                    existing.level = event.level
+                    return
+
+        # Otherwise, just add it at the end
+        self.events.append(event)
 
     def add_macro(self, macro):
         """Add the macro to the world's configuration, handling conflicts.
