@@ -620,6 +620,7 @@ class MUDPanel(AccessPanel):
         self.focus = True
         self.inside = True
         self.last_ac = None
+        self.macro_key = None
         self.output.SetFocus()
         self.nb_unread = 0
 
@@ -634,6 +635,7 @@ class MUDPanel(AccessPanel):
 
         # Event binding
         self.output.Bind(wx.EVT_TEXT_PASTE, self.OnPaste)
+        self.output.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
     def CreateClient(self):
         """Connect the MUDPanel."""
@@ -771,6 +773,7 @@ class MUDPanel(AccessPanel):
             # Test the different macros
             if self.client and self.client.test_macros(key, modifiers):
                 self.output.SetInsertionPoint(self.editing_pos)
+                self.macro_key = e.GetKeyCode()
                 return
 
             # Test auto-completion
@@ -795,3 +798,17 @@ class MUDPanel(AccessPanel):
                         self.output.AppendText(end)
 
         AccessPanel.OnKeyDown(self, e)
+
+    def OnKeyUp(self, e):
+        """A key is released in the window.
+
+        The release of a key used by a macro is ignored too.  Otherwise
+        Windows opens the menu bar when F10 is released, as it does
+        with Alt.
+
+        """
+        if self.macro_key is not None and e.GetKeyCode() == self.macro_key:
+            self.macro_key = None
+            return
+
+        e.Skip()
