@@ -203,7 +203,7 @@ class World:
 
         # Channels
         for channel in self.channels:
-            lines.append("#channel {{{}}}".format(channel.name))
+            lines.append(channel.sharp_script)
 
         # Macros
         for macro in self.macros:

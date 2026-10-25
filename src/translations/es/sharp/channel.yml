@@ -2,3 +2,4 @@
 empty_name: El nombre del canal está vacío.
 name: Nombre único del canal
 show: Mostrar en un cuadro de diálogo
+visible: "Mostrar este canal en la lista de canales (un canal oculto se puede abrir por su nombre)"

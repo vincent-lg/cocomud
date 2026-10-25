@@ -83,3 +83,31 @@ class TestChannels(TestCase):
         """Test that #feed in config.set, without a session, does nothing."""
         self.world.sharp_engine.execute("#feed tells hello")
         self.assertFalse(hasattr(self.world.channels[0], "messages"))
+
+    def test_hidden(self):
+        """Test creating a hidden channel and saving it."""
+        self.world.sharp_engine.execute("#channel {house chat} -visible")
+        tells, house = self.world.channels
+        self.assertTrue(tells.visible)
+        self.assertFalse(house.visible)
+        self.assertEqual(tells.sharp_script, "#channel {tells}")
+        self.assertEqual(house.sharp_script, "#channel {house chat} -visible")
+
+    def test_hidden_reload(self):
+        """Test that the saved script creates the same channel."""
+        self.world.sharp_engine.execute("#channel chat -visible")
+        script = self.world.channels[1].sharp_script
+        self.world.channels[:] = []
+        self.world.sharp_engine.execute(script)
+        channel, = self.world.channels
+        self.assertEqual(channel.name, "chat")
+        self.assertFalse(channel.visible)
+
+    def test_listeners(self):
+        """Test that listeners are told about new messages."""
+        session = self.session()
+        history = session.history("tells")
+        listener = MagicMock()
+        history.listeners.append(listener)
+        session.sharp_engine.execute("#feed tells hello")
+        listener.assert_called_once_with(history, history.messages[0])

@@ -2,3 +2,4 @@
 empty_name: The channel name is empty.  How do you want to call it?
 name: Unique name of the channel
 show: Show this channel in a dialog box
+visible: "List this channel in the channels dialog (a hidden channel can still be opened by name)"

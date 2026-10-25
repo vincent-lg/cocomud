@@ -419,6 +419,7 @@ class ClientWindow(DummyUpdater):
         """Open the channels dialog box."""
         dialog = ChannelsDialog(self.engine, self.world, self.session)
         dialog.ShowModal()
+        dialog.Destroy()
 
     def OnTriggers(self, e):
         """Open the triggers dialog box."""

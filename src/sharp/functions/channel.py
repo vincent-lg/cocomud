@@ -29,6 +29,7 @@
 """Module containing the Channel function class."""
 
 import wx
+from ytranslate import t
 
 from scripting.channel import Channel as ObjChannel
 from sharp import Function
@@ -42,22 +43,30 @@ class Channel(Function):
     description = "Create or display a channel"
     allow_creation = True
 
-    def run(self, name, show=True):
-        """Create a channel."""
+    def run(self, name, show=True, visible=True):
+        """Create a channel, or open the dialog on it if it exists.
+
+        The dialog selects the channel's last message.  A hidden channel
+        (-visible) isn't listed in the dialog, unless opened by name.
+
+        """
         if self.world:
             if name not in [ch.name for ch in self.world.channels]:
-                channel = ObjChannel(self.world, name)
+                channel = ObjChannel(self.world, name, visible=visible)
                 self.world.add_channel(channel)
             else:
                 if show and Channel.allow_creation:
                     dialog = ChannelsDialog(self.engine, self.world,
                             self.sharp_engine.session, name)
                     dialog.ShowModal()
+                    dialog.Destroy()
 
-    def display(self, dialog, name="", show=True):
+    def display(self, dialog, name="", show=True, visible=True):
         """Display the function's argument."""
         l_name = self.t("name", "Unique name of the channel")
         l_show = self.t("show", "Show this channel in a dialog box")
+        l_visible = self.t("visible", "List this channel in the channels "
+                "dialog (a hidden channel can still be opened by name)")
 
         # Dialog
         l_name = wx.StaticText(dialog, label=l_name)
@@ -71,6 +80,9 @@ class Channel(Function):
         dialog.cb_show = wx.CheckBox(dialog, label=l_show)
         dialog.cb_show.SetValue(show)
         options.Add(dialog.cb_show)
+        dialog.cb_visible = wx.CheckBox(dialog, label=l_visible)
+        dialog.cb_visible.SetValue(visible)
+        options.Add(dialog.cb_visible)
         dialog.top.Add(options)
 
     def complete(self, dialog):
@@ -91,5 +103,7 @@ class Channel(Function):
         show = dialog.cb_show.GetValue()
         if not show:
             arguments.append("-show")
+        if not dialog.cb_visible.GetValue():
+            arguments.append("-visible")
 
         return tuple(arguments)

@@ -29,6 +29,7 @@
 """Module containing the Feed function class."""
 
 import wx
+from ytranslate import t
 
 from sharp import Function
 

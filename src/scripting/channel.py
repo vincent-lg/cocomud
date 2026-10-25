@@ -50,15 +50,28 @@ class Channel:
     session (see `History`): two characters connected to the same game
     share channels, not their history.
 
+    A hidden channel (`#channel name -visible`) isn't listed in the
+    channels dialog, unless it's opened by name.
+
     """
 
-    def __init__(self, world, name):
+    def __init__(self, world, name, visible=True):
         self.world = world
         self.name = name
+        self.visible = visible
 
     def __repr__(self):
         return "<Channel {} for {}>".format(
                 repr(self.name), self.world and self.world.name or "unknown")
+
+    @property
+    def sharp_script(self):
+        """Return the SharpScript code to create this channel."""
+        script = "#channel {{{}}}".format(self.name)
+        if not self.visible:
+            script += " -visible"
+
+        return script
 
 
 class History:
@@ -66,7 +79,9 @@ class History:
     """The messages of a channel in a session.
 
     The position is the index of the message being read, or None
-    if no message has been read yet.
+    if no message has been read yet.  Listeners are called with the
+    history and the new message each time a message is added (the
+    channels dialog uses it to show new messages).
 
     """
 
@@ -74,6 +89,7 @@ class History:
         self.name = name
         self.messages = []
         self.position = None
+        self.listeners = []
 
     def __repr__(self):
         return "<History of {} ({} messages)>".format(repr(self.name),
@@ -83,6 +99,9 @@ class History:
         """Append a message at the end of the history."""
         message = Message(text)
         self.messages.append(message)
+        for listener in list(self.listeners):
+            listener(self, message)
+
         return message
 
 
