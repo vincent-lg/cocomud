@@ -30,6 +30,7 @@
 """This file contains the ClientWindow class."""
 
 from __future__ import absolute_import
+import ctypes
 import os
 import re
 import sys
@@ -86,7 +87,38 @@ class ClientWindow(DummyUpdater):
         self.loading = None
         self.connection = None
         self.CreateMenuBar()
+        self.BindAltSpace()
         self.InitUI(world)
+
+    def BindAltSpace(self):
+        """Let a macro use Alt+Space without opening the system menu.
+
+        Windows opens the system menu from the character it makes of
+        Alt+Space, before the macros can stop it.  An accelerator is
+        handled before that character is made: it runs the macro of
+        the current tab, or opens the system menu if there's none.
+
+        """
+        if sys.platform != "win32":
+            return
+
+        alt_space = wx.NewIdRef()
+        self.SetAcceleratorTable(wx.AcceleratorTable([
+                (wx.ACCEL_ALT, wx.WXK_SPACE, alt_space)]))
+        self.Bind(wx.EVT_MENU, self.OnAltSpace, id=alt_space)
+
+    def OnAltSpace(self, e):
+        """Alt+Space is pressed: run its macro or open the system menu."""
+        panel = self.panel
+        client = panel and panel.client
+        if panel and panel.world and client and client.test_macros(
+                wx.WXK_SPACE, wx.MOD_ALT):
+            panel.output.SetInsertionPoint(panel.editing_pos)
+            return
+
+        # WM_SYSCOMMAND, SC_KEYMENU with a space: the system menu
+        ctypes.windll.user32.PostMessageW(self.GetHandle(), 0x0112, 0xF100,
+                0x20)
 
     @property
     def world(self):
