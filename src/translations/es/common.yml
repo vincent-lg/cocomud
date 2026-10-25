@@ -23,6 +23,9 @@ script: Script
 shortcut: Acceso directo
 SSL: Secure telnet (SSL)
 telnet: Telnet
+event:
+    1: Evento
+    2+: Eventos
 trigger:
     1: Disparador
     2+: Disparadores

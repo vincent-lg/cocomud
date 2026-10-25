@@ -57,6 +57,7 @@ from ui.dialogs.macro import MacroDialog
 from ui.dialogs.notepad import NotepadDialog
 from ui.dialogs.preferences import PreferencesDialog
 from ui.dialogs.sharp_script_console import SharpScriptConsoleDialog
+from ui.dialogs.event import EventDialog
 from ui.dialogs.trigger import TriggerDialog
 from ui.dialogs.worlds import WorldsDialog, ExportWorldDialog
 from ui.event import EVT_FOCUS, FocusEvent, myEVT_FOCUS
@@ -184,6 +185,11 @@ class ClientWindow(DummyUpdater):
         triggers = wx.MenuItem(gameMenu, -1, t("ui.menu.triggers"))
         self.Bind(wx.EVT_MENU, self.OnTriggers, triggers)
         gameMenu.Append(triggers)
+
+        # Events
+        events = wx.MenuItem(gameMenu, -1, t("ui.menu.events"))
+        self.Bind(wx.EVT_MENU, self.OnEvents, events)
+        gameMenu.Append(events)
 
         # Channels
         channels = wx.MenuItem(gameMenu, -1, t("ui.menu.channels"))
@@ -417,6 +423,12 @@ class ClientWindow(DummyUpdater):
     def OnTriggers(self, e):
         """Open the triggers dialog box."""
         dialog = TriggerDialog(self.engine, self.world)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def OnEvents(self, e):
+        """Open the events dialog box."""
+        dialog = EventDialog(self.engine, self.world)
         dialog.ShowModal()
         dialog.Destroy()
 

@@ -12,6 +12,7 @@ game: "&Juego"
 aliases: "&Abreviaturas"
 macro: "&Macro"
 triggers: "&Disparadores"
+events: "&Eventos"
 channels: "&Canales"
 notepad: Editor
 notepad_world: "Para este &mundo..."

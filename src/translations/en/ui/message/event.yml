@@ -1,0 +1,16 @@
+﻿add: Add an event handler
+duplicate: >
+    There's already a handler for the event {event}.  Edit it instead.
+edit: Edit an event handler
+key: "Event (its key, like chopvegetables, fight or focus_lost):"
+missing_key: >
+    The event field is empty.  Please specify the event to react to.
+remove: >
+    Are you sure you want to remove the handler of the event {event}?
+unknown: >
+    Unable to find this event handler.
+unsaved: >
+    There are unsaved event handlers in this configuration.  If you
+    close this dialog without saving, they will be lost.  To save,
+    click on 'no' and then on 'ok'.  Are you sure you want to close
+    this dialog without saving?

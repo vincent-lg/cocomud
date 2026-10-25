@@ -12,6 +12,7 @@ game: "&Game"
 aliases: "&Aliases"
 macro: "&Macro"
 triggers: "&Triggers"
+events: "&Events"
 channels: "&Channels"
 notepad: Notepad
 notepad_world: "For this &world..."

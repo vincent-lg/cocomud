@@ -23,6 +23,9 @@ script: Script
 shortcut: Shortcut
 SSL: Secure telnet (SSL)
 telnet: Telnet
+event:
+    1: Event
+    2+: Events
 trigger:
     1: Trigger
     2+: Triggers

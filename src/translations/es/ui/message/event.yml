@@ -1,0 +1,16 @@
+﻿add: Añadir una reacción a un evento
+duplicate: >
+    Ya existe una reacción al evento {event}. Modifíquela en su lugar.
+edit: Modificar una reacción a un evento
+key: "Evento (su clave, como chopvegetables, fight o focus_lost):"
+missing_key: >
+    El campo del evento está vacío. Indique el evento al que reaccionar.
+remove: >
+    ¿Seguro que quiere eliminar la reacción al evento {event}?
+unknown: >
+    No se puede encontrar esta reacción.
+unsaved: >
+    Hay reacciones a eventos sin guardar en esta configuración. Si
+    cierra este diálogo sin guardar, se perderán. Para guardar, pulse
+    'no' y luego 'aceptar'. ¿Seguro que quiere cerrar este diálogo sin
+    guardar?
