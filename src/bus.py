@@ -37,7 +37,8 @@ listens to them.  They carry raw data, as it was received:
     msdp (name, value)       an MSDP variable, filtered by name
     gmcp (package, data)     a GMCP message, filtered by package
     line (line)              a received line, without ANSI codes, before
-                             the triggers
+                             the triggers.  A callback returning True
+                             hides the line (no display, no trigger)
 
 Events are named and meaningful to the player ("chopvegetables",
 "fight").  World scripts fire them, and so does the engine for a few
@@ -85,19 +86,25 @@ class Hooks:
     def fire(self, name, *args, key=None, **kwargs):
         """Call the callbacks registered for this hook.
 
-        A failing callback is logged and doesn't prevent the others
-        from being called.
+        Return whether a callback returned a true value, which only
+        some hooks use (the line hook hides the line).  A failing
+        callback is logged, doesn't prevent the others from being
+        called and doesn't count.
 
         """
+        result = False
         for registered, callback in list(self.callbacks.get(name, ())):
             if registered is not None and not matches(registered, key):
                 continue
 
             try:
-                callback(*args, **kwargs)
+                if callback(*args, **kwargs):
+                    result = True
             except Exception:
                 self.logger.exception("The {} hook failed: {!r}".format(
                         name, callback))
+
+        return result
 
 
 class Events:

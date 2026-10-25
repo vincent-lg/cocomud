@@ -206,10 +206,23 @@ class TestSessionHooks(MockClient):
 
     def test_line(self):
         """Test the line hook, fired for each line without ANSI codes."""
-        hook = MagicMock()
+        hook = MagicMock(return_value=None)
         self.session.hooks.register("line", hook)
         self.client.factory.world.triggers = []
         self.client.handle_message = MagicMock()
         self.client.handle_lines("\x1b[31mWelcome\x1b[0m\r\nto Erion.")
         self.assertEqual(hook.call_args_list, [call("Welcome"),
                 call("to Erion.")])
+
+    def test_line_hidden(self):
+        """Test that a line hook returning True hides the line."""
+        self.session.hooks.register("line", lambda line: line == "45% hp")
+        trigger = MagicMock()
+        trigger.test.return_value = None
+        self.client.factory.world.triggers = [trigger]
+        self.client.factory.strip_ansi = True
+        self.client.handle_message = MagicMock()
+        self.client.handle_lines("45% hp\r\nYou hit.")
+        trigger.test.assert_called_once_with("You hit.")
+        self.client.handle_message.assert_called_once_with("You hit.",
+                mark=None)

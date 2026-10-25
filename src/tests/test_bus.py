@@ -112,6 +112,16 @@ class TestHooks(TestCase):
         callback.assert_called_once_with()
         self.hooks.logger.exception.assert_called_once()
 
+    def test_result(self):
+        """Test that fire returns whether a callback returned True."""
+        observer = MagicMock(return_value=None)
+        self.hooks.register("line", observer)
+        self.assertFalse(self.hooks.fire("line", "Hello"))
+        hider = MagicMock(return_value=True)
+        self.hooks.register("line", hider)
+        self.assertTrue(self.hooks.fire("line", "Hello"))
+        self.assertEqual(observer.call_count, 2)
+
 
 class TestEvents(TestCase):
 
