@@ -11,6 +11,26 @@
   </style>
 </head>
 <body>
+  {%- if page.lang == "fr" -%}
+    {%- assign other = page.url | remove_first: "/fr" -%}
+  {%- else -%}
+    {%- assign other = page.url | prepend: "/fr" -%}
+  {%- endif -%}
+  {%- assign found = site.pages | where: "url", other | first -%}
+  {%- unless found -%}
+    {%- if page.lang == "fr" %}{% assign other = "/" %}{% else %}{% assign other = "/fr/" %}{% endif -%}
+  {%- endunless %}
+  <nav>
+  {%- if page.lang == "fr" %}
+    <a href="{{ '/fr/' | relative_url }}">Accueil</a> |
+    <a href="{{ '/fr/download.html' | relative_url }}">Télécharger</a> |
+    <a href="{{ other | relative_url }}" lang="en" hreflang="en">English</a>
+  {%- else %}
+    <a href="{{ '/' | relative_url }}">Home</a> |
+    <a href="{{ '/download.html' | relative_url }}">Download</a> |
+    <a href="{{ other | relative_url }}" lang="fr" hreflang="fr">Français</a>
+  {%- endif %}
+  </nav>
   <main>
 {{ content }}
   </main>

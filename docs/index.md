@@ -1,36 +1,36 @@
 ---
-title: CocoMUD
+title: "CocoMUD client"
 ---
 
 # CocoMUD client
 
-CocoMUD is a MUD client designed for ease of access with a screen reader. It
-aims to offer as many features as any other MUD client, while remaining as
-accessible as possible, with text-to-speech and Braille output.
+CocoMUD client is a MUD client designed for ease-of-access with a screen reader.  It plans to offer just as many features as another MUD client, while remaining as accessible as possible through several features, including a Text-To-Speech (TTS) for speech and Braille messaging.
 
-## Download
+[Home](index.md) [Download](download.md) [Quick start](basics.md) [Report a bug](https://github.com/vincent-lg/cocomud/issues)
 
-CocoMUD runs on Windows as a portable archive: download it, extract it, and
-open `cocomud.exe`. No installation is needed.
+Other languages: [French](fr/index.md).
 
-Builds are published on the
-[CocoMUD releases page](https://github.com/vincent-lg/cocomud/releases).
+## Start using now
+
+To download CocoMUD, go to the [download page](download.md).  You might also like to read [CocoMUD basics](basics.md) to learn how to use the main features of CocoMUD.
 
 ## Main features
 
+These features are the main tasks of the CocoMUD client roadmap.
+
 - A MUD client with a steady networking system.
-- Accessible with most screen readers, through speech and Braille.
-- An interface translated into several languages.
-- A simple but powerful way to customize your experience, with aliases,
-  macros, triggers and more.
+- An accessible client with most screen readers.
+- A portable client on Windows, Linux and Mac OS.
+- A translated interface into different languages.
+- A simple but powerful mechanism to customize the user experience, with [aliases](alias.md), [macros](macros.md), [triggers](triggers.md) and more.
 
-## Contact
+## Contact and discussions
 
-Found a bug, or want to suggest a feature? Open an issue on
-[CocoMUD's issue tracker](https://github.com/vincent-lg/cocomud/issues).
+You have a bug to report, a feature to suggest?  You just want to say hello or talk about some ideas you have?
 
-## License
+- You can [open a new issue](https://github.com/vincent-lg/cocomud/issues) on GitHub, assuming you have a GitHub account (if not, [click here to sign up](https://github.com/signup)).
+- You can subscribe an post to the [mailing list of CocoMUD](https://www.freelists.org/list/cocomud).  You don't need an account to do so, but you will need to subscribe by entering your email address.
 
-CocoMUD is distributed under the
-[3-clause BSD license](https://opensource.org/licenses/BSD-3-Clause). Its source
-code is on [GitHub](https://github.com/vincent-lg/cocomud).
+## Licensing
+
+CocoMUD is distributed under the [3-clause BSD](https://opensource.org/licenses/BSD-3-Clause).  Its source code, issues and documentation can be found on its [GitHub repository](https://github.com/vincent-lg/cocomud).

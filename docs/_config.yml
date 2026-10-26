@@ -1,6 +1,9 @@
 title: CocoMUD
 lang: en
 
+kramdown:
+  toc_levels: "2..3"
+
 defaults:
   - scope:
       path: ""
