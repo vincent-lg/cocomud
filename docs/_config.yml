@@ -1,0 +1,16 @@
+title: CocoMUD
+lang: en
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+  - scope:
+      path: "fr"
+    values:
+      lang: fr
+  - scope:
+      path: "es"
+    values:
+      lang: es

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title and page.title != site.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { max-width: 46rem; margin: 0 auto; padding: 1rem; font-family: system-ui, sans-serif; line-height: 1.6; }
+    pre, code { font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <main>
+{{ content }}
+  </main>
+</body>
+</html>
