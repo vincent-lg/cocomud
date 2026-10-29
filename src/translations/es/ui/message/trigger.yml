@@ -2,8 +2,10 @@
 edit: Editar un disparador
 missing_reaction: >
     El campo del disparador está vacío. Especifique un disparador.
+invalid_variable: >
+    El nombre de la variable está vacío o no es válido. Use solo letras,
+    números y guiones bajos.
 mark: Destacar disparador
-mute: Silenciar disparador
 remove: >
     ¿Está seguro de que quiere borrar el disparador {trigger}?
 substitution: "Mensaje con el que se substituirá la línea, si hay alguno:"
@@ -12,3 +14,9 @@ unknown: >
 unsaved: >
     Hay disparadores sin guardar y si continúa se perderán. ¿Quiere cerrar esta ventana de todos modos?
     Si quiere guardarlos, elija 'no' y pulse aceptar.
+variable: "Nombre de la variable:"
+visibility: Visibilidad de la línea que activó el disparador
+visible_always: Siempre visible
+visible_never: Nunca visible (silenciar)
+visible_if_set: Visible solo cuando la variable existe
+visible_if_unset: Visible solo cuando la variable no existe

@@ -28,12 +28,17 @@
 
 """Module containing the trigger dialog."""
 
+import re
+
 import wx
 
 from ytranslate import t
 
 from scripting.trigger import Trigger
 from ui.sharp_editor import SharpEditor
+
+# A variable name, as accepted by SharpScript
+RE_VARIABLE = re.compile(r"^[A-Za-z0-9_]+$")
 
 class TriggerDialog(wx.Dialog):
 
@@ -231,10 +236,32 @@ class EditTriggerDialog(wx.Dialog):
                 self.trigger, "action")
         sizer.Add(self.editor)
 
-        # Mute option
-        self.mute = wx.CheckBox(self, label=t("ui.message.trigger.mute"))
-        self.mute.SetValue(self.trigger.mute)
-        options.Add(self.mute)
+        # Visibility of the triggered line
+        s_visibility = wx.BoxSizer(wx.VERTICAL)
+        choices = [
+                t("ui.message.trigger.visible_always"),
+                t("ui.message.trigger.visible_never"),
+                t("ui.message.trigger.visible_if_set"),
+                t("ui.message.trigger.visible_if_unset"),
+        ]
+        self.visibility = wx.RadioBox(self,
+                label=t("ui.message.trigger.visibility"), choices=choices,
+                majorDimension=1, style=wx.RA_SPECIFY_COLS)
+        if self.trigger.mute:
+            self.visibility.SetSelection(1)
+        elif self.trigger.show_if:
+            self.visibility.SetSelection(2)
+        elif self.trigger.hide_if:
+            self.visibility.SetSelection(3)
+
+        l_variable = wx.StaticText(self,
+                label=t("ui.message.trigger.variable"))
+        variable = self.trigger.show_if or self.trigger.hide_if
+        self.variable = wx.TextCtrl(self, value=variable)
+        s_visibility.Add(self.visibility)
+        s_visibility.Add(l_variable)
+        s_visibility.Add(self.variable)
+        self.OnVisibility()
 
         # Mark option
         self.mark = wx.CheckBox(self, label=t("ui.message.trigger.mark"))
@@ -253,6 +280,7 @@ class EditTriggerDialog(wx.Dialog):
         sizer.Add(s_substitution)
 
         # Rest of the dialoog
+        sizer.Add(s_visibility)
         sizer.Add(options)
         sizer.Add(buttons)
         sizer.Fit(self)
@@ -260,26 +288,38 @@ class EditTriggerDialog(wx.Dialog):
         self.t_trigger.SetFocus()
 
         # Event binding
+        self.visibility.Bind(wx.EVT_RADIOBOX, self.OnVisibility)
         self.Bind(wx.EVT_BUTTON, self.OnOK, id=wx.ID_OK)
         self.Bind(wx.EVT_BUTTON, self.OnCancel, id=wx.ID_CANCEL)
+
+    def OnVisibility(self, e=None):
+        """Enable the variable field only when a variable is needed."""
+        self.variable.Enable(self.visibility.GetSelection() >= 2)
 
     def OnOK(self, e):
         """Save the trigger."""
         reaction = self.t_trigger.GetValue()
         action = self.trigger.action
         substitution = self.substitution.GetValue()
-        mute = self.mute.GetValue()
+        visibility = self.visibility.GetSelection()
+        variable = self.variable.GetValue().strip()
         mark = self.mark.GetValue()
         if not reaction:
             wx.MessageBox(t("ui.message.trigger.missing_reaction"),
                     t("ui.alert.missing"), wx.OK | wx.ICON_ERROR)
             self.t_trigger.SetFocus()
+        elif visibility >= 2 and not RE_VARIABLE.search(variable):
+            wx.MessageBox(t("ui.message.trigger.invalid_variable"),
+                    t("ui.alert.error"), wx.OK | wx.ICON_ERROR)
+            self.variable.SetFocus()
         else:
             self.trigger.reaction = reaction
             self.trigger.action = action
             self.trigger.re_reaction = self.trigger.find_regex(reaction)
             self.trigger.substitution = substitution
-            self.trigger.mute = mute
+            self.trigger.mute = visibility == 1
+            self.trigger.show_if = variable if visibility == 2 else ""
+            self.trigger.hide_if = variable if visibility == 3 else ""
             self.trigger.mark = mark
             if self.trigger not in self.triggers:
                 self.triggers.append(self.trigger)

@@ -254,7 +254,7 @@ To do so, create a trigger.  Through the interface:
 - Add a trigger.
 - Paste the line: `A cloud of sparks from your campfire soars toward the darkening sky.`
 - No need to select an action, we won't do anything (except if you want to add a crackling sound when that happens).
-- Tab until you find the "mute trigger" checkbox.  Check it.
+- Tab until you find the "Visibility of the triggered line" choices.  Select "Never visible (mute)".
 - Press **OK** several times to validate and save.
 
 If the client receives this line, it will just ignore it and not display it.
@@ -326,6 +326,35 @@ The same trigger in SharpScript would be:
 ```
 
 Important note: we have three arguments to the `#trigger` action here.  The first one is still the name of the trigger, the second one is still the action to be performed (empty in our case).  The third one is our substitution.  If the field is empty, there's no substitution.  That's just what happened for all of our previous tests.
+
+## Showing or hiding a line with a variable
+
+A mute trigger always hides its line.  Sometimes you want to switch this on and off: hide the ambiance messages while you're fighting, for instance, and see them again afterward.  Triggers can be made visible or hidden depending on whether a variable exists.
+
+In the trigger dialog, the "Visibility of the triggered line" choices offer:
+
+- **Always visible**: the default.
+- **Never visible (mute)**: the mute trigger we saw above.
+- **Visible only when the variable is set**: the line appears only if the variable written in the "Variable name" field exists.
+- **Visible only when the variable is not set**: the line is hidden as long as this variable exists.
+
+You then create or delete the variable with `#writevar`, usually in a macro or an alias.  For instance, an alias `quiet` that hides the campfire message:
+
+```
+#trigger {A cloud of sparks from your campfire soars toward the darkening sky.} {} +hide_if=quiet
+#alias quiet {#writevar quiet {1}}
+#alias noisy {#writevar quiet {}}
+```
+
+`#writevar quiet {1}` creates the variable `quiet` (its value doesn't matter), so the line is hidden.  `#writevar quiet {}` deletes it, so the line appears again.  `+show_if=variable` works the other way around: the line appears only while the variable exists.
+
+This works with substitution too.  If the line is visible, it is replaced by the substitution as usual.  If it's hidden, nothing is displayed at all, neither the line nor its substitution:
+
+```
+#trigger {HP: *} {} {Health: $1} +show_if=show_hp
+```
+
+The trigger's action runs before CocoMUD decides whether to display the line, so the action itself can create or delete the variable.
 
 ## Triggers fired by a regular expression
 

@@ -3,8 +3,10 @@ edit: Editer un trigger
 missing_reaction: >
     Le champ de texte contenant le nom du trigger est vide.
     Vous devez préciser une réaction pour ce trigger.
+invalid_variable: >
+    Le nom de la variable est vide ou invalide. Utilisez seulement des
+    lettres, des chiffres et des signes soulignés.
 mark: Trigger marqué
-mute: Trigger muet
 remove: >
     Êtes-vous sûr de vouloir retirer le trigger {trigger} ?
 substitution: >
@@ -17,3 +19,9 @@ unsaved: >
     sauvegarde, ces modifications seront perdues. Pour sauvegarder,
     cliquez sur 'non' puis sur 'ok'. Voulez-vous vraiment quitter
     cette boîte de dialogue sans sauvegarder ?
+variable: "Nom de la variable :"
+visibility: Visibilité de la ligne ayant déclenché le trigger
+visible_always: Toujours visible
+visible_never: Jamais visible (trigger muet)
+visible_if_set: Visible seulement si la variable existe
+visible_if_unset: Visible seulement si la variable n'existe pas

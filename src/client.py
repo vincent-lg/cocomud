@@ -320,14 +320,15 @@ class Client(Telnet):
                     log.exception("The trigger {} failed execution".format(
                             repr(trigger.reaction)))
 
-                if trigger.mute:
+                visible = trigger.is_visible()
+                if not visible:
                     display = False
                 if trigger.mark and mark is None:
                     before = nl.join([l for l in no_ansi_lines])
                     mark = len(before) + len(nl)
 
                 # Handle triggers with substitution
-                if trigger.substitution:
+                if visible and trigger.substitution:
                     display = False
                     replacement = trigger.replace()
                     lines.extend(replacement.splitlines())

@@ -205,7 +205,12 @@ class SharpScript:
 
                 argument = repr(argument)
             elif argument[0] in "-+":
-                kwargs[argument[1:]] = True if argument[0] == "+" else False
+                if "=" in argument:
+                    # A flag with a value, like '+show_if=variable'
+                    name, value = argument[1:].split("=", 1)
+                    kwargs[name] = value
+                else:
+                    kwargs[argument[1:]] = argument[0] == "+"
                 continue
             else:
                 argument = self.replace_semicolons(argument)

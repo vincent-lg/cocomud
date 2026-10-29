@@ -2,8 +2,10 @@
 edit: Edit a trigger
 missing_reaction: >
     The trigger field is empty.  Please specify the trigger's reaction.
+invalid_variable: >
+    The variable name is empty or invalid.  Use only letters, digits
+    and underscores.
 mark: Mark trigger
-mute: Mute trigger
 remove: >
     Are you sure you want to remove the trigger {trigger}?
 substitution: "Message to substitute to the triggered line, if any:"
@@ -14,3 +16,9 @@ unsaved: >
     close this dialog without saving, they will be lost.  To save,
     click on 'no' and then on 'ok'.  Are you sure you want to close
     this dialog without saving?
+variable: "Variable name:"
+visibility: Visibility of the triggered line
+visible_always: Always visible
+visible_never: Never visible (mute)
+visible_if_set: Visible only when the variable is set
+visible_if_unset: Visible only when the variable is not set

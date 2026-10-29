@@ -55,6 +55,8 @@ class Trigger:
         # Flags
         self.mute = False
         self.mark = False
+        self.show_if = ""
+        self.hide_if = ""
         self.logger = logger
 
         # Set the trigger's level
@@ -75,6 +77,10 @@ class Trigger:
             arguments.append("+mute")
         if self.mark:
             arguments.append("+mark")
+        if self.show_if:
+            arguments.append("+show_if=" + self.show_if)
+        if self.hide_if:
+            arguments.append("+hide_if=" + self.hide_if)
 
         statement = self.sharp_engine.format((tuple(arguments), ))
         return statement
@@ -86,6 +92,8 @@ class Trigger:
                 self.substitution)
         copy.mute = self.mute
         copy.mark = self.mark
+        copy.show_if = self.show_if
+        copy.hide_if = self.hide_if
         copy.level = self.level
         return copy
 
@@ -161,6 +169,27 @@ class Trigger:
         """
         engine = self.sharp_engine
         return engine.replace_variables(self.substitution)
+
+    def is_visible(self):
+        """Return whether the triggered line should be displayed.
+
+        A muted trigger is never displayed.  If 'show_if' is set, the
+        line is displayed only if this variable exists.  If 'hide_if'
+        is set, the line is displayed only if this variable doesn't
+        exist.  Variables are checked after the trigger's action
+        has run, so the action can change its own visibility.
+
+        """
+        if self.mute:
+            return False
+
+        variables = self.sharp_engine.locals
+        if self.show_if:
+            return self.show_if in variables
+        if self.hide_if:
+            return self.hide_if not in variables
+
+        return True
 
     def test(self, line, execute=False):
         """Should the trigger be triggered by the text?

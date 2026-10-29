@@ -320,7 +320,11 @@ class World:
                     return
                 elif self.merging == MergingMethod.replace:
                     existing.action = trigger.action
+                    existing.substitution = trigger.substitution
                     existing.mute = trigger.mute
+                    existing.mark = trigger.mark
+                    existing.show_if = trigger.show_if
+                    existing.hide_if = trigger.hide_if
                     existing.level = trigger.level
                     return
 
