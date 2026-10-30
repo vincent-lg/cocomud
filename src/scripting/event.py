@@ -64,8 +64,8 @@ class Event:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this event handler."""
-        return self.sharp_engine.format((("#event", self.key,
-                self.action), ))
+        return self.sharp_engine.statement("#event", self.key,
+                self.action)
 
     @property
     def copied(self):

@@ -225,6 +225,24 @@ Edgar dit : je n'y comprend rien, quelqu'un pourrait-il m'aider ?
 
 Les espaces dans les déclencheurs pourraient bien être l'une des erreurs principales quand on crée ses propres triggers la première fois. Le meilleur conseil que je puisse vous donner est de regarder avec attention les lignes que vous voulez surveiller à l'aide de triggers, et de n'utiliser le signe astérisque (`*`) que quand vous n'avez pas de moyen de savoir ce qui s'y trouve.
 
+## Surveiller des caractères spéciaux
+
+Certains caractères ont un sens particulier dans un trigger :
+
+- `*` signifie n'importe quoi, comme on l'a vu.
+- Un trigger commençant par `^` est une expression régulière.
+- La barre oblique inversée (`\`) fait du caractère suivant un caractère ordinaire.
+
+Mais comment surveiller une ligne qui contient un vrai astérisque ? Ecrivez `\*` au lieu de `*`. Par exemple, pour intercepter la ligne `*** Bienvenue chez vous ***` (et seulement cette ligne) :
+
+```
+\*\*\* Bienvenue chez vous \*\*\*
+```
+
+Sans les barres obliques inversées, chaque `*` signifierait n'importe quoi, et le trigger se déclencherait sur bien plus de lignes que prévu (et prendrait plus de temps à vérifier chaque ligne). C'est la même chose pour un trigger qui doit intercepter une ligne commençant par `^` : écrivez `\^` à la place. Et pour une vraie barre oblique inversée, écrivez `\\`.
+
+Les autres caractères, comme `+`, `-`, `{`, `}` ou `;`, peuvent être écrits tels quels dans la boîte de dialogue des triggers : un trigger comme `+100 points d'expérience.` fonctionne sans précaution particulière, CocoMUD les protège quand il enregistre votre configuration.
+
 ## Les canaux CocoMUD dans les triggers
 
 CocoMUD offre un système assez puissant de canaux. Cette fonctionnalité est à différencier des canaux en jeu, qui sont dépendants du jeu où vous vous connectez. Les canaux CocoMUD sont des listes d'`'evènements dans lesquels vous mettez ce que vous voulez. Ce n'est pas obligatoire de mettre des canaux en jeu dans des canaux CocoMUD, c'est juste plus comfortable. Nous allons voir cela (pourquoi l'utiliser et comment faire).

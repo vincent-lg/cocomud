@@ -228,6 +228,24 @@ Edgar says: I don't get it at all, could someone help me?
 
 Spaces may be the main source of confusion in your triggers.  The best advice is to look closely at the lines you receive from the server, and use only the `*` sign when you don't know what will be put there.
 
+## Matching special characters
+
+Some characters have a special meaning in a trigger:
+
+- `*` means anything, as we've seen.
+- A trigger beginning with `^` is a [regular expression](#triggers-fired-by-a-regular-expression).
+- The backslash (`\`) makes the next character an ordinary character.
+
+So what if the line you want to catch contains a real asterisk?  Write `\*` instead of `*`.  For instance, to catch the line `*** Welcome home ***` (and only this line):
+
+```
+\*\*\* Welcome home \*\*\*
+```
+
+Without the backslashes, each `*` would mean anything, and the trigger would fire on far more lines than you expected (and take more time to check every line).  The same goes for a trigger that should catch a line beginning with `^`: write `\^` instead.  And if you want a real backslash, write `\\`.
+
+Other characters, like `+`, `-`, `{`, `}` or `;`, can be written as is in the trigger dialog: a trigger like `+100 experience points.` works without any special care, CocoMUD escapes them when it saves your configuration.  If you write triggers directly in SharpScript, see [escaping special characters in SharpScript](sharpscript.md#escaping-special-characters).
+
 ## CocoMUD channels in triggers
 
 CocoMUD has a more interesting feature of channels.  A channel is basically a list of events.  It will store these events and you can display this list whenever you want.  It might be useful, for instance, when exploring the game and not paying particular attention to some messages (on the public channel, or the ooc channel, for instance).  Afterward you might want to read them, so you display the list of messages.

@@ -39,6 +39,10 @@ from sharp.exceptions import ScriptInterrupt
 
 # Constants
 RE_VAR = re.compile(r"(?<!\\)\$\{?([A-Za-z0-9_]+)\}?")
+RE_FLAG = re.compile(r"^[+-][A-Za-z_]\w*(=\S*)?$")
+
+# Characters that a leading backslash protects at the start of an argument
+LEADING_ESCAPES = "+-{\\"
 
 class SharpScript:
 
@@ -198,7 +202,7 @@ class SharpScript:
             if argument.startswith("{+"):
                 argument = repr(dedent(argument))
             elif argument.startswith("{"):
-                argument = argument[1:-1]
+                argument = self.unescape_argument(argument[1:-1])
                 argument = self.replace_semicolons(argument)
                 if variables:
                     argument = self.replace_variables(argument)
@@ -213,6 +217,7 @@ class SharpScript:
                     kwargs[argument[1:]] = argument[0] == "+"
                 continue
             else:
+                argument = self.unescape_argument(argument)
                 argument = self.replace_semicolons(argument)
                 if variables:
                     argument = self.replace_variables(argument)
@@ -325,7 +330,11 @@ class SharpScript:
         i = 0
         while i < len(text):
             char = text[i]
-            if char == "{":
+            if char == "\\":
+                # An escaped brace (\{ or \}) doesn't count
+                i += 2
+                continue
+            elif char == "{":
                 level += 1
             elif char == "}":
                 level -= 1
@@ -401,9 +410,14 @@ class SharpScript:
 
         """
         if isinstance(content, str):
+            # The arguments are already written in SharpScript
             instructions, _ = self.split_statements(content)
+            escape = self.wrap_argument
         else:
+            # The arguments are values, except for the flags
             instructions = content
+            escape = lambda argument: argument if RE_FLAG.search(
+                    argument) else self.escape_argument(argument)
 
         # At this stage, the instructions are formatted in Python
         lines = []
@@ -413,7 +427,7 @@ class SharpScript:
 
             # Escape the arguments if necessary
             for i, argument in enumerate(arguments):
-                arguments[i] = self.escape_argument(argument)
+                arguments[i] = escape(argument)
 
             line = function + " " + " ".join(arguments)
             lines.append(line.rstrip(" "))
@@ -425,9 +439,22 @@ class SharpScript:
         else:
             return lines
 
+    def statement(self, function, *arguments, flags=()):
+        """Write a statement whose arguments are values.
+
+        Contrary to 'format', every argument is escaped so it is
+        read back unchanged, semi-colons included:  this is meant to
+        save objects (like triggers) in a configuration file.  The
+        flags (like '+mute') are written as is after the arguments.
+
+        """
+        arguments = [self.escape_argument(argument, semicolons=True)
+                for argument in arguments]
+        return " ".join((function, ) + tuple(arguments) + tuple(flags))
+
     @staticmethod
-    def escape_argument(argument):
-        """Escape the argument if needed."""
+    def wrap_argument(argument):
+        """Surround the argument with braces if needed."""
         if argument.startswith("{"):
             pass
         elif "\n" in argument:
@@ -435,6 +462,96 @@ class SharpScript:
             argument = "{\n    " + "\n    ".join(lines) + "\n}"
         elif " " in argument or argument == "":
             argument = "{" + argument + "}"
+
+        return argument
+
+    @classmethod
+    def escape_argument(cls, argument, semicolons=False):
+        """Escape a value so it can be read back as a single argument.
+
+        The value is surrounded by braces if needed and the characters
+        that SharpScript would interpret are escaped:
+
+        * A value beginning with '+' or '-' would be read as a flag,
+          or as Python code ('{+'), it is written '\\+' or '\\-'.
+        * A value beginning with '{' would be read as a block,
+          it is written '\\{'.
+        * Unbalanced braces are escaped ('\\{' and '\\}').
+        * If 'semicolons' is set, semi-colons are doubled, so they
+          aren't read as statement separators.
+
+        Python code ('{+ ... }') is never modified.
+
+        """
+        if argument.startswith("{+") and argument.endswith("}"):
+            return argument
+
+        if semicolons:
+            argument = argument.replace(";", ";;")
+
+        unbalanced = not cls.balanced(argument)
+        block = False
+        bare = " " not in argument and argument != ""
+        if "\n" not in argument:
+            first = argument[:1]
+            second = argument[1:2]
+            if first == "+" or (first in ("-", "{") and bare):
+                argument = "\\" + argument
+            elif first == "{":
+                # Braces are needed, they wouldn't be added
+                block = True
+            elif first == "\\" and second and second in LEADING_ESCAPES:
+                argument = "\\" + argument
+            elif bare and argument.startswith("##"):
+                argument = "#" + argument
+
+        if unbalanced:
+            argument = re.sub(r"(?<!\\)([{}])", r"\\\1", argument)
+
+        # A final backslash would escape the closing brace
+        if not bare and "\n" not in argument and argument.endswith("\\"):
+            argument += "\\"
+
+        if block:
+            return "{" + argument + "}"
+
+        return cls.wrap_argument(argument)
+
+    @staticmethod
+    def balanced(text):
+        """Return whether the braces in the text are balanced.
+
+        Escaped braces (\\{ and \\}) are ignored.
+
+        """
+        level = 0
+        i = 0
+        while i < len(text):
+            char = text[i]
+            if char == "\\":
+                i += 1
+            elif char == "{":
+                level += 1
+            elif char == "}":
+                level -= 1
+                if level < 0:
+                    return False
+
+            i += 1
+
+        return level == 0
+
+    @staticmethod
+    def unescape_argument(argument):
+        """Remove the backslash protecting the first character.
+
+        Only the first character is considered, so that the escaped
+        arguments of nested statements are kept for when they run.
+
+        """
+        if argument.startswith("\\") and argument[1:2] and \
+                argument[1] in LEADING_ESCAPES:
+            argument = argument[1:]
 
         return argument
 
@@ -468,6 +585,6 @@ class SharpScript:
                 if "\n" in argument:
                     argument = dedent(argument.strip("\n"))
 
-            arguments.append(argument)
+            arguments.append(self.unescape_argument(argument))
 
         return function, arguments, flags

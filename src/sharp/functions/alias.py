@@ -29,6 +29,7 @@
 """Module containing the Alias function class."""
 
 from scripting.alias import Alias as ObjAlias
+from scripting.pattern import unwrap_python
 from sharp import Function
 
 class Alias(Function):
@@ -37,6 +38,6 @@ class Alias(Function):
 
     def run(self, alias, action):
         """Create an alias."""
-        alias = ObjAlias(self.sharp_engine, alias, action)
+        alias = ObjAlias(self.sharp_engine, unwrap_python(alias), action)
         if self.world:
             self.world.add_alias(alias)

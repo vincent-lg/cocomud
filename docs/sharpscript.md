@@ -150,6 +150,21 @@ If you want o write a semi-colon in your SharpScript command, just put two semi-
 #say {I would like to display something;; but I'm not sure what.}
 ```
 
+## Escaping special characters
+
+A few characters have a meaning in SharpScript at the beginning of an argument: `+` and `-` mark a [flag](#flags), `{+` begins [Python code](#embedding-python-into-sharpscript) and `{` begins a long argument.  To use them as ordinary characters at the beginning of an argument, put a backslash (`\`) before them:
+
+```
+#trigger {\+100 experience points.} {#play levelup.wav}
+#trigger \-5 {#say Ouch!}
+```
+
+Without the backslash, `{+100 experience points.}` would be read as Python code, and `-5` as a flag.  You can also write `\{` and `\}` to use a brace that has no matching brace, and `\\` for a backslash before one of these characters.
+
+You don't need to do that when you create triggers, aliases or macros through the interface: CocoMUD escapes these characters (semi-colons included) when it saves your configuration.
+
+In triggers and aliases, the backslash also makes `*` an ordinary asterisk: `\*` matches an asterisk, not anything.  See [matching special characters](triggers.md#matching-special-characters).
+
 ## Flags
 
 Some commands support flags:  Flags are here to influence the behavior of a function in some way.  The best example available at this time is the `#say` command we have seen.  By default, it displays the provided text, sends it to the screen reader to be spoken, and to the Braille display to be displayed.  There are three flags that control that:

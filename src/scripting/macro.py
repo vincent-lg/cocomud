@@ -66,8 +66,8 @@ class Macro:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this macro."""
-        return self.sharp_engine.format((("#macro", self.shortcut,
-                self.action), ))
+        return self.sharp_engine.statement("#macro", self.shortcut,
+                self.action)
 
     @property
     def copied(self):

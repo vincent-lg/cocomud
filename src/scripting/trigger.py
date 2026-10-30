@@ -33,6 +33,7 @@ import re
 from textwrap import dedent
 
 from log import sharp as logger
+from scripting.pattern import pattern_to_regex
 
 class Trigger:
 
@@ -69,21 +70,22 @@ class Trigger:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this trigger."""
-        arguments = ["#trigger", self.reaction, self.action]
+        arguments = [self.reaction, self.action]
         if self.substitution:
             arguments.append(self.substitution)
 
+        flags = []
         if self.mute:
-            arguments.append("+mute")
+            flags.append("+mute")
         if self.mark:
-            arguments.append("+mark")
+            flags.append("+mark")
         if self.show_if:
-            arguments.append("+show_if=" + self.show_if)
+            flags.append("+show_if=" + self.show_if)
         if self.hide_if:
-            arguments.append("+hide_if=" + self.hide_if)
+            flags.append("+hide_if=" + self.hide_if)
 
-        statement = self.sharp_engine.format((tuple(arguments), ))
-        return statement
+        return self.sharp_engine.statement("#trigger", *arguments,
+                flags=flags)
 
     @property
     def copied(self):
@@ -113,12 +115,7 @@ class Trigger:
         if reaction.startswith("^"):
             return re.compile(reaction)
 
-        reaction = re.escape(reaction)
-
-        # The '*' sign will be replaced by a group
-        reaction = reaction.replace("\\*", "(.*?)")
-        reaction = "^" + reaction + "$"
-
+        reaction = pattern_to_regex(reaction)
         return re.compile(reaction, re.IGNORECASE | re.UNICODE)
 
     def set_variables(self, match):
@@ -168,7 +165,8 @@ class Trigger:
 
         """
         engine = self.sharp_engine
-        return engine.replace_variables(self.substitution)
+        substitution = engine.replace_variables(self.substitution)
+        return substitution.replace("\\{", "{").replace("\\}", "}")
 
     def is_visible(self):
         """Return whether the triggered line should be displayed.

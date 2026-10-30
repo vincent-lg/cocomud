@@ -32,6 +32,7 @@ import re
 from textwrap import dedent
 
 from log import logger
+from scripting.pattern import pattern_to_regex
 
 class Alias:
 
@@ -59,8 +60,8 @@ class Alias:
     @property
     def sharp_script(self):
         """Return the SharpScript code to create this alias."""
-        return self.sharp_engine.format((("#alias", self.alias,
-                self.action), ))
+        return self.sharp_engine.statement("#alias", self.alias,
+                self.action)
 
     def find_regex(self, alias):
         """Find and compile the alias given as argument.
@@ -73,12 +74,7 @@ class Alias:
         if alias.startswith("^"):
             return re.compile(alias)
 
-        alias = re.escape(alias)
-
-        # The '*' sign will be replaced by a group
-        alias = alias.replace("\\*", "(.*?)")
-        alias = "^" + alias + "$"
-
+        alias = pattern_to_regex(alias)
         return re.compile(alias, re.IGNORECASE)
 
     @property

@@ -28,6 +28,7 @@
 
 """Module containing the Trigger function class."""
 
+from scripting.pattern import unwrap_python
 from scripting.trigger import Trigger as ObjTrigger
 from sharp import Function
 
@@ -37,9 +38,9 @@ class Trigger(Function):
 
     def run(self, reaction, action, substitution="", mute=False,
             mark=False, show_if="", hide_if=""):
-        """Say the text."""
-        trigger = ObjTrigger(self.sharp_engine, reaction, action,
-                substitution)
+        """Create a trigger."""
+        trigger = ObjTrigger(self.sharp_engine, unwrap_python(reaction),
+                action, substitution)
         trigger.mute = mute
         trigger.mark = mark
         trigger.show_if = show_if
