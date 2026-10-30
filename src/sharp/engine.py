@@ -94,29 +94,33 @@ class SharpScript:
                 code, variables=variables, first=True
             )
             instructions = "\n".join(instructions).splitlines()
-            pycode = "def script():\n    " + "\n    ".join(instructions) + "\n    yield None"
             globals = self.globals
             globals["vars"] = self.locals
-            locals = {}
+            self.apply_pending()
+            script = self.compile_script(instructions)
+
+            # The script's variables are local to the function, writing
+            # them in its frame has no effect:  the existing variables
+            # the script uses are assigned at its beginning instead.
+            names = [name for name in script.__code__.co_varnames
+                    if name in self.locals and name != "vars"]
+            if names:
+                instructions = ["{} = vars[{}]".format(name, repr(name))
+                        for name in names] + instructions
+                script = self.compile_script(instructions)
 
             if debug:
                 self.logger.debug("Executing SharpScript\n{}".format(
-                        pycode))
-            exec(pycode, globals, locals)
-            script = locals["script"]
+                        "\n".join(instructions)))
             code = script()
 
         # code is a generator, consume it little by little
         self.apply_pending()
 
-        # Only synchronize the script's real local variables: the frame
-        # keeps a copy of whatever is pushed in it, and a paused script
-        # would otherwise restore stale (possibly deleted) variables
-        # when it resumes.
+        # Only synchronize the script's real local variables: a paused
+        # script would otherwise restore stale (possibly deleted)
+        # variables when it resumes.
         varnames = set(code.gi_code.co_varnames)
-        f_locals = code.gi_frame.f_locals
-        f_locals.update({name: val for name, val in self.locals.items()
-                if name in varnames})
 
         value = None
         try:
@@ -144,6 +148,14 @@ class SharpScript:
             reactor.callLater(
                 value, self.execute, code, debug, variables, to_process
             )
+
+    def compile_script(self, instructions):
+        """Return the generator function running the instructions."""
+        pycode = "def script():\n    " + "\n    ".join(instructions) + \
+                "\n    yield None"
+        locals = {}
+        exec(pycode, self.globals, locals)
+        return locals["script"]
 
     def apply_pending(self):
         """Apply the variables set or deleted by '#writevar'."""
